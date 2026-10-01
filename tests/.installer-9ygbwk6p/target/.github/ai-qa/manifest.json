@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "prefix": "qa",
+  "framework_version": "1.0.0",
+  "files": {
+    ".github/agents/qa-review.agent.md": "ff4ff2f46b84bdb104275cb6b724bd1fdb84446c90c55fd8c899a79bb4b1039c",
+    ".github/ai-qa/framework/rules.md": "4b3235c9d2555c5d5363fb13ad718399606407091769ffad0514b8352394f6d6",
+    ".github/instructions/qa-policy.instructions.md": "19667cd7243831f9a8f60b64ae0e61c7fa9cd64225b2aead93188680716ef01b",
+    ".github/skills/qa-plan/SKILL.md": "029adaab94eef86bbb56b4713d8ef80b518d86031565003d0b50142260290ce2"
+  },
+  "block": "c54c0b1708ee6d0c92f1ddf0d60ff39e958a2e5311a120a37285cfce444a5ca8",
+  "ignore_block": "b014b0f0644821703b4b8fbb54c442df2ec18bf68bc29a754fa9f524bfe90833"
+}

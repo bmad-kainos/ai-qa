@@ -59,15 +59,22 @@ class InstallersTest(unittest.TestCase):
                     self.assertIn("Existing project settings", original.read_text())
                     self.assertFalse((self.target / ".github/ai-qa/project").exists())
                     self.assertFalse((self.target / ".github/agents/unrelated.agent.md").exists())
+                    rendered = self.target / ".github/instructions/qa-project.instructions.md"
+                    rendered.parent.mkdir(parents=True, exist_ok=True)
+                    rendered.write_text("project-owned rendering\n")
                     self.call(runner, "--verify")
                     self.write_source(".github/agents/qa-review.agent.md", "agent v2\n")
+                    self.write_source("CHANGELOG.md", "Release notes for installer test\n")
                     self.call(runner, "update", "--dry-run")
                     self.assertEqual((self.target / ".github/agents/qa-review.agent.md").read_text(), "agent v1\n")
-                    self.call(runner, "update")
+                    update = self.call(runner, "update").stdout
+                    self.assertIn("Release notes for installer test", update)
+                    self.assertIn("qa-configure refresh", update)
                     self.assertEqual((self.target / ".github/agents/qa-review.agent.md").read_text(), "agent v2\n")
                     self.call(runner, "verify")
                     self.call(runner, "uninstall")
                     self.assertEqual(original.read_text(), "Existing project settings\n")
+                    self.assertEqual(rendered.read_text(), "project-owned rendering\n")
                     self.assertFalse((self.target / ".github/agents/qa-review.agent.md").exists())
                     self.assertFalse((self.target / ".github/ai-qa/manifest.json").exists())
 
@@ -108,15 +115,24 @@ class InstallersTest(unittest.TestCase):
                     project = self.target / ".github/ai-qa/project/project.md"
                     project.parent.mkdir(parents=True)
                     project.write_text("project knowledge\n")
+                    baseline = self.target / ".github/ai-qa/baselines/previous.md"
+                    baseline.parent.mkdir(parents=True)
+                    baseline.write_text("old baseline\n")
+                    work_baseline = self.target / "qa-work/example/outputs/baseline.md"
+                    work_baseline.parent.mkdir(parents=True)
+                    work_baseline.write_text("work baseline\n")
                     unrelated = self.target / ".github/workflows/ci.yml"
                     unrelated.parent.mkdir(parents=True)
                     unrelated.write_text("keep workflow\n")
+                    self.call(runner, "purge", ok=False)
                     self.call(runner, "verify")
                     self.call(runner, "uninstall")
                     self.assertEqual(project.read_text(), "project knowledge\n")
                     self.call(runner, "install", "--prefix", "other")
-                    self.call(runner, "purge")
+                    self.call(runner, "purge", "--yes")
                     self.assertFalse(project.exists())
+                    self.assertFalse(baseline.exists())
+                    self.assertFalse(work_baseline.exists())
                     self.assertEqual(collision.read_text(), "custom\n")
                     self.assertEqual(unrelated.read_text(), "keep workflow\n")
                     self.call(runner, "install", "--prefix", "other")
@@ -125,6 +141,48 @@ class InstallersTest(unittest.TestCase):
                     manifest["files"][".github/ai-qa/project/project.md"] = "0" * 64
                     manifest_path.write_text(json.dumps(manifest))
                     self.call(runner, "uninstall", ok=False)
+
+    def test_namespace_collision_and_prefixed_metadata(self):
+        for runner in ("sh", "ps1"):
+            with self.subTest(runner=runner):
+                with self.recreate():
+                    for relative in (".github/agents/qa-local.agent.md",
+                                     ".github/skills/qa-local/SKILL.md",
+                                     ".github/instructions/qa-local.instructions.md"):
+                        path = self.target / relative
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        path.write_text("user owned\n")
+                    self.call(runner, "install", ok=False)
+                    self.assertFalse((self.target / ".github/ai-qa/manifest.json").exists())
+                    self.write_source(".github/agents/qa-review.agent.md",
+                                      "---\nname: qa-review\n---\nUse qa-plan and qa-work.\n")
+                    self.write_source(".github/skills/qa-plan/SKILL.md",
+                                      "---\nname: qa-plan\n---\nSee qa-review.\n")
+                    self.call(runner, "install", "--prefix", "other")
+                    agent = (self.target / ".github/agents/other-review.agent.md").read_text()
+                    skill = (self.target / ".github/skills/other-plan/SKILL.md").read_text()
+                    self.assertIn("name: other-review", agent)
+                    self.assertIn("Use other-plan and qa-work", agent)
+                    self.assertIn("name: other-plan", skill)
+                    self.assertIn("See other-review", skill)
+                    self.call(runner, "verify")
+
+    def test_framework_version_and_project_status(self):
+        for runner in ("sh", "ps1"):
+            with self.subTest(runner=runner):
+                with self.recreate():
+                    self.call(runner, "install")
+                    self.assertIn("project layer is not configured", self.call(runner, "verify").stdout)
+                    project = self.target / ".github/ai-qa/project/project.md"
+                    project.parent.mkdir(parents=True)
+                    project.write_text("configured\n")
+                    (project.parent / "conventions").mkdir()
+                    self.assertNotIn("WARN:", self.call(runner, "verify").stdout)
+                    manifest_path = self.target / ".github/ai-qa/manifest.json"
+                    manifest = json.loads(manifest_path.read_text())
+                    manifest["framework_version"] = "0.0.0"
+                    manifest_path.write_text(json.dumps(manifest))
+                    self.call(runner, "verify", ok=False)
 
     def test_instruction_conflict_and_self_guard(self):
         for runner in ("sh", "ps1"):
@@ -185,7 +243,8 @@ class FixtureIntegrationTest(unittest.TestCase):
                         def invoke(which, command, success=True):
                             base = (["bash", str(ROOT / "install.sh")] if which == "sh"
                                     else ["pwsh", "-NoProfile", "-File", str(ROOT / "install.ps1")])
-                            result = subprocess.run(base + [command, str(target)], cwd=ROOT,
+                            extra = ["--yes"] if command == "purge" else []
+                            result = subprocess.run(base + [command, *extra, str(target)], cwd=ROOT,
                                                     capture_output=True, text=True)
                             self.assertEqual(result.returncode == 0, success,
                                              f"{fixture.name}/{which}/{command}: {result.stdout}\n{result.stderr}")
