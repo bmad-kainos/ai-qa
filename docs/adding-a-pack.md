@@ -1,6 +1,6 @@
 # Adding a pack
 
-Packs live in `payload/.github/ai-qa/framework/packs/<id>/`. Start from `packs/_TEMPLATE/`.
+Packs live in `.github/ai-qa/framework/packs/<id>/`. Start from `packs/_TEMPLATE/`.
 
 ## Files
 

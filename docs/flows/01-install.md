@@ -29,11 +29,11 @@ Collisions are checked against existing `qa*` agents, `qa-*` skills and `qa*` in
 flowchart TD
   A(["install.sh update /path/to/project"])
   A --> B["Read manifest and version"]
-  B --> C{"Each payload file"}
+  B --> C{"Each framework file"}
   C -->|unchanged| C1["Skip"]
   C -->|"hash matches manifest"| C2["Replace"]
   C -->|"edited locally"| C3["Keep, write .ai-qa-new"]
-  B --> D{"Each file dropped<br/>from the payload"}
+  B --> D{"Each file dropped<br/>from the framework"}
   D -->|unmodified| D1["Delete"]
   D -->|modified| D2["Keep and warn"]
   C1 --> E["Rewrite manifest"]

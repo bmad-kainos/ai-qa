@@ -35,16 +35,16 @@ class SyntheticInstallerTests(unittest.TestCase):
         (self.source / "CHANGELOG.md").write_text("# Changelog\n\n## v1.0.0\nSynthetic notes.\n")
         (self.source / "docs").mkdir()
         (self.source / "docs/migrations.md").write_text("# Migrations\n\nrefresh-required: 1.0.0\n")
-        self.payload("agents/qa.agent.md", "Agent uses qa-plan and qa-configure.\n")
-        self.payload("agents/qa-configure.agent.md", "Configure.\n")
-        self.payload("skills/qa-plan/SKILL.md", "See qa.agent.md.\n")
-        self.payload("skills/qa-plan/references/check.md", "Reference v1.\n")
-        self.payload("ai-qa/framework/method/rules.md", "Framework v1.\n")
-        self.payload("ai-qa/framework/method/retired.md", "Removed next version.\n")
-        self.payload("instructions/qa-rendered.instructions.md", "Configure-owned, never installed.\n")
+        self.framework_file("agents/qa.agent.md", "Agent uses qa-plan and qa-configure.\n")
+        self.framework_file("agents/qa-configure.agent.md", "Configure.\n")
+        self.framework_file("skills/qa-plan/SKILL.md", "See qa.agent.md.\n")
+        self.framework_file("skills/qa-plan/references/check.md", "Reference v1.\n")
+        self.framework_file("ai-qa/framework/method/rules.md", "Framework v1.\n")
+        self.framework_file("ai-qa/framework/method/retired.md", "Removed next version.\n")
+        self.framework_file("instructions/qa-rendered.instructions.md", "Configure-owned, never installed.\n")
 
-    def payload(self, relative, text):
-        path = self.source / "payload/.github" / relative
+    def framework_file(self, relative, text):
+        path = self.source / ".github" / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text)
 
@@ -91,8 +91,8 @@ class SyntheticInstallerTests(unittest.TestCase):
 
                 edited = self.target / ".github/ai-qa/framework/method/rules.md"
                 edited.write_text("project edit\n")
-                (self.source / "payload/.github/ai-qa/framework/method/retired.md").unlink()
-                self.payload("ai-qa/framework/method/new.md", "New framework file.\n")
+                (self.source / ".github/ai-qa/framework/method/retired.md").unlink()
+                self.framework_file("ai-qa/framework/method/new.md", "New framework file.\n")
                 (self.source / "VERSION").write_text("1.1.0\n")
                 (self.source / "CHANGELOG.md").write_text("# Changelog\n\n## v1.1.0\nUpdate notes.\n\n## v1.0.0\nOld.\n")
                 (self.source / "docs/migrations.md").write_text("# Migrations\n\nrefresh-required: 1.1.0\n")
@@ -163,8 +163,8 @@ class SyntheticInstallerTests(unittest.TestCase):
                 self.call(runner, "uninstall", expected=1)
 
 
-class RealPayloadTests(unittest.TestCase):
-    def test_install_update_uninstall_with_shipped_payload(self):
+class RealFrameworkTests(unittest.TestCase):
+    def test_install_update_uninstall_with_shipped_framework(self):
         with tempfile.TemporaryDirectory(prefix="ai-qa-real-") as temporary:
             base = Path(temporary)
             for name, runner in runners():

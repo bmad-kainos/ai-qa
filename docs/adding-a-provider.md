@@ -1,6 +1,6 @@
 # Adding a provider
 
-Providers live in `payload/.github/ai-qa/framework/providers/<provider>.md`. The operation contract they implement is in `operations.md`.
+Providers live in `.github/ai-qa/framework/providers/<provider>.md`. The operation contract they implement is in `operations.md`.
 
 ## Contract
 
@@ -29,7 +29,7 @@ Each operation must return the fields that `operations.md` requires. For example
 - MCP is optional. A manual fallback must always exist.
 - L4 operations are invoked only through `qa-publish`, which applies the gate protocol. `qa-create-pr` is the exception: it creates PRs through `repo.pr.create` behind its own L4 gate.
 - If the preferred transport fails, the skill says so and falls back to the next one.
-- Never add client code or libraries to the payload.
+- Never add client code or libraries to the framework files.
 
 ## Checklist
 

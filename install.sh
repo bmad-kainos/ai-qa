@@ -11,7 +11,7 @@ usage() {
 }
 fail() { printf 'Error: %s\n' "$1" >&2; exit 1; }
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-SOURCE="$SCRIPT_DIR/payload/.github"
+SOURCE="$SCRIPT_DIR/.github"
 [[ -f "$SCRIPT_DIR/VERSION" ]] || fail 'Missing VERSION next to installer'
 VERSION="$(sed -n '1{s/[[:space:]]//g;p;}' "$SCRIPT_DIR/VERSION")"
 [[ -n "$VERSION" ]] || fail 'VERSION is empty'
@@ -34,8 +34,8 @@ if ((PURGE)) && [[ "$COMMAND" != uninstall ]]; then fail '--purge requires unins
 [[ -d "$TARGET" ]] || fail "Target is not a directory: $TARGET"
 [[ ! -L "$TARGET" ]] || fail "Refusing symlink target: $TARGET"
 TARGET="$(cd "$TARGET" && pwd -P)"
-if [[ "$COMMAND" != verify && ( "$TARGET" == "$SCRIPT_DIR" || ( -f "$TARGET/install.sh" && -d "$TARGET/payload/.github/ai-qa/framework" ) ) ]]; then fail 'Refusing to modify the AI-QA source repository itself'; fi
-[[ -d "$SOURCE" ]] || fail 'Missing payload/.github next to installer'
+if [[ "$COMMAND" != verify && ( "$TARGET" == "$SCRIPT_DIR" || ( -f "$TARGET/install.sh" && -d "$TARGET/.github/ai-qa/framework" ) ) ]]; then fail 'Refusing to modify the AI-QA source repository itself'; fi
+[[ -d "$SOURCE" ]] || fail 'Missing .github framework folder next to installer'
 
 hash_file() {
     if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | awk '{print $1}'
@@ -153,7 +153,7 @@ if [[ "$COMMAND" != uninstall ]]; then
     esac
     printf '%s|%s\n' "$outrel" "$staged" >> "$desired"
   done < "$tmp/source-list"
-  [[ -s "$desired" ]] || fail 'No framework-owned files found in payload'
+  [[ -s "$desired" ]] || fail 'No framework-owned files found in .github'
 fi
 
 collisions="$tmp/collisions" plan="$tmp/plan" new_files="$tmp/new-files" modified="$tmp/modified"

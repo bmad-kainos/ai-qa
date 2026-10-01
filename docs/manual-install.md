@@ -2,7 +2,7 @@
 
 Use these steps when the installer scripts cannot be run. The repository root is the target.
 
-1. Copy only `payload/.github/agents/qa*.agent.md`, `payload/.github/skills/qa-*/` (including all nested references and assets), and `payload/.github/ai-qa/framework/` to the matching `.github/` paths. Do not copy rendered instructions or anything under `payload/.github/ai-qa/project/` or `baselines/`.
+1. From an AI-QA checkout, copy only `.github/agents/qa*.agent.md`, `.github/skills/qa-*/` (including all nested references and assets), and `.github/ai-qa/framework/` to the same paths in your project. Do not copy rendered instructions or anything under `.github/ai-qa/project/` or `baselines/`.
 2. Create `.github/copilot-instructions.md` if it does not exist. Preserve all existing content and add or replace only this marked pointer block:
 
 	```markdown

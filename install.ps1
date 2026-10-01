@@ -11,7 +11,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $Encoding = New-Object System.Text.UTF8Encoding($false)
 $ScriptDir = (Resolve-Path -LiteralPath $PSScriptRoot).Path
-$SourceRoot = Join-Path $ScriptDir 'payload/.github'
+$SourceRoot = Join-Path $ScriptDir '.github'
 $Version = (Get-Content -LiteralPath (Join-Path $ScriptDir 'VERSION') -Raw).Trim()
 $ManifestRel = '.github/ai-qa/manifest.json'
 $Begin = '<!-- ai-qa:start -->'; $End = '<!-- ai-qa:end -->'
@@ -135,10 +135,10 @@ try {
     if (IsLink $Target) { Fail "Refusing symlink target: $Target" }
     $ResolvedTarget = (Resolve-Path -LiteralPath $Target).Path
     if ($Command -ne 'verify' -and ($ResolvedTarget -eq $ScriptDir -or
-        ((Test-Path (Join-Path $ResolvedTarget 'install.sh')) -and (Test-Path (Join-Path $ResolvedTarget 'payload/.github/ai-qa/framework'))))) {
+        ((Test-Path (Join-Path $ResolvedTarget 'install.sh')) -and (Test-Path (Join-Path $ResolvedTarget '.github/ai-qa/framework'))))) {
         Fail 'Refusing to modify the AI-QA source repository itself'
     }
-    if (-not (Test-Path -LiteralPath $SourceRoot -PathType Container)) { Fail 'Missing payload/.github next to installer' }
+    if (-not (Test-Path -LiteralPath $SourceRoot -PathType Container)) { Fail 'Missing .github framework folder next to installer' }
     $ManifestPath = SafePath $ManifestRel
     $Manifest = ReadManifest $ManifestPath
     if ($Command -in @('update', 'uninstall') -and -not $Manifest) { Fail "No managed installation to $Command" }
@@ -206,7 +206,7 @@ try {
             }
             $desired['.github/' + $tail] = $bytes
         }
-        if (-not $desired.Count) { Fail 'No framework-owned files found in payload' }
+        if (-not $desired.Count) { Fail 'No framework-owned files found in .github' }
     }
 
     $collisions = [Collections.Generic.List[string]]::new(); $plan = [Collections.Generic.List[object]]::new()
