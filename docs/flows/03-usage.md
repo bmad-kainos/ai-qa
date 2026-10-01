@@ -39,9 +39,9 @@ You can also call any `qa-*` skill directly and skip `@qa`.
 flowchart TD
   D1["qa-analyse-requirement"] --> RD{"Readiness Red?"}
   RD -->|yes| STOP(["Stop: refinement questions"])
-  RD -->|no| D2["qa-code-context"]
+  RD -->|no| D2["qa-map-code"]
   D2 --> D3["qa-coverage-gaps"]
-  D3 --> D4["qa-design-tests"]
+  D3 --> D4["qa-design-scenarios"]
   D4 --> D5["qa-regression-risk"]
   D5 --> D6["qa-automation-plan"]
   D6 --> D7["qa-review-tests (design)"]
@@ -50,13 +50,13 @@ flowchart TD
   D8 --> DS(["QA Summary in chat"])
 ```
 
-`qa-code-context` also runs `verify` when you give it a branch. `qa-coverage-gaps` runs at requirement scope. `qa-review-tests` runs as a subagent where the host supports it.
+`qa-map-code` also runs `verify` when you give it a branch. `qa-coverage-gaps` runs at requirement scope. `qa-review-tests` runs as a subagent where the host supports it.
 
 ## automate
 
 ```mermaid
 flowchart TD
-  A1["Approved design or spec"] --> A2["qa-branch<br/>propose, then create local (L2)"]
+  A1["Approved design or spec"] --> A2["qa-create-branch<br/>propose, then create local (L2)"]
   A2 --> A3["qa-generate-tests<br/>inventory first (L1)"]
   A3 --> A4["qa-review-tests (code)"]
   A4 --> A5["qa-run-tests<br/>(L3 unless safe)"]

@@ -1,20 +1,20 @@
 ---
-name: qa-branch
+name: qa-create-branch
 description: Propose a branch from confirmed repository conventions, create it locally after L2 approval, and treat push as a separate L4 action.
 argument-hint: "[task/work-id and optional proposed base or branch name]"
 ---
 
-# Prepare branch
+# Create Branch
 Resolve and validate a branch proposal from this repository's recorded conventions. The proposal has no side effect; local creation is a separate gated action, and pushing is always separate.
 
 ## When to use
 Use when QA work needs an isolated branch or when validating a proposed branch against project rules. Do not use as implicit approval to commit, push, create a PR, merge, discard work or edit project conventions.
 
 ## Reads
-Always read `.github/ai-qa/project/project.md` for project/repository identity and source context; read `.github/ai-qa/project/conventions/git.md` sections `Remote host`, `Base branch`, `Protected branches`, `Branch patterns`, `Ticket syntax`, and related PR/commit conventions, plus `conventions/qa-process.md` `Team options` for an optional branch-description length rule. Read `.github/ai-qa/framework/method/{safety,discovery,artefacts,git}.md`, repository contributing guidance and current `qa-work/<work-id>/index.md` if present. Inspect actual branch, HEAD, refs and dirty state. If project configuration is missing, use read-only repository evidence; for missing values only, consult `.github/ai-qa/framework/defaults/git.md`, mark each chosen fallback `★ Default`, and suggest `qa-configure`. Never hard-code a branch or base name.
+Always read `.github/ai-qa/project/project.md` for project/repository identity and source context; read `.github/ai-qa/project/conventions/git.md` sections `Remote host`, `Base branch`, `Protected branches`, `Branch patterns`, `Ticket syntax`, and related PR/commit conventions, plus `conventions/qa-process.md` `Team options` for an optional branch-description length rule. Read `.github/ai-qa/framework/method/{safety,discovery,artefacts,work-id-and-git}.md`, repository contributing guidance and current `qa-work/<work-id>/index.md` if present. Inspect actual branch, HEAD, refs and dirty state. If project configuration is missing, use read-only repository evidence; for missing values only, consult `.github/ai-qa/framework/defaults/git.md`, mark each chosen fallback `★ Default`, and suggest `qa-configure`. Never hard-code a branch or base name.
 
 ## Work-id
-Resolve per `.github/ai-qa/framework/method/git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
+Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
 Take task/work ID, optional requested name/base and whether the user is asking only for a proposal or authorising local creation. Gather current branch, base/default branch, protected branches, branch/ticket patterns, remote, matching existing refs and dirty-tree state. If task or naming cannot be resolved, state the evidence gap and offer a convention-compliant proposal; never invent a ticket key.
@@ -33,7 +33,7 @@ Present the proposal in chat. When creation is approved, write the step result t
 ```yaml
 ---
 work-id: "<work-id>"
-skill: "qa-branch"
+skill: "qa-create-branch"
 framework-version: "<installed-version-or-unknown>"
 created: "<UTC-ISO-8601>"
 inputs:

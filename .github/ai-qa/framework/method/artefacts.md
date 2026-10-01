@@ -47,6 +47,8 @@ inputs:
 
 `inputs` lists every decision-relevant upstream source: ticket/AC revision, branch/commit, project context and conventions, applicable pack/version, earlier analysis artefacts and test-run IDs as appropriate. Do not put secrets in metadata. For non-Markdown outputs use a suitable metadata comment/header when the format supports it; log raw-log provenance in `execution.md` and the index, not by modifying logs.
 
+Start each skill-produced artefact from `.github/ai-qa/framework/templates/artefact.md`. It provides this front-matter, a scope and status line, a skill-specific output section and the **Drift** section that every skill must include. Start `index.md` from `templates/work-index.md` instead.
+
 ## Staleness
 
 An artefact is **stale if any input is newer or has changed** since the artefact was generated. On resume, check the current revision/time of every listed input. Mark the artefact stale and refresh or explicitly defer it, then check downstream dependants. An unchanged file path does not prove freshness; a source that cannot be checked is `?`, not current. Reuse only non-stale work and preserve stable FR/NFR IDs across updates. State source revision, environment, result provenance and uncertainty.

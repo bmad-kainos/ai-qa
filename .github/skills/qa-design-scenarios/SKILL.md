@@ -1,10 +1,10 @@
 ---
-name: qa-design-tests
+name: qa-design-scenarios
 description: Design a lean, traceable set of deterministic manual scenarios (Given/When/Then or numbered steps, per the project's Scenario format) focused on business outcomes, boundaries and risks not already adequately covered by unit tests.
 argument-hint: "[ticket, requirements or feature; optional work-id]"
 ---
 
-# Design Manual Tests
+# Design Manual Scenarios
 
 Generate a lean set of manual scenarios, in the project's configured Scenario format (`bdd` Given/When/Then by default, or `steps`), that avoid duplicating unit and integration coverage, focusing instead on business-level acceptance, cross-service behavior and edge cases that need real data or infrastructure. Scenarios must be clear, reproducible, deterministic and traceable to stable requirement IDs.
 
@@ -20,7 +20,7 @@ If the project layer is missing, use supplied/repository evidence, state environ
 
 ## Work-id
 
-Resolve per `.github/ai-qa/framework/method/git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
+Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
 
@@ -86,7 +86,7 @@ When creating test data, use a consistent identifier pattern linking data to the
 
 ## Output
 
-Write `qa-work/<work-id>/design.md` with front matter `work-id`, `skill: qa-design-tests`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirement, coverage and environment revisions). Include numbered/tagged scenarios in the configured format (state the format used at the top of the file), each with `Covers: FRn, NFRn`, environment/setup/cleanup and expected evidence. Add **Scenarios Not Written** listing IDs/categories deliberately omitted and one-line evidence-based justifications; if coverage evidence is unavailable, say so and mark the decision provisional. Update `qa-work/<work-id>/index.md` with requirement-to-scenario links, omitted coverage, environment, assumptions and artefact link. Provide scenario count and important omissions in chat.
+Write `qa-work/<work-id>/design.md` with front matter `work-id`, `skill: qa-design-scenarios`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirement, coverage and environment revisions). Include numbered/tagged scenarios in the configured format (state the format used at the top of the file), each with `Covers: FRn, NFRn`, environment/setup/cleanup and expected evidence. Add **Scenarios Not Written** listing IDs/categories deliberately omitted and one-line evidence-based justifications; if coverage evidence is unavailable, say so and mark the decision provisional. Update `qa-work/<work-id>/index.md` with requirement-to-scenario links, omitted coverage, environment, assumptions and artefact link. Provide scenario count and important omissions in chat.
 
 ## Side effects and safety
 

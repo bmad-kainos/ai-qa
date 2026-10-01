@@ -14,11 +14,11 @@ Use when starting QA work, changing repository scope, or establishing current ev
 
 ## Reads
 
-Always read `.github/ai-qa/project/project.md` when present for the project summary, components, stack, environments, dependencies, constraints, docs and unknowns. Read applicable `conventions/git.md`, `testing.md`, `qa-process.md`, `integrations.md`, and `reporting.md` to understand current operating rules; read `conventions/discovery.md` if present as existing project evidence, never as authority to edit it. Read `.github/ai-qa/framework/method/{discovery,safety,precedence,git,artefacts}.md`. Read `.github/copilot-instructions.md` if present and only relevant prior `qa-work/<work-id>/` artefacts. If the project layer is missing, proceed from read-only session evidence, record that absence, and suggest `qa-configure` for persistent setup.
+Always read `.github/ai-qa/project/project.md` when present for the project summary, components, stack, environments, dependencies, constraints, docs and unknowns. Read applicable `conventions/git.md`, `testing.md`, `qa-process.md`, `integrations.md`, and `reporting.md` to understand current operating rules; read `conventions/discovery.md` if present as existing project evidence, never as authority to edit it. Read `.github/ai-qa/framework/method/{discovery,safety,precedence,work-id-and-git,artefacts}.md`. Read `.github/copilot-instructions.md` if present and only relevant prior `qa-work/<work-id>/` artefacts. If the project layer is missing, proceed from read-only session evidence, record that absence, and suggest `qa-configure` for persistent setup.
 
 ## Work-id
 
-Resolve per `.github/ai-qa/framework/method/git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
+Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
 

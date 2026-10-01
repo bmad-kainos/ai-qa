@@ -22,7 +22,7 @@ The original use cases were a story moved to "In Test" that needs test cases, st
 A future provider must read `.github/ai-qa/project/project.md`; `.github/ai-qa/project/conventions/integrations.md`, `git.md` and `qa-process.md`; `.github/ai-qa/framework/method/safety.md`, `artefacts.md` and `precedence.md`; and `.github/ai-qa/framework/providers/operations.md` plus the applicable provider recipe. This reference is not a v1 operation and must not be used to bypass provider configuration. If project context is absent, use read-only session evidence and suggest `qa-configure`; never edit the project layer.
 
 ## Work-id
-Resolve per `.github/ai-qa/framework/method/git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
+Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
 A future implementation would require the work-item key, confirmed provider/deployment/transport, Acceptance Criteria, Testing Notes, Out of Scope, sprint/cycle context and available Zephyr method. If prior artefacts are missing, gather the minimum yourself; never refuse. Do not request or persist secret values.

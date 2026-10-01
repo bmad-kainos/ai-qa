@@ -27,7 +27,7 @@ Use when someone asks to generate a tech report, weekly update or team notes; su
 Always read `.github/ai-qa/project/project.md` for project components and report grouping; `.github/ai-qa/project/conventions/reporting.md` sections `Audiences`, `Formats`, `Channel templates`, `Tech-report defaults` and `File naming`; `conventions/git.md` section `Commit types`; and `conventions/integrations.md` for the work-item provider if weekly mode is requested. Read `.github/ai-qa/framework/method/safety.md`, `git.md`, `artefacts.md`, `precedence.md`, `.github/ai-qa/framework/defaults/reporting.md` only when conventions are absent, the selected file under `references/`, live git history and any current prior artefacts. If the project layer is missing, use read-only session evidence and suggest `qa-configure`.
 
 ## Work-id
-Resolve per `.github/ai-qa/framework/method/git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
+Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
 Invoke with a date range and output mode. Examples:

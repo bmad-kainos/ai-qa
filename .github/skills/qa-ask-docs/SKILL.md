@@ -1,11 +1,11 @@
 ---
-name: qa-analyse-docs
+name: qa-ask-docs
 description: Answer questions using local project documentation and configured remote documentation sources; use for documented behaviour, workflows, rules, architecture or APIs.
 argument-hint: "[question, topic or documentation area]"
 user-invocable: true
 ---
 
-# Analyse Project Documentation
+# Ask Project Documentation
 Answer questions against project documentation by searching relevant pages and synthesising an answer with precise citations using the supplied templates.
 
 ## When to use
@@ -20,7 +20,7 @@ Do not use to update docs; use `qa-update-docs` for local changes and `qa-publis
 Always read `.github/ai-qa/project/project.md` sections `Summary`, `Documentation sources`, `Components` and `Unknowns and conflicts`; `.github/ai-qa/project/conventions/reporting.md` section `Documentation`; `integrations.md` sections `Docs` and `Repository and PRs` when remote docs are requested; and `qa-process.md` only for relevant project process policy. Read `.github/ai-qa/framework/method/safety.md`, `discovery.md`, `artefacts.md`, `precedence.md`, the configured local index and relevant pages. For remote documentation, read `.github/ai-qa/framework/providers/operations.md` and the configured provider recipe; use only `docs.search` and `docs.get`. Read prior `qa-work/<work-id>/` artefacts only if source revisions remain current. If the project layer is missing, use read-only session evidence and suggest `qa-configure`.
 
 ## Work-id
-Resolve per `.github/ai-qa/framework/method/git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
+Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
 Take the question, area, document link, version/branch and optional work ID. Clarify ambiguous product scope when sources conflict. A `qa-work/<work-id>/index.md` is useful context only when its source revisions remain current. If prior artefacts are missing, gather the minimum yourself; never refuse.
@@ -46,7 +46,7 @@ Take the question, area, document link, version/branch and optional work ID. Cla
 - [Answer Not Found Instructions](references/answer-not-found.md)
 
 ## Output
-Use the answer format from the selected reference. Cite precise paths/links and headings, scope searched and source revisions; identify contradictions, unknowns and a clear **Not documented** result where applicable. This read-only skill writes no files by default. If saving was requested, write `qa-work/<work-id>/outputs/<name>.md` with the frontmatter required by `.github/ai-qa/framework/method/artefacts.md`: `work-id`, `skill: qa-analyse-docs`, `framework-version`, `created` (UTC ISO-8601) and `inputs` (documentation paths/URLs and revisions). Update `qa-work/<work-id>/index.md` with the output link and freshness. Standalone local index updates require no separate gate; orchestrated writes require prior L1 plan approval. Never change `.github/ai-qa/project/`.
+Use the answer format from the selected reference. Cite precise paths/links and headings, scope searched and source revisions; identify contradictions, unknowns and a clear **Not documented** result where applicable. This read-only skill writes no files by default. If saving was requested, write `qa-work/<work-id>/outputs/<name>.md` with the frontmatter required by `.github/ai-qa/framework/method/artefacts.md`: `work-id`, `skill: qa-ask-docs`, `framework-version`, `created` (UTC ISO-8601) and `inputs` (documentation paths/URLs and revisions). Update `qa-work/<work-id>/index.md` with the output link and freshness. Standalone local index updates require no separate gate; orchestrated writes require prior L1 plan approval. Never change `.github/ai-qa/project/`.
 
 The “Answer Found” template is:
 

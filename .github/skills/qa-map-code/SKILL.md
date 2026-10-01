@@ -1,10 +1,10 @@
 ---
-name: qa-code-context
+name: qa-map-code
 description: Map the smallest implementation surface, flows, dependencies and tests for requirements; verify implementation against a named branch without switching branches.
 argument-hint: "[ticket, requirement IDs, feature or branch; optional work-id]"
 ---
 
-# Code Context
+# Map Code
 
 Identify the minimal set of affected components, files, symbols and control/data flows needed to understand a change, including dependencies, side effects, related tests and documentation. In `verify` mode, compare each requirement to a specified branch using read-only Git inspection and report whether it is present, matches, deviates or is missing.
 
@@ -20,7 +20,7 @@ If the project layer is missing, proceed with read-only local evidence and sugge
 
 ## Work-id
 
-Resolve per `.github/ai-qa/framework/method/git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
+Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
 
@@ -45,7 +45,7 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. If th
 
 ## Output
 
-Write `qa-work/<work-id>/context.md` with front matter `work-id`, `skill: qa-code-context`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (branch/base/commit/source revision). Include scope and evidence revision; component map and requirement IDs; minimal affected file/symbol list and control/data-flow summary; dependencies, boundaries, side effects, flags, environment logic and failure/observability paths; related tests, docs and relevant configured commands (references only); in `verify` mode, the per-requirement status table plus explicit flag/environment findings; unknowns, confidence and what was not inspected. Update `qa-work/<work-id>/index.md` with requirement-to-component links, branch/base/commit, evidence source, verification statuses, unknown paths and artefact link. The concise chat response should identify the highest-value paths and any missing or deviating behavior.
+Write `qa-work/<work-id>/context.md` with front matter `work-id`, `skill: qa-map-code`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (branch/base/commit/source revision). Include scope and evidence revision; component map and requirement IDs; minimal affected file/symbol list and control/data-flow summary; dependencies, boundaries, side effects, flags, environment logic and failure/observability paths; related tests, docs and relevant configured commands (references only); in `verify` mode, the per-requirement status table plus explicit flag/environment findings; unknowns, confidence and what was not inspected. Update `qa-work/<work-id>/index.md` with requirement-to-component links, branch/base/commit, evidence source, verification statuses, unknown paths and artefact link. The concise chat response should identify the highest-value paths and any missing or deviating behavior.
 
 ## Side effects and safety
 

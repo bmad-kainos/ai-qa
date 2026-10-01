@@ -32,7 +32,7 @@ None by default. Mark a command safe only after project evidence and explicit co
 
 ## Work-id rule
 
-Resolve explicit argument → ticket from current branch matching project `Ticket syntax` / `Branch patterns` → `adhoc-<yyyymmdd>-<slug>`, per `method/git.md`.
+Resolve explicit argument → ticket from current branch matching project `Ticket syntax` / `Branch patterns` → `adhoc-<yyyymmdd>-<slug>`, per `method/work-id-and-git.md`.
 
 ## qa-work policy
 

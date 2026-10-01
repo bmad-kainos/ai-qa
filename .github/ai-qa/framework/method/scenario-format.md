@@ -72,4 +72,4 @@ Check the rendered page in either case; do not assume Markdown conversion is los
 3. If the evidence conflicts (`⚠`) or is absent (`∅`), ask once. Offer `bdd` as Option A, being the framework default, and `steps` as Option B.
 4. Record the answer in `qa-process.md` with its status and evidence. If `bdd` is applied only as a default, mark it `★` with the date.
 
-A project can change the setting later with `qa-configure refresh`. Artefacts already written keep their format until `qa-design-tests` is run again.
+A project can change the setting later with `qa-configure refresh`. Artefacts already written keep their format until `qa-design-scenarios` is run again.

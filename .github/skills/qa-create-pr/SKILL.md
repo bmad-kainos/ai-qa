@@ -19,7 +19,7 @@ Do not use to merge, deploy, make a PR ready for review or silently commit or pu
 Always read `.github/ai-qa/project/project.md`; `.github/ai-qa/project/conventions/git.md` sections `Remote host`, `Base branch`, `Protected branches`, `Branch patterns`, `Ticket syntax`, `PR title pattern`, `PR types`, `Prefix-to-type mapping`, `PR templates`, `Exemplar PR` and `Draft and reviewer policy`; `conventions/integrations.md`, `qa-process.md` and `reporting.md`; `.github/ai-qa/framework/method/safety.md`, `git.md` and `artefacts.md`; `.github/ai-qa/framework/providers/operations.md` and the configured repository provider recipe; actual project PR template(s); and `assets/pr-example.md`. Discover GitHub templates at `.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/` and Azure Repos templates at `.azuredevops/pull_request_template.md` only as candidates; use paths actually recorded in `PR templates`. If a value is absent, consult `.github/ai-qa/framework/defaults/git.md` and label it as a framework default, not a project fact. Read prior index/drafts only while their source revisions remain current. If the project layer is missing, use read-only session evidence and suggest `qa-configure`.
 
 ## Work-id
-Resolve per `.github/ai-qa/framework/method/git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
+Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
 Resolve the source branch, confirmed base, remote/repository, optional ticket/work item, reviewed diff, project template, exemplar, test evidence, requested scope, and any prior current QA artefact. If context is missing, gather the minimum yourself; never refuse. Do not include uncommitted local changes as if they were part of the PR.
@@ -56,7 +56,7 @@ Resolve the source branch, confirmed base, remote/repository, optional ticket/wo
 
 6. **Analyse the branch changes relative to the base branch**
 	- Compare the source branch with the base branch using the remote-tracking refs and the exact three-dot diff: `git diff origin/<base>...origin/<branch>` (substitute the confirmed remote name where it is not `origin`). This matches the PR comparison semantics and excludes local uncommitted changes.
-	- If remote-tracking refs are unavailable, ask the user before falling back to a local branch comparison or fetching/pushing. A push is always a separate L4 gate handled by `qa-branch`; PR creation never pushes implicitly.
+	- If remote-tracking refs are unavailable, ask the user before falling back to a local branch comparison or fetching/pushing. A push is always a separate L4 gate handled by `qa-create-branch`; PR creation never pushes implicitly.
 	- Start with a lightweight inventory such as `--name-status`. Use `git diff --stat origin/<base>...origin/<branch>` or branch-only commit subjects only when they materially improve the List of Changes. Fetch a full patch only if necessary.
 	- Use the diff to derive the List of Changes and validate an optional scope. Do not use the diff as the primary source for Summary.
 
@@ -150,7 +150,7 @@ Resolve work ID from explicit ID, then a branch ticket matching confirmed `.gith
 | Read branches, remote diff, work item, template and existing PR | L0 | No gate; use confirmed scope and bounded reads |
 | Write local PR draft/receipt/index | L1 | Non-default branch; workflow-plan approval applies in orchestration; summarise changes |
 | Create local branch or commit | L2 | Separate exact gate; not part of this skill's normal procedure |
-| Push source branch via `qa-branch` | L4 | Separate gate with exact branch and side effects; never implied by PR approval |
+| Push source branch via `qa-create-branch` | L4 | Separate gate with exact branch and side effects; never implied by PR approval |
 | Create draft PR through `repo.pr.create` | L4 | Show exact title/body, head/base and side effect; explicit affirmative; verify by read-back |
 
 No implicit commit, force push, ready-for-review, merge or deployment. Redact secrets and unwanted mentions. Do not hard-code a host, ticket provider, template path, title grammar or default branch.

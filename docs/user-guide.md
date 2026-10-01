@@ -43,7 +43,7 @@ Every skill works on its own. If an upstream artefact is missing, the skill gath
 | Need | Ask |
 |---|---|
 | Independent 13-area regression assessment | `qa-regression-risk` on a diff, ticket or description |
-| Check a branch against requirements | `qa-code-context verify <branch>` |
+| Check a branch against requirements | `qa-map-code verify <branch>` |
 | Read-only test inventory | `qa-coverage-gaps --inventory` |
 | Tests from an OpenAPI spec | `qa-generate-tests` with the spec path |
 | Classify a CI failure | `qa-analyse-failure <ci-run-url>` or paste the log |

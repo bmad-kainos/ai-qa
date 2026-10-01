@@ -32,9 +32,9 @@ Read [migrations](docs/migrations.md) before updating.
 
 | Group | Skills |
 |---|---|
-| Core | `qa-analyse-requirement` · `qa-code-context` · `qa-coverage-gaps` · `qa-design-tests` · `qa-regression-risk` · `qa-automation-plan` · `qa-review-tests` · `qa-generate-tests` · `qa-run-tests` · `qa-analyse-failure` · `qa-test-plan` · `qa-publish` |
-| Supporting | `qa-bug-report` · `qa-analyse-docs` · `qa-baseline` · `qa-retrospective` |
-| Engineering | `qa-branch` · `qa-create-pr` · `qa-tech-report` · `qa-update-docs` |
+| Core | `qa-analyse-requirement` · `qa-map-code` · `qa-coverage-gaps` · `qa-design-scenarios` · `qa-regression-risk` · `qa-automation-plan` · `qa-review-tests` · `qa-generate-tests` · `qa-run-tests` · `qa-analyse-failure` · `qa-test-plan` · `qa-publish` |
+| Supporting | `qa-bug-report` · `qa-ask-docs` · `qa-baseline` · `qa-retrospective` |
+| Engineering | `qa-create-branch` · `qa-create-pr` · `qa-tech-report` · `qa-update-docs` |
 | Discovery | `qa-discover` |
 
 See the [user guide](docs/user-guide.md) for workflows and walkthroughs.
