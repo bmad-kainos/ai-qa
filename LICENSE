@@ -1,19 +1,21 @@
-AI-QA
-Copyright (c) 2026 the AI-QA contributors.
+MIT License
 
-Licence terms for AI-QA's own content have not yet been declared by the
-repository owner. Until they are, no licence is granted beyond what is
-required by the third-party notices below.
+Copyright (c) 2026 AI-QA contributors
 
--------------------------------------------------------------------------------
-Third-party notices
--------------------------------------------------------------------------------
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-Portions of this repository (test packs, engineering skills, installer design
-and reference material) are adapted from Feabhas (bmad-kainos/feabhas @
-b788dc1), licensed under the MIT Licence. The full notice is reproduced in
-docs/licenses/feabhas-MIT.txt and ships to installed projects as
-.github/ai-qa/framework/LICENSE-feabhas.txt.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-QA methodology is ported from the Generic QA POC
-(sylwia-luczak/AI-QA-AGENT_GENERIC @ ac750bb), which does not declare a licence.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

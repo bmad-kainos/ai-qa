@@ -2,6 +2,8 @@
 
 This is a documentation contract for provider recipes, not an installed client API. Skills request named operations; provider, deployment and transport are selected from `.github/ai-qa/project/conventions/integrations.md`. Read project settings from `.github/ai-qa/project/project.md` and applicable conventions; only `qa-configure` writes the project layer. A provider recipe never bypasses the L0-L5 rules in `.github/ai-qa/framework/method/safety.md`.
 
+Provider files (`jira.md`, `confluence.md`, `azure-devops.md`, `azure-wiki.md`, `github.md`) are **transport recipes, not executable connectors**. No recipe claims that an MCP tool is installed, that credentials are configured, or that a remote call has succeeded. Every recipe is **unverified** until the configured transport is authorised and a real read-back succeeds. On 401/403/404 report the actual failure rather than a nonexistent item, and retry 429/5xx with bounded back-off for reads only; never blindly retry a non-idempotent write.
+
 ## Deployment identification
 
 For Atlassian, `*.atlassian.net` suggests Cloud (**◐ Inferred**); a self-hosted/custom URL suggests Server/DC (**◐ Inferred**). Record the basis and sample URL without credentials. Confirm with an approved read-only `serverInfo` `deploymentType` probe or the configured Atlassian MCP server's deployment metadata. If neither can confirm it, ask once which deployment is configured; do not guess an edition or try a different host. For other providers, use the deployment recorded in `conventions/integrations.md`; an URL alone does not prove access or capability.
@@ -21,8 +23,6 @@ For Atlassian, `*.atlassian.net` suggests Cloud (**◐ Inferred**); a self-hoste
 | Azure Repos PR | ✓ | `az repos pr` | — | ✓ |
 | Azure Pipelines | — | `az pipelines` | ✓ | ✓ |
 | GitHub PR and Actions | ✓ | `gh` | — | ✓ |
-
-## Named operation catalog
 
 ## Operation contract
 
@@ -83,9 +83,7 @@ Use approved secret storage for authentication and never include credential valu
 
 ## Execution and manual fallback
 
-## Selection, failure and manual fallback
-
-1. Read `conventions/integrations.md` for the capability's provider, deployment, base URL, identifiers, preferred-to-fallback transports, authentication method and environment-variable names. Verify the transport is actually available and authorised.
+## Read `conventions/integrations.md` for the capability's provider, deployment, base URL, identifiers, preferred-to-fallback transports, authentication method and environment-variable names. Verify the transport is actually available and authorised.
 2. Use the configured preferred transport. MCP tool-name hints in provider files are discovery hints only: verify names and supported inputs against available tools. CLI commands require an already-installed, authenticated CLI. REST is a recipe, not a client. Do not install dependencies or write `.vscode/mcp.json` here.
 3. If the preferred transport fails, report which transport failed and why, then offer the next configured fallback. Do not silently switch tenant, deployment, auth scope or operation. Never blindly retry a non-idempotent write. A second transport for a write requires the same still-valid exact L4 approval; if target/payload changes, show it and ask again.
 4. If no approved transport works, use Manual: ask the user to paste source material or search results for reads; provide paste-ready provider-format content and destination instructions for writes. Write the handoff only to `qa-work/<work-id>/outputs/` after local L1 conditions are met. Label it `unverified / not published` (or `not created`); do not claim a remote ID or URL.
@@ -94,4 +92,6 @@ For L4, show action, target, exact payload and side effect, then wait for explic
 
 ## Status rules
 
-`verified` means an authorised read observed the claimed state; for writes, re-read after the write and compare the expected body/fields/version. A local draft, successful HTTP response or returned ID without read-back remains `unverified`. `blocked` means approval/access/deployment is missing; `unsupported` means the selected provider/transport cannot perform the operation; `failed` means an authorised attempt returned an error. Never translate 403 to “not found”, imply completeness from a truncated page, print credentials, or expose private content outside its approved scope.
+`veProvenance
+
+Confluence Server/DC read/update/append and conversion facts, and Jira Server/DC issue and comment behaviour, derive from `sylwia-luczak/AI-QA-AGENT_GENERIC` at `ac750bb` (`tools/confluence_tool.py`, `tools/jira_tool.py` and the scenario-format guidance). That source declares no licence, so these files paraphrase behaviour and import no code. Other deployment and API examples remain **unverified** against any live tenant

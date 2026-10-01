@@ -1,6 +1,6 @@
 # GitHub — transport recipe
 
-Use the [provider contract](README.md). Confirm owner/repository, issue versus pull request versus Discussions, visibility, labels, write permission and destination before fetching private content or publishing. Prefer approved GitHub-native tools; use REST/GraphQL or `gh` only when configured and authorized.
+Use the [provider contract](operations.md). Confirm owner/repository, issue versus pull request versus Discussions, visibility, labels, write permission and destination before fetching private content or publishing. Prefer approved GitHub-native tools; use REST/GraphQL or `gh` only when configured and authorized.
 
 | Named operation | MCP hint | CLI | REST and verification | Manual |
 |---|---|---|---|---|

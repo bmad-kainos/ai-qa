@@ -1,6 +1,6 @@
 # Azure DevOps Wiki — transport recipe
 
-Use the [provider contract](README.md). Azure Wiki is not Azure Boards: determine organization, project, wiki identifier, page path, supported API version and whether it is a project wiki or a published code wiki. A published code wiki is backed by Git; do not assume REST page updates are allowed.
+Use the [provider contract](operations.md). Azure Wiki is not Azure Boards: determine organization, project, wiki identifier, page path, supported API version and whether it is a project wiki or a published code wiki. A published code wiki is backed by Git; do not assume REST page updates are allowed.
 
 | Named operation | MCP hint | CLI | REST and verification | Manual |
 |---|---|---|---|---|

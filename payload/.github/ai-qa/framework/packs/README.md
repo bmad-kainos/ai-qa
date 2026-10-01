@@ -14,4 +14,4 @@
 
 If no pack matches, AI-QA uses the existing project tests and warns that confidence is reduced. If no framework exists, it reports ∅, records ★ and offers a gated scaffold. A full-tier pack provides actionable generation guidance. It doesn't mean dependencies are installed or that generated tests pass.
 
-Start new packs from [_TEMPLATE](_TEMPLATE/README.md). Pack content is adapted from Feabhas `.github/instructions/frameworks/**` and `.github/skills/api-tests/**` (MIT, see `../LICENSE-feabhas.txt`).
+Start new packs from [_TEMPLATE](_TEMPLATE/). Pack content is adapted from Feabhas `.github/instructions/frameworks/**` and `.github/skills/api-tests/**` (MIT, see `../LICENSE-feabhas.txt`).

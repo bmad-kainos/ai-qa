@@ -1,6 +1,6 @@
 # Azure DevOps work items — transport recipe
 
-Use the [provider contract](README.md). Confirm organization, project, area/iteration, work item type, field names, process template and permission. Azure DevOps Services and Azure DevOps Server may differ in supported API versions and base paths; this is **unverified guidance**, not a claim that an ADO connector exists.
+Use the [provider contract](operations.md). Confirm organization, project, area/iteration, work item type, field names, process template and permission. Azure DevOps Services and Azure DevOps Server may differ in supported API versions and base paths; this is **unverified guidance**, not a claim that an ADO connector exists.
 
 | Named operation | MCP hint | CLI | REST and verification | Manual |
 |---|---|---|---|---|

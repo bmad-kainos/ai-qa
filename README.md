@@ -74,7 +74,7 @@ AI-QA never edits the default branch. Creating a branch never pushes it, and AI-
 |---|---|
 | `payload/.github/` | Everything the installer copies into a target |
 | `install.sh`, `install.ps1`, `VERSION`, `CHANGELOG.md` | Installers and release metadata |
-| `docs/` | [Architecture](docs/architecture.md), [user guide](docs/user-guide.md), [configure](docs/configure.md), [safety](docs/safety.md), [adding a pack](docs/adding-a-pack.md), [adding a provider](docs/adding-a-provider.md), [migrations](docs/migrations.md), [manual install](docs/manual-install.md) |
+| `docs/` | [Flows and diagrams](docs/flows/README.md), [architecture](docs/architecture.md), [user guide](docs/user-guide.md), [configure](docs/configure.md), [safety](docs/safety.md), [adding a pack](docs/adding-a-pack.md), [adding a provider](docs/adding-a-provider.md), [migrations](docs/migrations.md), [manual install](docs/manual-install.md) |
 | `fixtures/` | Seven validation repositories and expected discovery/Project Context outputs ([fixtures/README.md](fixtures/README.md)) |
 | `tools/qa-stats.py` | Optional standard-library helper for baseline percentiles and flaky-SHA detection. It runs from this checkout only and is never installed |
 | `reference/zephyr/` | Zephyr knowledge kept for future work; not installed |
@@ -82,4 +82,4 @@ AI-QA never edits the default branch. Creating a branch never pushes it, and AI-
 
 ## Provenance
 
-The methodology is ported from the Generic QA POC (`sylwia-luczak/AI-QA-AGENT_GENERIC@ac750bb`). The tooling, packs and engineering skills are adapted from Feabhas (`bmad-kainos/feabhas@b788dc1`) under its [MIT licence](docs/licenses/feabhas-MIT.txt); the notice also ships at `.github/ai-qa/framework/LICENSE-feabhas.txt`. See [LICENSE](LICENSE).
+The methodology is ported from the Generic QA POC (`sylwia-luczak/AI-QA-AGENT_GENERIC@ac750bb`). The tooling, packs and engineering skills are adapted from Feabhas (`bmad-kainos/feabhas@b788dc1`) under its MIT licence ([notice](payload/.github/ai-qa/framework/LICENSE-feabhas.txt), also installed with the framework). AI-QA itself is released under the [MIT licence](LICENSE).
