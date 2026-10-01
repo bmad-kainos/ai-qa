@@ -85,7 +85,7 @@ Write `qa-work/<work-id>/automation.md` with front matter `work-id`, `skill: qa-
 | Scenario / requirement | Decision | Level | Location | Mocking | Environment / data | CI impact | Justification / evidence |
 |---|---|---|---|---|---|---|---|
 
-Add a short Gherkin example only when it clarifies planned behavior; label it proposed. State blockers, manual alternatives, residual risk and whether existing coverage suffices. Update `qa-work/<work-id>/index.md` with decisions, FR/NFR links, evidence, environment/CI blockers, impact and artefact link. Summarise the decision and highest-impact scenarios in chat.
+Add a short example in the configured Scenario format only when it clarifies planned behavior; label it proposed. State blockers, manual alternatives, residual risk and whether existing coverage suffices. Update `qa-work/<work-id>/index.md` with decisions, FR/NFR links, evidence, environment/CI blockers, impact and artefact link. Summarise the decision and highest-impact scenarios in chat.
 
 ## Side effects and safety
 

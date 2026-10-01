@@ -24,7 +24,7 @@ Status values: Not started · In progress · Complete · Skipped · Blocked · S
 | design | Analyse requirement | Not started | `requirement.md` | <revision> | <fresh / stale / unknown> |
 | design | Code context / branch verification | Not started | `context.md` | <revision> | <fresh / stale / unknown> |
 | design | Requirement coverage gaps | Not started | `coverage.md` | <revision> | <fresh / stale / unknown> |
-| design | Design BDD scenarios | Not started | `design.md` | <revision> | <fresh / stale / unknown> |
+| design | Design manual scenarios | Not started | `design.md` | <revision> | <fresh / stale / unknown> |
 | design | Regression risk | Not started | `regression.md` | <revision> | <fresh / stale / unknown> |
 | design | Automation plan | Not started | `automation.md` | <revision> | <fresh / stale / unknown> |
 | design | Design review | Not started | `review.md` | <revision> | <fresh / stale / unknown> |

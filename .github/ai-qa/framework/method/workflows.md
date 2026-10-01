@@ -10,7 +10,7 @@ Read `safety.md`, `precedence.md`, relevant project conventions and the method f
 2. **Red readiness stops design.** Record blockers and offer refinement questions; do not invent acceptance criteria or continue to automation.
 3. `qa-code-context`: identify the minimal affected files and flows, dependencies, side effects, related tests and docs. If a branch is given, verify each requirement as present / matches / deviates / missing and record flags/environment logic.
 4. `qa-coverage-gaps(requirement)`: assess per-FR evidence at unit/integration/E2E levels, the coverage verdict and role boundary. Distinguish existence, assertion relevance, execution and measured coverage.
-5. `qa-design-tests`: create lean BDD scenarios using the dedup rule; state `Covers: FRn`, selective categories, quality criteria and **Scenarios Not Written**.
+5. `qa-design-tests`: create lean manual scenarios in the configured Scenario format (`scenario-format.md`) using the dedup rule; state `Covers: FRn`, selective categories, quality criteria and **Scenarios Not Written**.
 6. `qa-regression-risk`: complete all 13 areas, escalation rules and HIGH/CRITICAL handling.
 7. `qa-automation-plan`: decide per scenario automated (level/location/mocking/environment/CI impact), manual or not needed; justify against the nine factors and impact level.
 8. `qa-review-tests(design)`: check FR/NFR traceability, redundancy, determinism and risk gaps.

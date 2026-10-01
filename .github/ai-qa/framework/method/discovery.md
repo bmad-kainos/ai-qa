@@ -42,6 +42,7 @@ Record status, conclusion and evidence for every domain. “Not applicable” al
 | PRs | GitHub and ADO templates, contributing docs and recent merged PRs when a transport is available; recency beats volume. |
 | CODEOWNERS | `CODEOWNERS` locations and relevant path ownership, or bounded search evidence. |
 | Definition of done and QA evidence | CONTRIBUTING, project docs, templates, CI checks, test reports or confirmed user statement. |
+| Manual scenario format | How acceptance criteria are written in recent tickets and docs (Given/When/Then, step lists, free text), existing manual test-case documents or templates, and test-plan pages. Record the sample and the proportion in each style. This decides the `Scenario format` setting in `qa-process.md` (`bdd` or `steps`); see `scenario-format.md`. Cucumber `.feature` files indicate *automated* BDD, not the manual style. |
 | Documentation | Documentation root, ADRs, wiki links and index/home/glossary pages. |
 | Integrations | Remote host, ticket syntax, Atlassian/ADO URLs, `.vscode/mcp.json`, authenticated CLIs (`gh auth status`, `az account show`) and environment-variable names. Record only status/identity metadata; never expose tokens or secret values. |
 | Project context | Purpose, components, technology stack, environments, data stores/dependencies, CI/CD, test landscape, constraints, docs, unknowns/conflicts and provenance; link sources and confidence. |

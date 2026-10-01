@@ -56,6 +56,12 @@ Configure renders this source into `.github/ai-qa/project/conventions/qa-process
 |---|---|---|---|
 | <default: commit index.md and outputs/; ignore everything else> | <approved project override if any> | <status> | <source/approval date> |
 
+## Scenario format
+
+| Format | Value | Status | Evidence/source |
+|---|---|---|---|
+| <`bdd` (Given / When / Then) or `steps` (numbered steps with expected results); see `method/scenario-format.md`> | <value> | <status> | <existing manual tests, AC style, or confirmation; `★` with date if default> |
+
 ## Locale
 
 | Locale | Value | Status | Evidence/source |

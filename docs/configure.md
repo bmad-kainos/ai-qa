@@ -21,6 +21,7 @@ Every write is L5: you see the diff first, and nothing is written without an exp
    - One question at a time, only for ⚠, behaviour-relevant ◐, ? and relevant ∅ findings. Each question shows the evidence, Option A (recommended) and the alternatives.
    - "Accept all" is supported, and there is one optional constraints question.
    - It never asks what the repo already answers, and never asks for secrets: only environment-variable names.
+   - It decides the manual scenario format: `bdd` (Given / When / Then) or `steps` (numbered steps with expected results). It looks at how acceptance criteria and any existing manual tests are written, recommends that style as Option A, and asks once with `bdd` as Option A if the evidence conflicts or is missing.
 6. **Defaults.** Fill ∅/✗ gaps from `framework/defaults/`, marked ★ with the date.
 7. **Packs.** Select a pack per test path.
 8. **Diff and L5 approval.**
@@ -54,7 +55,7 @@ Statuses are never merged, and an inference is never presented as an observation
 | `discovery.md` | Discovery report grouped by domain, ending with *Needs your input* |
 | `conventions/git.md` | Base branch, branch patterns and examples, commit style and types, ticket syntax, PR title pattern and types, PR templates and exemplar, draft and reviewer policy |
 | `conventions/testing.md` | Per test path: pack, locations, naming, fixtures and builders, tags, commands (all/path/tag), reports, environments and base URLs, test-data rules, manual-testing ownership |
-| `conventions/qa-process.md` | Readiness, DoD and evidence, plan destination and timing, comment templates, extra regression areas, fix-loop limits, commands safe to run, work-id rule, qa-work policy, locale (default en-GB), team options |
+| `conventions/qa-process.md` | Readiness, DoD and evidence, plan destination and timing, comment templates, extra regression areas, fix-loop limits, commands safe to run, work-id rule, qa-work policy, scenario format (`bdd` or `steps`), locale (default en-GB), team options |
 | `conventions/integrations.md` | Per capability: provider, deployment, base URL, identifiers, transports, auth method, environment-variable names |
 | `conventions/reporting.md` | Audiences, formats, channel templates, tech-report defaults, file naming, documentation pages |
 | `.github/instructions/qa-project.instructions.md` | `applyTo` = the project's test globs |

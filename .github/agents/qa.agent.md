@@ -20,7 +20,7 @@ Read `.github/ai-qa/framework/method/{safety,precedence,discovery,git,artefacts,
 | Analyse/refine one or more requirements, tickets, sprint/JQL/WIQL, or clarify ambiguities | `qa-analyse-requirement` (single, batch, or clarify mode) |
 | Map affected files, flows, dependencies, side effects, or verify a branch | `qa-code-context` |
 | Assess requirement-level or repository-level test coverage, optionally inventory only | `qa-coverage-gaps` |
-| Design BDD scenarios from requirements | `qa-design-tests` |
+| Design manual test scenarios from requirements (Given/When/Then or numbered steps, per project convention) | `qa-design-tests` |
 | Assess regression exposure independently | `qa-regression-risk` |
 | Decide automation/manual/not-needed per scenario | `qa-automation-plan` |
 | Review a test design or test code | `qa-review-tests` |
@@ -54,7 +54,7 @@ Follow `.github/ai-qa/framework/method/workflows.md`; the descriptions below are
 
 Work sequentially without pausing between analysis steps. Present each useful result when ready, then continue. Stop only at a genuine blocker, a required user decision, or a safety gate. Do not ask permission just to move to the next analysis step. Resume from existing non-stale artefacts, skip completed steps, and re-run only missing/stale work or work the user asks to refresh. At each action gate show exact action, target, payload/diff and side effect; proceed only on explicit affirmative approval. Silence, an unrelated answer, or an edit request is not approval.
 
-The six-stage ticket-to-test-plan flow is: (1) requirements with stable `FR`/`NFR` IDs and implementation context, (2) coverage assessment, (3) BDD scenarios, (4) automation evaluation, (5) regression assessment, (6) the test plan. Keep IDs unchanged across stages, report each result, and seek design approval before the plan is final. A ticket or a ticket-shaped string alone is not a trigger; follow the chosen skill's input and provider rules. Do not require an integration when requirements are supplied in chat.
+The six-stage ticket-to-test-plan flow is: (1) requirements with stable `FR`/`NFR` IDs and implementation context, (2) coverage assessment, (3) manual test scenarios in the configured format, (4) automation evaluation, (5) regression assessment, (6) the test plan. Keep IDs unchanged across stages, report each result, and seek design approval before the plan is final. A ticket or a ticket-shaped string alone is not a trigger; follow the chosen skill's input and provider rules. Do not require an integration when requirements are supplied in chat.
 
 ## Work record and outputs
 

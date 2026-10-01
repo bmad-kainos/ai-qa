@@ -38,6 +38,10 @@ Resolve explicit argument → ticket from current branch matching project `Ticke
 
 Default: commit `index.md` and `outputs/`; ignore everything else. Projects may change this policy here after discovery and confirmation. Never commit secrets or confidential data.
 
+## Scenario format
+
+Candidate default: `bdd` (Given / When / Then). The alternative is `steps` (numbered steps with expected results). Both are defined in `method/scenario-format.md`. Configure asks when evidence conflicts or is absent; a value applied without evidence is marked `★` with a date.
+
 ## Locale
 
 Candidate default: `en-GB`.

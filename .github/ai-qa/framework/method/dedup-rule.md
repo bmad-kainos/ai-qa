@@ -15,7 +15,7 @@ A passing test must be relevant, have assertions that exercise the behaviour, an
 
 ## Core principle
 
-Manual scenarios exist to catch what unit and integration tests **cannot** — real business outcomes, cross-service behaviour, and edge cases that only surface with live data and infrastructure. They are not a re-run of unit test logic in Gherkin syntax.
+Manual scenarios exist to catch what unit and integration tests **cannot** — real business outcomes, cross-service behaviour, and edge cases that only surface with live data and infrastructure. They are not a re-run of unit test logic in scenario form.
 
 > A simple ticket with 3 ACs, all already covered by passing unit tests, should produce **2–4 manual scenarios** — not one scenario per AC. This is a heuristic, not a target or a cap: risk and real boundary coverage take precedence, and it does not require a fixed scenario count.
 
@@ -30,11 +30,13 @@ Manual scenarios exist to catch what unit and integration tests **cannot** — r
 
 ## What to avoid
 
-- One scenario per AC when several ACs are exercised by the same business flow — merge them into a single end-to-end scenario with multiple `AND` assertions
+- One scenario per AC when several ACs are exercised by the same business flow — merge them into a single end-to-end scenario with multiple assertions (`AND` lines in `bdd`, extra steps or expected results in `steps`)
 - Re-asserting pure validation/calculation logic already confirmed unit-tested and passing
 - Padding the plan with scenarios that add no new risk coverage, just to look thorough
 
 ## Scenario format
+
+Write scenarios in the project's configured format, `bdd` (Given / When / Then) by default or `steps`. Both formats and how a project chooses are defined in `scenario-format.md`. The `bdd` form is:
 
 ```gherkin
 GIVEN <precondition>

@@ -13,8 +13,9 @@ First release of AI-QA for GitHub Copilot in VS Code.
   - Engineering: `qa-branch`, `qa-create-pr`, `qa-tech-report`, `qa-update-docs`.
   - Discovery: `qa-discover`.
 - **Workflows:** `design`, `automate`, `full`, `triage`. They are resumable and skippable and reuse non-stale artefacts.
+- **Manual scenario format:** two formats, `bdd` (Given / When / Then, the default) and `steps` (numbered steps with expected results). `qa-configure` decides which during its Confirm step and records it in `conventions/qa-process.md`; `qa-design-tests`, `qa-test-plan`, `qa-review-tests` and `qa-publish` follow the setting.
 - **Framework:**
-  - Method files: discovery, safety (L0–L5), artefacts, traceability, dedup rule, readiness, automation criteria, 13 regression areas, effort estimation, failure classes, precedence, questions, git, workflows.
+  - Method files: discovery, safety (L0–L5), artefacts, traceability, dedup rule, scenario format, readiness, automation criteria, 13 regression areas, effort estimation, failure classes, precedence, questions, git, workflows.
   - Defaults: git, testing, qa-process, reporting.
   - Templates: project, discovery, conventions ×5, index, artefact, test-plan, qa-project instructions.
 - **Project Context:** a sourced `project.md` (what the project is), kept separate from `conventions/*.md` (how AI-QA operates).

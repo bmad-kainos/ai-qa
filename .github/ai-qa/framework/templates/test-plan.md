@@ -44,13 +44,27 @@ Distinguish test existence, assertion relevance, actual execution, measured cove
 
 ## Test Scenarios
 
-Write lean BDD scenarios focused on business outcomes, cross-service behaviour, real environment edge cases, permissions, runtime feature flag ON/OFF behaviour, failure modes depending on infrastructure, and HIGH/CRITICAL risks. Tag each scenario and list `Covers: FRn, NFRn`.
+Write lean scenarios, in the project's configured Scenario format (see `method/scenario-format.md`), focused on business outcomes, cross-service behaviour, real environment edge cases, permissions, runtime feature flag ON/OFF behaviour, failure modes depending on infrastructure, and HIGH/CRITICAL risks. Tag each scenario and list `Covers: FRn, NFRn`.
+
+Format `bdd` (default):
 
 ```gherkin
 GIVEN <precondition>
 WHEN <action>
 THEN <observable expected result>
 AND <additional assertion>
+```
+
+Format `steps`:
+
+```md
+**Preconditions:** <environment, data and state before step 1>
+
+| # | Action | Expected result | Evidence |
+|---|---|---|---|
+| 1 | <action> | <observable result> | |
+
+**Cleanup:** <how to restore state>
 ```
 
 ### Scenarios Not Written
