@@ -27,5 +27,4 @@ First release of AI-QA for GitHub Copilot in VS Code.
   - Commands: `install`, `update`, `verify`, `uninstall`. Flags: `--dry-run`, `--prefix`, `--purge`.
   - Behaviour: SHA-256 manifest, marked blocks, `.ai-qa-new` on conflict, and a refusal to install into the AI-QA checkout itself.
 - **Tooling:** the optional `tools/qa-stats.py`, standard library only, run from this checkout.
-- **Fixtures:** seven validation repositories with expected discovery/Project Context outputs.
 - **Reference:** Zephyr knowledge in `reference/zephyr/`, not installed.

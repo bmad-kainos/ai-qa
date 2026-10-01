@@ -30,4 +30,4 @@ qa-work/**
 
 To uninstall manually, remove only the copied agent files, skill directories, and `.github/ai-qa/framework/` files. Remove the two marked blocks, preserving all surrounding content. Remove `.github/copilot-instructions.md` or `.gitignore` only if you created the file and it is otherwise empty. Keep `.github/ai-qa/project/`, baselines, and `qa-work/`.
 
-Never copy `tools/`, `.github/ai-qa/project/`, or fixture-specific config into the target. Open the target in VS Code and run `qa-configure` to create the project-owned layer after reviewing its proposed diff (L5). Do not add `.vscode/mcp.json` unless MCP is chosen and approved.
+Never copy `tools/` or `.github/ai-qa/project/` into the target. Open the target in VS Code and run `qa-configure` to create the project-owned layer after reviewing its proposed diff (L5). Do not add `.vscode/mcp.json` unless MCP is chosen and approved.

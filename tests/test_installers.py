@@ -8,7 +8,6 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "fixtures"
 
 
 def runners():
@@ -164,40 +163,37 @@ class SyntheticInstallerTests(unittest.TestCase):
                 self.call(runner, "uninstall", expected=1)
 
 
-class FixtureSmokeTests(unittest.TestCase):
-    def test_real_payload_against_each_fixture(self):
-        expected = {"conflicting-signals", "dotnet-no-pack", "empty-repo", "java-maven-restassured-azdo", "monorepo-workspaces", "python-pytest-jira", "ts-playwright-github"}
-        self.assertTrue(expected.issubset({p.name for p in FIXTURES.iterdir() if p.is_dir()}))
-        with tempfile.TemporaryDirectory(prefix="ai-qa-fixtures-") as temporary:
+class RealPayloadTests(unittest.TestCase):
+    def test_install_update_uninstall_with_shipped_payload(self):
+        with tempfile.TemporaryDirectory(prefix="ai-qa-real-") as temporary:
             base = Path(temporary)
-            for fixture in sorted(FIXTURES.iterdir()):
-                if not fixture.is_dir() or fixture.name.startswith("_"):
-                    continue
-                for name, runner in runners():
-                    with self.subTest(fixture=fixture.name, runner=name):
-                        target = base / (fixture.name + "-" + name)
-                        shutil.copytree(fixture, target)
-                        subprocess.run(["git", "init", "-q", str(target)], check=True)
-                        before = {p.relative_to(target): p.read_bytes() for p in target.rglob("*") if p.is_file() and ".git" not in p.parts}
-                        installer = ROOT / ("install.sh" if name == "sh" else "install.ps1")
-                        command = runner + ([str(installer)] if name == "sh" else ["-File", str(installer)])
+            for name, runner in runners():
+                with self.subTest(runner=name):
+                    target = base / name
+                    (target / "src").mkdir(parents=True)
+                    (target / "src/app.py").write_text("print('app')\n")
+                    (target / ".gitignore").write_text("*.pyc\n")
+                    subprocess.run(["git", "init", "-q", str(target)], check=True)
+                    before = {p.relative_to(target): p.read_bytes() for p in target.rglob("*") if p.is_file() and ".git" not in p.parts}
+                    installer = ROOT / ("install.sh" if name == "sh" else "install.ps1")
+                    command = runner + ([str(installer)] if name == "sh" else ["-File", str(installer)])
 
-                        def invoke(action, expected_code=0):
-                            result = subprocess.run(command + [action, str(target)], cwd=ROOT, capture_output=True, text=True, input="")
-                            self.assertEqual(result.returncode, expected_code, result.stdout + result.stderr)
-                            return result
+                    def invoke(action):
+                        result = subprocess.run(command + [action, str(target)], cwd=ROOT, capture_output=True, text=True, input="")
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-                        invoke("install")
-                        invoke("verify")
-                        framework = target / ".github/ai-qa/framework/method/safety.md"
-                        framework.write_text("fixture edit\n")
-                        invoke("update")
-                        self.assertTrue(Path(str(framework) + ".ai-qa-new").exists())
-                        invoke("uninstall")
-                        self.assertEqual(framework.read_text(), "fixture edit\n")
-                        after = {p.relative_to(target): p.read_bytes() for p in target.rglob("*") if p.is_file() and ".git" not in p.parts}
-                        for relative, contents in before.items():
-                            self.assertEqual(after.get(relative), contents, str(relative))
+                    invoke("install")
+                    invoke("verify")
+                    framework = target / ".github/ai-qa/framework/method/safety.md"
+                    framework.write_text("local edit\n")
+                    invoke("update")
+                    self.assertTrue(Path(str(framework) + ".ai-qa-new").exists())
+                    invoke("uninstall")
+                    self.assertEqual(framework.read_text(), "local edit\n")
+                    framework.unlink()
+                    Path(str(framework) + ".ai-qa-new").unlink()
+                    after = {p.relative_to(target): p.read_bytes() for p in target.rglob("*") if p.is_file() and ".git" not in p.parts}
+                    self.assertEqual(after, before)
 
 
 if __name__ == "__main__":

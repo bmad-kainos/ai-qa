@@ -72,23 +72,3 @@ Change the policy through `qa-configure` (`qa-process.md` → *qa-work policy*).
 ## Integrations without MCP
 
 Every operation has a manual fallback. For reads, paste the work item, page or log into chat. For writes, the skill writes the exact payload to `qa-work/<id>/outputs/` and tells you where to paste it. Every external write, including a manual hand-off that you then paste yourself, is preceded by an L4 gate that shows the action, target, exact payload and side effect.
-
-## Fixture walkthroughs
-
-The [fixtures](../fixtures/README.md) are the v1 validation targets. To try one:
-
-1. Copy a fixture somewhere outside this checkout and run `git init` in it.
-2. Install AI-QA into the copy and run `@qa-configure`.
-3. Compare the result with `fixtures/_expected/<fixture>/`.
-
-| Fixture | What to look for |
-|---|---|
-| `java-maven-restassured-azdo` | Maven + JUnit 5/REST Assured → `junit5-restassured` pack; Azure Pipelines and Boards (`AB#` syntax); help/list-only command verification |
-| `ts-playwright-github` | Playwright API + e2e → `playwright-ts`; GitHub Actions, PR template, `#123` issues |
-| `python-pytest-jira` | pytest + httpx → `pytest`; `*.atlassian.net` → Jira Cloud ◐, confirmed by a `serverInfo` probe or one question |
-| `dotnet-no-pack` | xUnit has no matching pack → reduced-confidence warning; a self-hosted Jira URL → Server/DC ◐ |
-| `empty-repo` | No tests or CI → ∅ findings, ★ defaults dated after approval, offer of a gated scaffold |
-| `conflicting-signals` | ⚠ Jest vs Vitest, Jira vs ADO, competing branch patterns, each asked once with evidence |
-| `monorepo-workspaces` | Two workspace scopes; v1 configures a single scope path and asks which |
-
-Never install into this checkout; the installer refuses.

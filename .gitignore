@@ -3,8 +3,4 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 /tests/.installer-*/
-/tests/.installer-fixtures-*/
-/fixtures/**/bin/
-/fixtures/**/obj/
-/fixtures/**/.vs/
 *.egg-info/

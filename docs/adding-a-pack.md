@@ -23,6 +23,5 @@ Packs live in `payload/.github/ai-qa/framework/packs/<id>/`. Start from `packs/_
 
 1. Add the pack folder with the files for its tier.
 2. Add the pack to `packs/README.md`.
-3. If useful, add a fixture under `fixtures/` with expected outputs in `fixtures/_expected/`.
-4. Add a CHANGELOG entry. If existing installations need re-rendering, add `refresh-required: <version>` to `docs/migrations.md`.
-5. Run `python3 -m unittest discover -s tests`.
+3. Add a CHANGELOG entry. If existing installations need re-rendering, add `refresh-required: <version>` to `docs/migrations.md`.
+4. Run `python3 -m unittest discover -s tests`.
