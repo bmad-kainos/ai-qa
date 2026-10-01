@@ -1,48 +1,85 @@
 # AI-QA
 
-AI-QA v1 is a project-aware QA/QE framework for **GitHub Copilot in VS Code**. It installs Markdown agents, skills, instructions and framework references into a repository; it does not install an application runtime or test runner. The project runs its own tests. MCP is optional: every external operation has a manual fallback.
+AI-QA v1 is a project-aware QA/QE framework for **GitHub Copilot in VS Code**. It installs Markdown agents, skills and framework references into a repository. It doesn't install an application runtime, a test runner, a binary or a client library. The project's own tooling runs its tests. MCP is optional: every external operation has a manual fallback.
+
+```text
+INSTALL → CONFIGURE (DISCOVER → CONFIRM → ADAPT) → USE → REFRESH
+```
 
 ## Install
 
-From a separate AI-QA checkout (do not install into this repository):
+Run the installer from a separate AI-QA checkout. Don't install into this repository; the installer refuses to.
 
 ```sh
-./install.sh install /path/to/project
-./install.sh verify /path/to/project
+./install.sh install /path/to/project      # or: ./install.sh install --dry-run /path/to/project
+./install.sh verify  /path/to/project
 ```
 
-On Windows, use `./install.ps1 install C:\path\to\project` (PowerShell). `--dry-run` previews changes. If existing `qa*` agents, skills or instructions collide, choose an explicit `--prefix <name>` or resolve the collision before installation. See [manual install](docs/manual-install.md) for a non-scripted option.
-
-Open the project in VS Code and ask `qa-configure` to configure it. Inspect its discovered evidence and suggested decisions, approve the adaptation diff at L5, then ask `qa` for `design`, `automate`, `full`, `triage` or invoke any `qa-*` skill directly. `qa-configure refresh` reconciles changed project evidence while preserving user-managed sections.
+On Windows, use `./install.ps1 install C:\path\to\project` (PowerShell 5.1+ or 7). Both installers behave the same and use only shell built-ins and standard OS tools. If existing `qa*` agents, skills or instructions collide, the installer stops. You can then pick a namespace with `--prefix <name>` or resolve the collision first. See [manual install](docs/manual-install.md) for a non-scripted option.
 
 ```sh
-./install.sh update /path/to/project
-./install.sh verify /path/to/project
-./install.sh uninstall /path/to/project
+./install.sh update    /path/to/project    # modified files are kept; new versions are written as <file>.ai-qa-new
+./install.sh uninstall /path/to/project    # keeps project layer, baselines and qa-work unless --purge (confirmed)
 ```
 
-Updates preserve modified installed files and emit `.ai-qa-new` copies for review. Uninstall preserves project knowledge and baselines unless explicitly purged. Read [migrations](docs/migrations.md) before updating.
+Read [migrations](docs/migrations.md) before updating.
+
+## Use
+
+1. Open the project in VS Code and ask **`@qa-configure`** to configure it. It discovers evidence, asks one question at a time, only about real conflicts or unknowns, and shows the exact diff. Nothing is written until you approve the L5 gate.
+2. Ask **`@qa`** for a workflow (`design`, `automate`, `full`, `triage`), or invoke any of the 21 `qa-*` skills directly.
+3. Run `@qa-configure refresh` after the project changes or after a framework update that flags a refresh. Refresh never rewrites `<!-- ai-qa:user -->` sections.
+
+| Group | Skills |
+|---|---|
+| Core | `qa-analyse-requirement` · `qa-code-context` · `qa-coverage-gaps` · `qa-design-tests` · `qa-regression-risk` · `qa-automation-plan` · `qa-review-tests` · `qa-generate-tests` · `qa-run-tests` · `qa-analyse-failure` · `qa-test-plan` · `qa-publish` |
+| Supporting | `qa-bug-report` · `qa-analyse-docs` · `qa-baseline` · `qa-retrospective` |
+| Engineering | `qa-branch` · `qa-create-pr` · `qa-tech-report` · `qa-update-docs` |
+| Discovery | `qa-discover` |
+
+See the [user guide](docs/user-guide.md) for workflows and walkthroughs.
 
 ## Where information lives
 
 | Path in target repository | Owner | Purpose |
 |---|---|---|
-| `.github/ai-qa/framework/` | AI-QA | Portable methods, defaults, provider recipes and test packs |
 | `.github/agents/qa*.agent.md`, `.github/skills/qa-*/` | AI-QA | VS Code Copilot entry points |
-| `.github/ai-qa/project/project.md` | Project | Sourced description of *what* this project is |
-| `.github/ai-qa/project/conventions/*.md` | Project | *How* AI-QA works here, including providers, deployments and transports |
-| `qa-work/<work-id>/index.md`, `outputs/` | Project | Committed traceability and deliverables |
+| `.github/ai-qa/framework/` | AI-QA | Methods, providers, packs, defaults and templates; never edited per project |
+| `.github/ai-qa/project/project.md` | Project (`qa-configure`) | *What* the project is: the sourced Project Context |
+| `.github/ai-qa/project/conventions/*.md` | Project (`qa-configure`) | *How* AI-QA works here: git, testing, qa-process, integrations, reporting |
+| `.github/instructions/qa-*.instructions.md` | Project (`qa-configure`) | Rendered project and pack instructions, scoped by `applyTo` to discovered test paths |
+| `qa-work/<work-id>/` | Project | `index.md` and `outputs/` committed by default; working artefacts ignored |
+| `.github/ai-qa/baselines/` | Project | Baseline snapshots |
 
-The default `.gitignore` policy excludes intermediate work, logs and test data. Adapt it through `qa-configure` if the project has different retention rules. `qa` cannot change the project-owned layer. Never paste credentials into configuration; record environment variable **names** only.
+Never put credentials in configuration. Record environment-variable **names** only.
 
-## Safety and workflows
+## Safety
 
-Read-only operations need no gate. Local edits are permitted only on non-default branches after workflow plan approval. Local branch creation and commits (L2), environment-dependent/full tests (L3 unless explicitly safe), external writes and pushes (L4), and installation of dependencies or project adaptation (L5) require explicit, action-specific approval. Branch creation does **not** imply a push; AI-QA never merges or modifies product code in its failure fix loop.
+Safety gates are authoritative, and agent tool lists are not a safety mechanism. See [safety](docs/safety.md).
 
-Workflows are resumable; non-stale artefacts are reused. `design` analyses a requirement, maps code and coverage, designs scenarios, assesses regression and automation, reviews design, then prepares a plan after approval. `automate` generates and checks tests against the project's framework and runs them subject to gates. `full` joins both; `triage` classifies failures and can prepare a bug report. See [walkthroughs](docs/walkthroughs.md).
+| Level | Covers | Gate |
+|---|---|---|
+| L0 | Reads and read-only probes | None |
+| L1 | Local edits on a non-default branch | No gate; in workflows only after plan approval; always summarised |
+| L2 | Create local branch, commit | Gated |
+| L3 | Full / environment-dependent / long test runs | Gated unless marked safe in `qa-process.md` |
+| L4 | Push, PR, comments, work items, publishing | Always gated |
+| L5 | Dependency install, adaptation-layer writes, `mcp.json` | Always gated |
 
-## Development
+AI-QA never edits the default branch. Creating a branch never pushes it, and AI-QA never merges. The failure fix loop never touches product code.
 
-Examples in `examples/fixtures/` exercise Java/Azure DevOps, TypeScript/GitHub, Python/Jira Cloud, .NET, an empty repository and conflicting conventions; `examples/expected/` illustrates sourced discovery and project context for each. The optional, standard-library-only `tools/qa-stats.py` runs from **this checkout**, not from a target project. It accepts a JSON array of `{ "sha", "outcome": "passed"|"failed", "duration_seconds" }` and returns structured percentiles, same-SHA reruns and flaky SHA evidence; without it, label those metrics *not computed*.
+## Repository layout
 
-Methodology is informed by the Generic QA POC; pack and skill guidance adapts [Feabhas](https://github.com/bmad-kainos/feabhas) under its [MIT licence](docs/licenses/feabhas-MIT.txt). An AI-QA-specific licence and contribution policy are not declared here.
+| Path | Purpose |
+|---|---|
+| `payload/.github/` | Everything the installer copies into a target |
+| `install.sh`, `install.ps1`, `VERSION`, `CHANGELOG.md` | Installers and release metadata |
+| `docs/` | [Architecture](docs/architecture.md), [user guide](docs/user-guide.md), [configure](docs/configure.md), [safety](docs/safety.md), [adding a pack](docs/adding-a-pack.md), [adding a provider](docs/adding-a-provider.md), [migrations](docs/migrations.md), [manual install](docs/manual-install.md) |
+| `fixtures/` | Seven validation repositories and expected discovery/Project Context outputs ([fixtures/README.md](fixtures/README.md)) |
+| `tools/qa-stats.py` | Optional standard-library helper for baseline percentiles and flaky-SHA detection. It runs from this checkout only and is never installed |
+| `reference/zephyr/` | Zephyr knowledge kept for future work; not installed |
+| `tests/` | Installer and `qa-stats` tests (`python3 -m unittest discover -s tests`) |
+
+## Provenance
+
+The methodology is ported from the Generic QA POC (`sylwia-luczak/AI-QA-AGENT_GENERIC@ac750bb`). The tooling, packs and engineering skills are adapted from Feabhas (`bmad-kainos/feabhas@b788dc1`) under its [MIT licence](docs/licenses/feabhas-MIT.txt); the notice also ships at `.github/ai-qa/framework/LICENSE-feabhas.txt`. See [LICENSE](LICENSE).

@@ -1,368 +1,324 @@
+[CmdletBinding()]
 param(
-    [Parameter(Position = 0)][string]$Command = 'install',
+    [Parameter(Position = 0)][ValidateSet('install', 'update', 'verify', 'uninstall')][string]$Command = 'install',
     [Parameter(Position = 1)][string]$Target = '.',
     [string]$Prefix = 'qa',
-    [Alias('dry-run')][switch]$DryRun,
-    [switch]$Update,
-    [switch]$Uninstall,
+    [switch]$DryRun,
     [switch]$Purge,
-    [switch]$Yes,
-    [switch]$Verify
+    [switch]$Yes
 )
 
 $ErrorActionPreference = 'Stop'
-$begin = '<!-- ai-qa:start -->'
-$end = '<!-- ai-qa:end -->'
-$block = "$begin`nAI-QA agents: ``.github/agents/qa.agent.md`` and ``.github/agents/qa-configure.agent.md``.`n$end"
-$ignoreBegin = '# ai-qa:start'
-$ignoreEnd = '# ai-qa:end'
-$ignoreBlock = ($ignoreBegin, 'qa-work/**', '!qa-work/*/', '!qa-work/*/index.md',
-                '!qa-work/*/outputs/', '!qa-work/*/outputs/**', $ignoreEnd) -join "`n"
-$frameworkVersion = '1.0.0'
-$encoding = New-Object System.Text.UTF8Encoding($false)
-$source = (Resolve-Path -LiteralPath $PSScriptRoot).Path
+$Encoding = New-Object System.Text.UTF8Encoding($false)
+$ScriptDir = (Resolve-Path -LiteralPath $PSScriptRoot).Path
+$SourceRoot = Join-Path $ScriptDir 'payload/.github'
+$Version = (Get-Content -LiteralPath (Join-Path $ScriptDir 'VERSION') -Raw).Trim()
+$ManifestRel = '.github/ai-qa/manifest.json'
+$Begin = '<!-- ai-qa:start -->'; $End = '<!-- ai-qa:end -->'
+$IgnoreBegin = '# ai-qa:start'; $IgnoreEnd = '# ai-qa:end'
+$PrefixExplicit = $PSBoundParameters.ContainsKey('Prefix')
 
-function Hash-Bytes([byte[]]$bytes) {
+function Fail([string]$Message) { throw $Message }
+function HashBytes([byte[]]$Bytes) {
     $sha = [System.Security.Cryptography.SHA256]::Create()
-    try { return ([BitConverter]::ToString($sha.ComputeHash($bytes))).Replace('-', '').ToLowerInvariant() }
+    try { return ([BitConverter]::ToString($sha.ComputeHash($Bytes))).Replace('-', '').ToLowerInvariant() }
     finally { $sha.Dispose() }
 }
-function Hash-Text([string]$text) { return Hash-Bytes $encoding.GetBytes($text) }
-function Read-Text([string]$path) { return [System.IO.File]::ReadAllText($path, $encoding) }
-function Write-Text([string]$path, [string]$text) { [System.IO.File]::WriteAllText($path, $text, $encoding) }
-function Safe-Path([string]$relative) {
-    if (($relative -notmatch '^\.github/' -and $relative -ne '.gitignore') -or
-        $relative -match '(^|/)\.\.(/|$)' -or [System.IO.Path]::IsPathRooted($relative)) {
-        throw "Unsafe manifest path: $relative"
-    }
-    $path = $resolvedTarget
-    foreach ($part in ($relative -split '/')) {
-        $path = Join-Path $path $part
-        if (Test-Path -LiteralPath $path) {
-            $item = Get-Item -LiteralPath $path -Force
-            if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) { throw "Refusing symlink: $path" }
-        }
-    }
+function HashFile([string]$Path) { return HashBytes ([System.IO.File]::ReadAllBytes($Path)) }
+function IsLink([string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path)) { return $false }
+    return [bool]((Get-Item -LiteralPath $Path -Force).Attributes -band [System.IO.FileAttributes]::ReparsePoint)
+}
+function SafePath([string]$Relative) {
+    if ([IO.Path]::IsPathRooted($Relative) -or $Relative -match '(^|/)\.\.(/|$)' -or $Relative.Contains('|')) { Fail "Unsafe manifest path: $Relative" }
+    if ($Relative -notmatch '^\.github/(agents/|skills/|ai-qa/framework/|ai-qa/manifest\.json$|copilot-instructions\.md$)' -and
+        $Relative -notmatch '^\.gitignore$|^\.github/ai-qa/(project|baselines)(/|$)|^qa-work(/|$)') { Fail "Unsafe path: $Relative" }
+    $path = $ResolvedTarget
+    foreach ($part in ($Relative -split '/')) { $path = Join-Path $path $part; if (IsLink $path) { Fail "Refusing symlink: $path" } }
     return $path
 }
-function Managed-Block([string]$path, [string]$start = $begin, [string]$finish = $end) {
-    if (-not (Test-Path -LiteralPath $path)) { return $null }
-    $text = Read-Text $path
-    $starts = ([regex]::Matches($text, [regex]::Escape($start))).Count
-    $ends = ([regex]::Matches($text, [regex]::Escape($finish))).Count
-    if ($starts -ne $ends -or $starts -gt 1) { throw "Invalid AI-QA markers in $path" }
-    if ($starts -eq 0) { return $null }
-    $first = $text.IndexOf($start, [StringComparison]::Ordinal)
-    $last = $text.IndexOf($finish, $first, [StringComparison]::Ordinal) + $finish.Length
-    return $text.Substring($first, $last - $first)
+function AssertNoLinks([string]$Path) {
+    if (IsLink $Path) { Fail "Refusing symlink: $Path" }
+    if (Test-Path -LiteralPath $Path -PathType Container) {
+        $links = @(Get-ChildItem -LiteralPath $Path -Force -Recurse | Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint })
+        if ($links.Count) { Fail "Refusing symlink in managed path: $($links[0].FullName)" }
+    }
+}
+function GetBlock([string]$Text, [string]$Start, [string]$Finish) {
+    $a = [regex]::Matches($Text, [regex]::Escape($Start)).Count
+    $b = [regex]::Matches($Text, [regex]::Escape($Finish)).Count
+    if ($a -ne $b -or $a -gt 1) { Fail 'Invalid AI-QA markers' }
+    if ($a -eq 0) { return $null }
+    $first = $Text.IndexOf($Start, [StringComparison]::Ordinal)
+    $last = $Text.IndexOf($Finish, $first, [StringComparison]::Ordinal) + $Finish.Length
+    return $Text.Substring($first, $last - $first)
+}
+function MergeBlock([string]$Text, [string]$Start, [string]$Finish, [string]$Replacement, [bool]$Remove, [bool]$Eol) {
+    $block = GetBlock $Text $Start $Finish
+    if ($null -ne $block) {
+        $index = $Text.IndexOf($block, [StringComparison]::Ordinal)
+        $before = $Text.Substring(0, $index); $after = $Text.Substring($index + $block.Length)
+        if (-not $Remove) { return $before + $Replacement + $after }
+        if ($after.StartsWith("`r`n")) { $after = $after.Substring(2) } elseif ($after.StartsWith("`n")) { $after = $after.Substring(1) }
+        # Drop the blank separator line the installer added before the block.
+        if ($before.EndsWith("`n`n")) { $before = $before.Substring(0, $before.Length - 1) }
+        $result = $before + $after
+        if (-not $Eol) { $result = $result.TrimEnd("`r", "`n") }
+        return $result
+    }
+    if ($Remove) { return $Text }
+    if ($Text.Length -eq 0) { return $Replacement + "`n" }
+    if (-not $Text.EndsWith("`n")) { $Text += "`n" }
+    return $Text + "`n" + $Replacement + "`n"
+}
+function VersionGreater([string]$A, [string]$B) {
+    $x = $A.Split('.'); $y = $B.Split('.')
+    for ($i = 0; $i -lt [Math]::Max($x.Count, $y.Count); $i++) {
+        $p = if ($i -lt $x.Count) { [int]$x[$i] } else { 0 }; $q = if ($i -lt $y.Count) { [int]$y[$i] } else { 0 }
+        if ($p -gt $q) { return $true }; if ($p -lt $q) { return $false }
+    }
+    return $false
+}
+function EndsWithEol([string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return '1' }
+    $bytes = [IO.File]::ReadAllBytes($Path)
+    if ($bytes.Length -eq 0 -or $bytes[$bytes.Length - 1] -eq 10) { return '1' } else { return '0' }
+}
+function ReadManifest([string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
+    try { $data = [IO.File]::ReadAllText($Path, $Encoding) | ConvertFrom-Json } catch { Fail "Invalid install manifest: $Path" }
+    if ($data.schema -ne 1 -or $data.prefix -notmatch '^[A-Za-z0-9_-]+$' -or
+        $data.framework_version -notmatch '^\S+$' -or $data.instructions_block_sha256 -notmatch '^[0-9a-f]{64}$' -or
+        $data.gitignore_block_sha256 -notmatch '^[0-9a-f]{64}$') { Fail "Invalid install manifest: $Path" }
+    foreach ($property in $data.files.PSObject.Properties) {
+        $name = $property.Name
+        if ($property.Value -notmatch '^[0-9a-f]{64}$' -or
+            ($name -notmatch ('^\.github/agents/' + [regex]::Escape($data.prefix) + '[^/]*\.agent\.md$') -and
+             $name -notmatch ('^\.github/skills/' + [regex]::Escape($data.prefix) + '-[^/]+/.+$') -and
+             $name -notmatch '^\.github/ai-qa/framework/.+$')) { Fail "Unsafe manifest file: $name" }
+        $null = SafePath $name
+    }
+    return $data
+}
+function WriteManifest([string]$Path, $Data) {
+    $lines = [Collections.Generic.List[string]]::new()
+    $lines.Add('{'); $lines.Add('  "schema": 1,')
+    $lines.Add(('  "framework_version": "{0}",' -f $Data.framework_version))
+    $lines.Add(('  "prefix": "{0}",' -f $Data.prefix))
+    $lines.Add(('  "instructions_block_sha256": "{0}",' -f $Data.instructions_block_sha256))
+    $lines.Add(('  "gitignore_block_sha256": "{0}",' -f $Data.gitignore_block_sha256))
+    $lines.Add(('  "instructions_eol": "{0}",' -f $Data.instructions_eol))
+    $lines.Add(('  "gitignore_eol": "{0}",' -f $Data.gitignore_eol))
+    $lines.Add('  "created_files": [')
+    foreach ($createdFile in @($Data.created_files | Sort-Object)) { $lines.Add(('    "{0}",' -f $createdFile)) }
+    if ($Data.created_files.Count -gt 0) { $lines[$lines.Count - 1] = $lines[$lines.Count - 1].TrimEnd(',') }
+    $lines.Add('  ],')
+    $lines.Add('  "created_dirs": [')
+    foreach ($directory in @($Data.created_dirs | Sort-Object -Unique)) { $lines.Add(('    "{0}",' -f $directory)) }
+    if ($Data.created_dirs.Count -gt 0) { $lines[$lines.Count - 1] = $lines[$lines.Count - 1].TrimEnd(',') }
+    $lines.Add('  ],')
+    $lines.Add('  "files": {')
+    $names = @($Data.files.Keys | Sort-Object)
+    for ($i = 0; $i -lt $names.Count; $i++) {
+        $comma = if ($i -lt $names.Count - 1) { ',' } else { '' }
+        $lines.Add(('    "{0}": "{1}"{2}' -f $names[$i], $Data.files[$names[$i]], $comma))
+    }
+    $lines.Add('  }'); $lines.Add('}')
+    [IO.File]::WriteAllText($Path, (($lines -join "`n") + "`n"), $Encoding)
 }
 
 try {
-    if ($Command -in @('install', 'update', 'verify', 'uninstall', 'purge')) {
-        if ($Command -eq 'update') { $Update = $true }
-        if ($Command -eq 'verify') { $Verify = $true }
-        if ($Command -in @('uninstall', 'purge')) { $Uninstall = $true }
-        if ($Command -eq 'purge') { $Purge = $true }
-    } elseif ($Target -eq '.') {
-        $Target = $Command
-    } else { throw "Unknown command: $Command" }
-    if ($Prefix -notmatch '^[a-zA-Z0-9_-]+$') { throw 'Prefix must contain only letters, digits, underscores and hyphens' }
-    $block = $block.Replace('.github/agents/qa', ".github/agents/$Prefix")
-    if ($Purge -and -not $Uninstall) { throw '--purge requires --uninstall' }
-    if ($Purge -and -not $Yes -and -not $DryRun) {
-        throw '--purge deletes project data and baselines; rerun with --yes to confirm'
+    if (-not $Version) { Fail 'VERSION is empty' }
+    if ($Prefix -notmatch '^[A-Za-z0-9_-]+$') { Fail 'Prefix must contain only letters, digits, underscores and hyphens' }
+    if ($Purge -and $Command -ne 'uninstall') { Fail '--purge requires uninstall' }
+    if (-not (Test-Path -LiteralPath $Target -PathType Container)) { Fail "Target is not a directory: $Target" }
+    if (IsLink $Target) { Fail "Refusing symlink target: $Target" }
+    $ResolvedTarget = (Resolve-Path -LiteralPath $Target).Path
+    if ($Command -ne 'verify' -and ($ResolvedTarget -eq $ScriptDir -or
+        ((Test-Path (Join-Path $ResolvedTarget 'install.sh')) -and (Test-Path (Join-Path $ResolvedTarget 'payload/.github/ai-qa/framework'))))) {
+        Fail 'Refusing to modify the AI-QA source repository itself'
     }
-    if ([int]$Update.IsPresent + [int]$Uninstall.IsPresent + [int]$Verify.IsPresent -gt 1) {
-        throw '--update, --uninstall and --verify are mutually exclusive'
-    }
-    $resolvedTarget = (Resolve-Path -LiteralPath $Target).Path
-    if (-not (Test-Path -LiteralPath $resolvedTarget -PathType Container)) { throw "Target is not a directory: $Target" }
-    if ($resolvedTarget -eq $source -and -not $Verify) { throw 'Refusing to modify the AI-QA source repository itself' }
-    $manifestPath = Safe-Path '.github/ai-qa/manifest.json'
-    $instructionPath = Safe-Path '.github/copilot-instructions.md'
-    $ignorePath = Safe-Path '.gitignore'
-    $old = $null
-    if (Test-Path -LiteralPath $manifestPath) {
-        $old = Read-Text $manifestPath | ConvertFrom-Json
-        if ($old.version -ne 1 -or $null -eq $old.files) { throw "Invalid install manifest: $manifestPath" }
-        if ($old.prefix -notmatch '^[a-zA-Z0-9_-]+$') { throw 'Invalid manifest prefix' }
-        if ($old.block -notmatch '^[0-9a-f]{64}$' -or $old.ignore_block -notmatch '^[0-9a-f]{64}$') {
-            throw 'Invalid manifest block checksum'
+    if (-not (Test-Path -LiteralPath $SourceRoot -PathType Container)) { Fail 'Missing payload/.github next to installer' }
+    $ManifestPath = SafePath $ManifestRel
+    $Manifest = ReadManifest $ManifestPath
+    if ($Command -in @('update', 'uninstall') -and -not $Manifest) { Fail "No managed installation to $Command" }
+    if ($Command -eq 'install' -and $Manifest) { Fail 'Already installed; use update or verify' }
+    if ($Command -eq 'update' -and -not $PrefixExplicit) { $Prefix = $Manifest.prefix }
+    if ($Manifest -and $Command -ne 'uninstall' -and $Prefix -ne $Manifest.prefix) { Fail "Installed prefix is '$($Manifest.prefix)'; use the same -Prefix" }
+
+    if ($Command -eq 'verify') {
+        if (-not $Manifest) { Fail 'AI-QA manifest missing' }
+        $problems = [Collections.Generic.List[string]]::new()
+        foreach ($property in $Manifest.files.PSObject.Properties) {
+            $path = SafePath $property.Name
+            if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or (HashFile $path) -ne $property.Value) { $problems.Add($property.Name) }
         }
-        if (-not $old.framework_version) { throw 'Invalid manifest framework version' }
-    }
-    $previous = @{}
-    if ($old) {
-        foreach ($property in $old.files.PSObject.Properties) {
-            $null = Safe-Path $property.Name
-            if ($property.Value -notmatch '^[0-9a-f]{64}$') { throw "Invalid manifest checksum: $($property.Name)" }
-            $namespace = [regex]::Escape($old.prefix)
-            if ($property.Name -notmatch "^\.github/agents/$namespace" + '[^/]*\.agent\.md$' -and
-                $property.Name -notmatch "^\.github/skills/$namespace" + '-[^/]+/.+$' -and
-                $property.Name -notmatch '^\.github/ai-qa/framework/.+$' -and
-                $property.Name -notmatch "^\.github/instructions/$namespace" + '[^/]*\.instructions\.md$') {
-                throw "Unsafe manifest file: $($property.Name)"
-            }
-            $previous[$property.Name] = $property.Value
-        }
-    }
-    if ($Verify) {
-        if (-not $old) { throw 'AI-QA manifest missing' }
-        $problems = @()
-        foreach ($name in $previous.Keys) {
-            $path = Safe-Path $name
-            if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or
-                (Hash-Bytes ([System.IO.File]::ReadAllBytes($path))) -ne $previous[$name]) { $problems += $name }
-        }
-        $existingBlock = Managed-Block $instructionPath
-        if ($null -eq $existingBlock -or (Hash-Text $existingBlock) -ne $old.block) {
-            $problems += '.github/copilot-instructions.md (managed block)'
-        }
-        $existingIgnore = Managed-Block $ignorePath $ignoreBegin $ignoreEnd
-        if ($null -eq $existingIgnore -or (Hash-Text $existingIgnore) -ne $old.ignore_block) {
-            $problems += '.gitignore (managed block)'
-        }
-        if ($old.framework_version -ne $frameworkVersion) {
-            $problems += "framework version (expected $frameworkVersion, found $($old.framework_version))"
-        }
-        if ($problems.Count) { throw "Verification failed: $($problems -join ', ')" }
-        $project = Safe-Path '.github/ai-qa/project/project.md'
-        $conventions = Safe-Path '.github/ai-qa/project/conventions'
-        if (-not (Test-Path -LiteralPath $project -PathType Leaf) -or
-            -not (Test-Path -LiteralPath $conventions -PathType Container)) {
-            Write-Output 'WARN: project layer is not configured; run qa-configure'
-        }
-        Write-Output "Verified AI-QA framework $frameworkVersion, $($previous.Count) files and instruction blocks"
+        $instructionPath = SafePath '.github/copilot-instructions.md'; $ignorePath = SafePath '.gitignore'
+        $instructionText = if (Test-Path $instructionPath) { [IO.File]::ReadAllText($instructionPath, $Encoding) } else { '' }
+        $ignoreText = if (Test-Path $ignorePath) { [IO.File]::ReadAllText($ignorePath, $Encoding) } else { '' }
+        $instructionBlock = GetBlock $instructionText $Begin $End; $ignoreBlock = GetBlock $ignoreText $IgnoreBegin $IgnoreEnd
+        if ($null -eq $instructionBlock -or (HashBytes $Encoding.GetBytes((($instructionBlock -replace "`r`n", "`n") + "`n"))) -ne $Manifest.instructions_block_sha256) { $problems.Add('copilot-instructions.md (managed block)') }
+        if ($null -eq $ignoreBlock -or (HashBytes $Encoding.GetBytes((($ignoreBlock -replace "`r`n", "`n") + "`n"))) -ne $Manifest.gitignore_block_sha256) { $problems.Add('.gitignore (managed block)') }
+        if ($problems.Count) { Fail "Verification failed: $($problems -join ', ')" }
+        if ($Manifest.framework_version -ne $Version) { Write-Warning "Installed framework version $($Manifest.framework_version) differs from source $Version" }
+        if (-not (Test-Path (SafePath '.github/ai-qa/project/project.md') -PathType Leaf)) { Write-Output 'WARN: project layer is not configured; run qa-configure' }
+        Write-Output "Verified AI-QA framework $($Manifest.framework_version), $(@($Manifest.files.PSObject.Properties).Count) files and instruction blocks"
         exit 0
     }
-    if ($Uninstall -and -not $old) { throw 'No managed installation to uninstall' }
-    if ($Update -and -not $old) { throw 'No managed installation to update' }
-    if (-not $Update -and -not $Uninstall -and $old) { throw 'Already installed; use --update or --verify' }
-    if ($old -and -not $Uninstall -and $old.prefix -ne $Prefix) {
-        throw "Installed prefix is '$($old.prefix)'; use the same --prefix"
+    if ($Purge -and -not $Yes) {
+        if ([Console]::IsInputRedirected) { Fail '--purge requires confirmation; use -Yes for non-interactive use' }
+        $name = Split-Path -Leaf $ResolvedTarget
+        $answer = Read-Host "Purge project data and qa-work from $name? Type yes"
+        if ($answer -ne 'yes') { Fail 'Purge not confirmed' }
+    }
+    if ($Purge) { foreach ($rel in @('.github/ai-qa/project', '.github/ai-qa/baselines', 'qa-work')) { AssertNoLinks (Join-Path $ResolvedTarget $rel) } }
+
+    $oldFiles = @{}
+    if ($Manifest) { foreach ($property in $Manifest.files.PSObject.Properties) { $oldFiles[$property.Name] = $property.Value } }
+    $desired = @{}
+    if ($Command -ne 'uninstall') {
+        foreach ($folder in @('agents', 'skills', 'ai-qa/framework')) { AssertNoLinks (Join-Path $SourceRoot $folder) }
+        $rename = @{}
+        if ($Prefix -ne 'qa') {
+            foreach ($file in (Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'agents') -Filter 'qa*.agent.md' -File -Recurse -ErrorAction SilentlyContinue)) {
+                $name = [IO.Path]::GetFileNameWithoutExtension([IO.Path]::GetFileNameWithoutExtension($file.Name)); $rename[$name] = $Prefix + $name.Substring(2)
+            }
+            foreach ($folder in (Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'skills') -Directory -Filter 'qa-*' -ErrorAction SilentlyContinue)) { $rename[$folder.Name] = $Prefix + $folder.Name.Substring(2) }
+        }
+        $items = @()
+        $items += Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'agents') -Filter 'qa*.agent.md' -File -Recurse -ErrorAction SilentlyContinue
+        foreach ($folder in (Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'skills') -Directory -Filter 'qa-*' -ErrorAction SilentlyContinue)) { $items += Get-ChildItem -LiteralPath $folder.FullName -File -Recurse }
+        $items += Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'ai-qa/framework') -File -Recurse
+        foreach ($item in $items) {
+            if (IsLink $item.FullName) { Fail "Refusing symlink source: $($item.FullName)" }
+            $tail = $item.FullName.Substring($SourceRoot.Length + 1).Replace('\', '/')
+            if ($tail -match '^agents/qa') { $tail = $tail -replace '^agents/qa', $Prefix }
+            elseif ($tail -match '^skills/qa-') { $tail = $tail -replace '^skills/qa-', "$Prefix-" }
+            $bytes = [IO.File]::ReadAllBytes($item.FullName)
+            if ($Prefix -ne 'qa' -and $item.Extension -in @('.md', '.txt', '.json', '.yaml', '.yml')) {
+                $text = $Encoding.GetString($bytes)
+                foreach ($old in ($rename.Keys | Sort-Object Length -Descending)) {
+                    $pattern = '(?<![A-Za-z0-9_-])' + [regex]::Escape($old) + '(?![A-Za-z0-9_-])'
+                    $replacement = $rename[$old]
+                    $text = [regex]::Replace($text, $pattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $replacement })
+                }
+                $bytes = $Encoding.GetBytes($text)
+            }
+            $desired['.github/' + $tail] = $bytes
+        }
+        if (-not $desired.Count) { Fail 'No framework-owned files found in payload' }
     }
 
-    $namespaceCollisions = @()
-    foreach ($category in @('agents', 'instructions')) {
-        $dir = Join-Path $resolvedTarget ".github/$category"
-        if (-not (Test-Path -LiteralPath $dir)) { continue }
-        if ((Get-Item -LiteralPath $dir -Force).Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
-            throw "Refusing symlink: $dir"
+    $collisions = [Collections.Generic.List[string]]::new(); $plan = [Collections.Generic.List[object]]::new()
+    $newFiles = @{}; $modified = [Collections.Generic.List[string]]::new()
+    if ($Command -ne 'uninstall') {
+        foreach ($category in @('agents', 'instructions')) {
+            if ($category -eq 'instructions' -and $Prefix -ne 'qa') { continue }
+            $folder = Join-Path $ResolvedTarget ".github/$category"
+            if (IsLink $folder) { Fail "Refusing symlink: $folder" }
+            if (Test-Path -LiteralPath $folder -PathType Container) {
+                $pattern = if ($category -eq 'agents') { "$Prefix*.agent.md" } else { "$Prefix*.instructions.md" }
+                foreach ($file in (Get-ChildItem -LiteralPath $folder -Filter $pattern -File)) { $rel = ".github/$category/$($file.Name)"; if (-not $oldFiles.ContainsKey($rel)) { $collisions.Add("$rel (occupied namespace)") } }
+            }
         }
-        foreach ($item in (Get-ChildItem -LiteralPath $dir -Force)) {
-            $matchesPrefix = if ($category -eq 'agents') {
-                $item.Name -like "$Prefix*.agent.md"
-            } else { $item.Name -like "$Prefix*.instructions.md" }
-            $relative = ".github/$category/$($item.Name)"
-            if ($matchesPrefix -and -not $previous.ContainsKey($relative) -and -not $old -and -not $Uninstall) {
-                $namespaceCollisions += "$relative (occupied namespace)"
+        $skillFolder = Join-Path $ResolvedTarget '.github/skills'
+        if (IsLink $skillFolder) { Fail "Refusing symlink: $skillFolder" }
+        if (Test-Path -LiteralPath $skillFolder -PathType Container) {
+            foreach ($folder in (Get-ChildItem -LiteralPath $skillFolder -Directory -Filter "$Prefix-*")) {
+                $rel = ".github/skills/$($folder.Name)/"; if (-not @($oldFiles.Keys | Where-Object { $_.StartsWith($rel, [StringComparison]::Ordinal) }).Count) { $collisions.Add("$rel (occupied namespace)") }
             }
         }
     }
-    $skillsDir = Join-Path $resolvedTarget '.github/skills'
-    if (Test-Path -LiteralPath $skillsDir) {
-        if ((Get-Item -LiteralPath $skillsDir -Force).Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
-            throw "Refusing symlink: $skillsDir"
-        }
-        foreach ($item in (Get-ChildItem -LiteralPath $skillsDir -Force)) {
-            if ($item.Name -notlike "$Prefix-*") { continue }
-            $relative = ".github/skills/$($item.Name)/"
-            if (-not $old -and -not $Uninstall -and -not @($previous.Keys | Where-Object { $_.StartsWith($relative) }).Count) {
-                $namespaceCollisions += "$relative (occupied namespace)"
-            }
-        }
-    }
-    $files = @{}
-    if (-not $Uninstall) {
-        $sourceRoot = Join-Path $source '.github'
-        if ((Get-Item -LiteralPath $sourceRoot -Force).Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
-            throw "Refusing symlink source: $sourceRoot"
-        }
-        $replacements = [ordered]@{}
-        if ($Prefix -ne 'qa') {
-            foreach ($agent in (Get-ChildItem -Path (Join-Path $sourceRoot 'agents') -Filter 'qa*.agent.md' -File -ErrorAction SilentlyContinue)) {
-                $name = $agent.Name.Substring(0, $agent.Name.Length - '.agent.md'.Length)
-                $replacements[$name] = $Prefix + $name.Substring(2)
-            }
-            foreach ($skill in (Get-ChildItem -Path (Join-Path $sourceRoot 'skills') -Directory -Filter 'qa-*' -ErrorAction SilentlyContinue)) {
-                $replacements[$skill.Name] = $Prefix + $skill.Name.Substring(2)
-            }
-        }
-        foreach ($relative in @('agents', 'skills', 'ai-qa/framework', 'instructions')) {
-            $dir = Join-Path $sourceRoot $relative
-            if (-not (Test-Path -LiteralPath $dir)) { continue }
-            $ancestor = $sourceRoot
-            foreach ($part in ($relative -split '/')) {
-                $ancestor = Join-Path $ancestor $part
-                if ((Get-Item -LiteralPath $ancestor -Force).Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
-                    throw "Refusing symlink source: $ancestor"
-                }
-            }
-            foreach ($item in (Get-ChildItem -LiteralPath $dir -File -Recurse)) {
-                $tail = $item.FullName.Substring($sourceRoot.Length + 1).Replace('\', '/')
-                $include = switch -Regex ($tail) {
-                    '^agents/qa[^/]*\.agent\.md$' { $true; break }
-                    '^skills/qa-[^/]+/.+' { $true; break }
-                    '^ai-qa/framework/.+' { $true; break }
-                    '^instructions/qa[^/]*\.instructions\.md$' { $true; break }
-                    default { $false }
-                }
-                if (-not $include) { continue }
-                if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) { throw "Refusing symlink source: $tail" }
-                if ($Prefix -ne 'qa') {
-                    if ($tail -match '^agents/') { $tail = $tail -replace '^agents/qa', "agents/$Prefix" }
-                    elseif ($tail -match '^skills/') { $tail = $tail -replace '^skills/qa', "skills/$Prefix" }
-                    elseif ($tail -match '^instructions/') { $tail = $tail -replace '^instructions/qa', "instructions/$Prefix" }
-                }
-                $data = [System.IO.File]::ReadAllBytes($item.FullName)
-                if ($Prefix -ne 'qa' -and $item.Extension -in @('.md', '.txt', '.json', '.yaml', '.yml')) {
-                    $text = $encoding.GetString($data)
-                    foreach ($name in ($replacements.Keys | Sort-Object Length -Descending)) {
-                        $pattern = '(?<![A-Za-z0-9_-])' + [regex]::Escape($name) + '(?![A-Za-z0-9_-])'
-                        $text = [regex]::Replace($text, $pattern, $replacements[$name])
-                    }
-                    $data = $encoding.GetBytes($text)
-                }
-                $files[".github/$tail"] = $data
-            }
-        }
-        if ($files.Count -eq 0) { throw 'No framework-owned files found next to installer' }
-    }
-    $writes = @{}
-    $deletes = @()
-    $conflicts = @($namespaceCollisions)
-    $modified = @()
-    $retained = @{}
-    $names = @($previous.Keys) + @($files.Keys) | Sort-Object -Unique
-    foreach ($name in $names) {
-        $path = Safe-Path $name
-        $exists = Test-Path -LiteralPath $path
-        $current = if ($exists -and (Test-Path -LiteralPath $path -PathType Leaf)) {
-            [System.IO.File]::ReadAllBytes($path)
-        } else { $null }
-        $owned = $previous.ContainsKey($name)
-        $clean = $owned -and $null -ne $current -and (Hash-Bytes $current) -eq $previous[$name]
-        if ($files.ContainsKey($name)) {
-            $desired = $files[$name]
-            if ($owned) {
-                if ($null -ne $current -and (Hash-Bytes $current) -eq (Hash-Bytes $desired)) { continue }
-                if ($clean) { $writes[$path] = $desired }
-                else {
-                    $modified += $name
-                    $retained[$name] = $previous[$name]
-                    $writes[(Safe-Path ($name + '.ai-qa-new'))] = $desired
-                }
-            } elseif ($exists) { $conflicts += $name } else { $writes[$path] = $desired }
-        } elseif ($exists) {
-            if ($clean -or ($Uninstall -and $Purge)) { $deletes += $path }
+    foreach ($rel in $desired.Keys) {
+        $path = SafePath $rel; $newHash = HashBytes $desired[$rel]
+        if ($oldFiles.ContainsKey($rel)) {
+            if ((Test-Path -LiteralPath $path -PathType Leaf) -and (HashFile $path) -eq $newHash) { $newFiles[$rel] = $newHash }
+            elseif ((Test-Path -LiteralPath $path -PathType Leaf) -and (HashFile $path) -eq $oldFiles[$rel]) { $plan.Add(@{ action='write'; path=$rel; bytes=$desired[$rel] }); $newFiles[$rel]=$newHash }
             else {
-                $modified += $name
-                if (-not $Uninstall) { $retained[$name] = $previous[$name] }
+                $modified.Add($rel); $review = SafePath ($rel + '.ai-qa-new')
+                if ((Test-Path $review) -and (HashFile $review) -ne $newHash) { Fail "Refusing to overwrite existing review copy: $review" }
+                $plan.Add(@{ action='write'; path=($rel + '.ai-qa-new'); bytes=$desired[$rel] }); $newFiles[$rel]=$oldFiles[$rel]
             }
+        } elseif (Test-Path -LiteralPath $path) { $collisions.Add($rel) }
+        else { $plan.Add(@{ action='write'; path=$rel; bytes=$desired[$rel] }); $newFiles[$rel]=$newHash }
+    }
+    foreach ($rel in $oldFiles.Keys) {
+        if ($Command -eq 'uninstall' -or -not $desired.ContainsKey($rel)) {
+            $path=SafePath $rel
+            if ((Test-Path $path -PathType Leaf) -and (HashFile $path) -eq $oldFiles[$rel]) { $plan.Add(@{action='remove';path=$rel}) }
+            elseif (Test-Path $path) { $modified.Add($rel) }
         }
     }
-    $blocks = @(
-        @{ path = $instructionPath; relative = '.github/copilot-instructions.md'; desired = $block; key = 'block'; begin = $begin; end = $end },
-        @{ path = $ignorePath; relative = '.gitignore'; desired = $ignoreBlock; key = 'ignore_block'; begin = $ignoreBegin; end = $ignoreEnd }
+
+    $pointer = @($Begin, "AI-QA agents: @$Prefix and @$Prefix-configure.", 'Framework: .github/ai-qa/framework/.', "Project layer: .github/ai-qa/project/ (written only by $Prefix-configure).", 'Safety: .github/ai-qa/framework/method/safety.md.', $End) -join "`n"
+    $ignore = @($IgnoreBegin, 'qa-work/**', '!qa-work/*/', '!qa-work/*/index.md', '!qa-work/*/outputs/', '!qa-work/*/outputs/**', $IgnoreEnd) -join "`n"
+    $blockHash = HashBytes $Encoding.GetBytes($pointer + "`n"); $ignoreHash = HashBytes $Encoding.GetBytes($ignore + "`n")
+    $insCreated = if ($Manifest) { [string](@($Manifest.created_files) -contains '.github/copilot-instructions.md') } elseif (Test-Path (SafePath '.github/copilot-instructions.md')) { 'False' } else { 'True' }
+    $gitCreated = if ($Manifest) { [string](@($Manifest.created_files) -contains '.gitignore') } elseif (Test-Path (SafePath '.gitignore')) { 'False' } else { 'True' }
+    $insEol = if ($Manifest -and $Manifest.instructions_eol) { [string]$Manifest.instructions_eol } elseif ($Manifest) { '1' } else { EndsWithEol (SafePath '.github/copilot-instructions.md') }
+    $gitEol = if ($Manifest -and $Manifest.gitignore_eol) { [string]$Manifest.gitignore_eol } elseif ($Manifest) { '1' } else { EndsWithEol (SafePath '.gitignore') }
+    $blockHashes = @{}; $definitions = @(
+        @{path='.github/copilot-instructions.md';start=$Begin;finish=$End;replacement=$pointer;hash=$blockHash;old=$(if($Manifest){$Manifest.instructions_block_sha256});created=$insCreated;eol=($insEol -eq '1')},
+        @{path='.gitignore';start=$IgnoreBegin;finish=$IgnoreEnd;replacement=$ignore;hash=$ignoreHash;old=$(if($Manifest){$Manifest.gitignore_block_sha256});created=$gitCreated;eol=($gitEol -eq '1')}
     )
-    $blockActions = @()
-    $hashes = @{}
-    foreach ($entry in $blocks) {
-        $existingBlock = Managed-Block $entry.path $entry.begin $entry.end
-        if ($old -and ($null -eq $existingBlock -or (Hash-Text $existingBlock) -ne $old.($entry.key))) {
-            $modified += "$($entry.relative) (managed block)"
-            if (-not $Uninstall) {
-                $hashes[$entry.key] = $old.($entry.key)
-                $writes[(Safe-Path ($entry.relative + '.ai-qa-new'))] = $encoding.GetBytes($entry.desired + "`n")
-            }
+    foreach ($entry in $definitions) {
+        $path=SafePath $entry.path; $text=if(Test-Path $path){[IO.File]::ReadAllText($path,$Encoding)}else{''}; $current=GetBlock $text $entry.start $entry.finish
+        if ($Manifest -and ($null -eq $current -or (HashBytes $Encoding.GetBytes((($current -replace "`r`n", "`n") + "`n"))) -ne $entry.old)) {
+            $modified.Add("$($entry.path) (managed block)")
+            if ($Command -ne 'uninstall') { $plan.Add(@{action='write';path=($entry.path+'.ai-qa-new');bytes=$Encoding.GetBytes($entry.replacement+"`n")}) }
             continue
         }
-        if (-not $old -and $null -ne $existingBlock) {
-            $conflicts += "$($entry.relative) (existing markers)"
-            continue
+        if (-not $Manifest -and $null -ne $current) { $collisions.Add("$($entry.path) (existing markers)"); continue }
+        $blockHashes[$entry.path]=if($Command -eq 'uninstall'){$entry.old}else{$entry.hash}
+        $newText=MergeBlock $text $entry.start $entry.finish $entry.replacement ($Command -eq 'uninstall') $entry.eol
+        if ($Command -eq 'uninstall') {
+            if ($entry.created -eq 'True' -and -not $newText.Trim()) { $plan.Add(@{action='remove';path=$entry.path}) }
+            elseif ($newText -ne $text) { $plan.Add(@{action='write';path=$entry.path;bytes=$Encoding.GetBytes($newText)}) }
+        } else { $plan.Add(@{action='write';path=$entry.path;bytes=$Encoding.GetBytes($newText)}) }
+    }
+    if ($collisions.Count) { Fail "Conflicting or modified files (left untouched): $($collisions -join ', ')" }
+    if ($Command -eq 'uninstall') {
+        $plan.Add(@{action='remove';path=$ManifestRel})
+        if ($Purge) { foreach($rel in @('.github/ai-qa/project','.github/ai-qa/baselines','qa-work')){$plan.Add(@{action='purge';path=$rel})} }
+    }
+    $createdDirs = @(); if ($Manifest) { $createdDirs += @($Manifest.created_dirs) }
+    foreach ($entry in $plan | Where-Object action -eq 'write') {
+        $parent = Split-Path -Parent $entry.path
+        while ($parent -and -not (Test-Path (Join-Path $ResolvedTarget $parent))) {
+            $createdDirs += $parent.Replace('\', '/'); $parent = Split-Path -Parent $parent
         }
-        $text = if (Test-Path -LiteralPath $entry.path) { Read-Text $entry.path } else { '' }
-        if ($null -ne $existingBlock) { $text = $text.Replace($existingBlock, '').Trim("`n") }
-        if (-not $Uninstall) {
-            $text = $text.TrimEnd("`n") + $(if ($text.Trim()) { "`n`n" } else { '' }) + $entry.desired + "`n"
-            $hashes[$entry.key] = Hash-Text $entry.desired
-        } elseif ($text) { $text += "`n" }
-        $blockActions += @{ path = $entry.path; text = $text }
     }
-    if ($conflicts.Count) { throw "Conflicting or modified files (left untouched): $($conflicts -join ', ')" }
-    foreach ($path in $writes.Keys) {
-        if ($path.EndsWith('.ai-qa-new') -and (Test-Path -LiteralPath $path) -and
-            (Hash-Bytes ([System.IO.File]::ReadAllBytes($path))) -ne (Hash-Bytes $writes[$path])) {
-            throw "Refusing to overwrite existing review copy: $path"
+    $parent = Split-Path -Parent $ManifestRel
+    while ($parent -and -not (Test-Path (Join-Path $ResolvedTarget $parent))) {
+        $createdDirs += $parent.Replace('\', '/'); $parent = Split-Path -Parent $parent
+    }
+    $createdDirs = @($createdDirs | Sort-Object -Unique)
+    if ($DryRun) { foreach($entry in $plan){Write-Output "[dry-run] $($entry.action) $(Join-Path $ResolvedTarget $entry.path)"}; foreach($item in $modified){Write-Output "[dry-run] preserve modified $item"}; if($Command -ne 'uninstall'){Write-Output "[dry-run] write $ManifestPath"}; exit 0 }
+    foreach ($entry in $plan) {
+        $path=SafePath $entry.path
+        switch($entry.action){
+            write {$parent=Split-Path -Parent $path;if(-not(Test-Path $parent)){$null=New-Item -ItemType Directory -Path $parent -Force};[IO.File]::WriteAllBytes($path,$entry.bytes)}
+            remove {if(Test-Path $path){Remove-Item -LiteralPath $path -Force}}
+            purge {if(Test-Path $path){AssertNoLinks $path;Remove-Item -LiteralPath $path -Recurse -Force}}
         }
     }
-    if ($DryRun) {
-        foreach ($path in $writes.Keys) { Write-Output "[dry-run] write $path" }
-        foreach ($path in $deletes) { Write-Output "[dry-run] remove $path" }
-        foreach ($entry in $blockActions) { Write-Output "[dry-run] update managed block in $($entry.path)" }
-        foreach ($name in $modified) { Write-Output "[dry-run] preserve modified $name" }
-        if ($Purge) {
-            Write-Output '[dry-run] remove project data and baselines under .github/ai-qa/project, .github/ai-qa/baselines and qa-work'
-        }
-        Write-Output "[dry-run] update manifest"
-        exit 0
-    }
-    foreach ($path in $deletes) { Remove-Item -LiteralPath $path -Force }
-    foreach ($path in $writes.Keys) {
-        $null = New-Item -ItemType Directory -Path (Split-Path -Parent $path) -Force
-        [System.IO.File]::WriteAllBytes($path, $writes[$path])
-    }
-    foreach ($entry in $blockActions) {
-        if ($entry.text) {
-            $null = New-Item -ItemType Directory -Path (Split-Path -Parent $entry.path) -Force
-            Write-Text $entry.path $entry.text
-        } elseif (Test-Path -LiteralPath $entry.path) { Remove-Item -LiteralPath $entry.path -Force }
-    }
-    if ($Uninstall) {
-        Remove-Item -LiteralPath $manifestPath
-        if ($Purge) {
-            foreach ($path in @((Safe-Path '.github/ai-qa/project'),
-                                (Safe-Path '.github/ai-qa/baselines'),
-                                (Join-Path $resolvedTarget 'qa-work'))) {
-                if (Test-Path -LiteralPath $path) {
-                    $item = Get-Item -LiteralPath $path -Force
-                    if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) { throw "Refusing symlink: $path" }
-                    Remove-Item -LiteralPath $path -Recurse -Force
-                }
+    if ($Command -eq 'uninstall') {
+        foreach ($relative in ($createdDirs | Sort-Object { ($_ -split '/').Count } -Descending)) {
+            $directory = SafePath $relative
+            if ((Test-Path -LiteralPath $directory -PathType Container) -and
+                -not (Get-ChildItem -LiteralPath $directory -Force | Select-Object -First 1)) {
+                Remove-Item -LiteralPath $directory -Force
             }
         }
-        foreach ($path in ($deletes + @($manifestPath))) {
-            $dir = Split-Path -Parent $path
-            while ($dir -ne $resolvedTarget -and (Test-Path -LiteralPath $dir)) {
-                if (@(Get-ChildItem -LiteralPath $dir -Force).Count -ne 0) { break }
-                Remove-Item -LiteralPath $dir -Force
-                $dir = Split-Path -Parent $dir
-            }
-        }
-        Write-Output 'Uninstalled AI-QA framework assets'
-    } else {
-        $hashes = [ordered]@{}
-        foreach ($name in ($files.Keys | Sort-Object)) {
-            $hashes[$name] = if ($retained.ContainsKey($name)) { $retained[$name] } else { Hash-Bytes $files[$name] }
-        }
-        foreach ($name in $retained.Keys) { $hashes[$name] = $retained[$name] }
-        $manifest = [ordered]@{ version = 1; prefix = $Prefix; framework_version = $frameworkVersion;
-                                files = $hashes; block = $null; ignore_block = $null }
-        $manifest.block = if ($null -ne $old -and -not $blockActions.Where({ $_.path -eq $instructionPath }).Count) { $old.block } else { Hash-Text $block }
-        $manifest.ignore_block = if ($null -ne $old -and -not $blockActions.Where({ $_.path -eq $ignorePath }).Count) { $old.ignore_block } else { Hash-Text $ignoreBlock }
-        $null = New-Item -ItemType Directory -Path (Split-Path -Parent $manifestPath) -Force
-        Write-Text $manifestPath (($manifest | ConvertTo-Json -Depth 8) + "`n")
-        foreach ($name in $modified) { Write-Output "Preserved modified $name; review .ai-qa-new if present" }
-        Write-Output "$($(if ($Update) { 'Updated' } else { 'Installed' })) $($files.Count) AI-QA framework files"
-        if ($Update) {
-            $changelog = Join-Path $source 'CHANGELOG.md'
-            if (Test-Path -LiteralPath $changelog -PathType Leaf) {
-                Write-Output "`nCHANGELOG.md:`n$((Read-Text $changelog).TrimEnd())"
-            }
-            Write-Output "`nReview .ai-qa-new copies and run qa-configure refresh after reviewing framework changes."
-        }
+        Write-Output 'Uninstalled AI-QA framework assets'; foreach($item in $modified){Write-Output "Preserved modified $item"}; exit 0
     }
-} catch {
-    [Console]::Error.WriteLine("Error: $($_.Exception.Message)")
-    exit 1
-}
+    $createdFiles = @(); if ($insCreated -eq 'True') { $createdFiles += '.github/copilot-instructions.md' }; if ($gitCreated -eq 'True') { $createdFiles += '.gitignore' }
+    $manifestData=@{schema=1;framework_version=$Version;prefix=$Prefix;instructions_block_sha256=$(if($blockHashes.ContainsKey('.github/copilot-instructions.md')){$blockHashes['.github/copilot-instructions.md']}else{$Manifest.instructions_block_sha256});gitignore_block_sha256=$(if($blockHashes.ContainsKey('.gitignore')){$blockHashes['.gitignore']}else{$Manifest.gitignore_block_sha256});created_files=@($createdFiles);files=$newFiles;created_dirs=$createdDirs;instructions_eol=$insEol;gitignore_eol=$gitEol}
+    $null=New-Item -ItemType Directory -Path (Split-Path -Parent $ManifestPath) -Force; WriteManifest $ManifestPath $manifestData
+    foreach($item in $modified){Write-Output "Preserved modified $item; review .ai-qa-new if present"}
+    if($Command -eq 'update'){
+        Write-Output "Updated $($newFiles.Count) AI-QA framework files"
+        $changeLog=Join-Path $ScriptDir 'CHANGELOG.md';if(Test-Path $changeLog){Write-Output "`nCHANGELOG.md:";$show=$false;foreach($line in (Get-Content $changeLog)){if($line -eq "## v$($Manifest.framework_version)"){break};if($line -match '^## '){$show=$true};if($show){Write-Output $line}}}
+        $migration=Join-Path $ScriptDir 'docs/migrations.md';if(Test-Path $migration){$needsRefresh=$false;foreach($match in (Select-String $migration -Pattern '^\s*refresh-required:\s*([0-9.]+)')){$v=$match.Matches[0].Groups[1].Value;if((VersionGreater $v $Manifest.framework_version) -and -not (VersionGreater $v $Version)){$needsRefresh=$true}};if($needsRefresh){Write-Output "`nThis update requires qa-configure refresh (see docs/migrations.md)."}}
+    } else {Write-Output "Installed $($newFiles.Count) AI-QA framework files"}
+} catch { [Console]::Error.WriteLine("Error: $($_.Exception.Message)"); exit 1 }

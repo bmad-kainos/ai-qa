@@ -4,6 +4,7 @@ __pycache__/
 .DS_Store
 /tests/.installer-*/
 /tests/.installer-fixtures-*/
-/examples/fixtures/**/bin/
-/examples/fixtures/**/obj/
-/examples/fixtures/**/.vs/
+/fixtures/**/bin/
+/fixtures/**/obj/
+/fixtures/**/.vs/
+*.egg-info/

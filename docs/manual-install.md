@@ -1,6 +1,20 @@
 # Manual installation
 
-Copy the framework-owned `.github/agents/qa*.agent.md`, `.github/skills/qa-*/` and `.github/ai-qa/framework/` paths to the target repository without modifying their contents. Put a pointer to the two agents between `<!-- ai-qa:start -->` and `<!-- ai-qa:end -->` in `.github/copilot-instructions.md` (create that file if missing). Add the marked `.gitignore` block below at the project root:
+Use these steps when the installer scripts cannot be run. The repository root is the target.
+
+1. Copy only `payload/.github/agents/qa*.agent.md`, `payload/.github/skills/qa-*/` (including all nested references and assets), and `payload/.github/ai-qa/framework/` to the matching `.github/` paths. Do not copy rendered instructions or anything under `payload/.github/ai-qa/project/` or `baselines/`.
+2. Create `.github/copilot-instructions.md` if it does not exist. Preserve all existing content and add or replace only this marked pointer block:
+
+	```markdown
+	<!-- ai-qa:start -->
+	AI-QA agents: @qa and @qa-configure.
+	Framework: `.github/ai-qa/framework/`.
+	Project layer: `.github/ai-qa/project/` (written only by qa-configure).
+	Safety: `.github/ai-qa/framework/method/safety.md`.
+	<!-- ai-qa:end -->
+	```
+
+3. Add or replace only the marked block below in the repository `.gitignore`:
 
 ```gitignore
 # ai-qa:start
@@ -12,4 +26,8 @@ qa-work/**
 # ai-qa:end
 ```
 
-The installer additionally records SHA-256 hashes in `.github/ai-qa/manifest.json` so update and uninstall can preserve user modifications; manual installations must maintain that inventory themselves. Never copy `tools/`, `examples/`, `.github/ai-qa/project/` or fixture-specific config into the target. Open the target in VS Code and run `qa-configure` to create the project-owned layer after reviewing its proposed diff (L5). Only render instructions for discovered test paths and selected packs. Do not add `.vscode/mcp.json` unless MCP is chosen and approved.
+4. Optionally create `.github/ai-qa/manifest.json` with `schema`, `framework_version`, `prefix`, `created_files`, and a `files` object containing one path-to-SHA-256 entry per installed agent, skill, and framework file. This allows the scripts to verify, update, and uninstall the manual installation safely. If you omit it, manage those assets manually.
+
+To uninstall manually, remove only the copied agent files, skill directories, and `.github/ai-qa/framework/` files. Remove the two marked blocks, preserving all surrounding content. Remove `.github/copilot-instructions.md` or `.gitignore` only if you created the file and it is otherwise empty. Keep `.github/ai-qa/project/`, baselines, and `qa-work/`.
+
+Never copy `tools/`, `.github/ai-qa/project/`, or fixture-specific config into the target. Open the target in VS Code and run `qa-configure` to create the project-owned layer after reviewing its proposed diff (L5). Do not add `.vscode/mcp.json` unless MCP is chosen and approved.

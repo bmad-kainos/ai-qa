@@ -1,0 +1,19 @@
+AI-QA
+Copyright (c) 2026 the AI-QA contributors.
+
+Licence terms for AI-QA's own content have not yet been declared by the
+repository owner. Until they are, no licence is granted beyond what is
+required by the third-party notices below.
+
+-------------------------------------------------------------------------------
+Third-party notices
+-------------------------------------------------------------------------------
+
+Portions of this repository (test packs, engineering skills, installer design
+and reference material) are adapted from Feabhas (bmad-kainos/feabhas @
+b788dc1), licensed under the MIT Licence. The full notice is reproduced in
+docs/licenses/feabhas-MIT.txt and ships to installed projects as
+.github/ai-qa/framework/LICENSE-feabhas.txt.
+
+QA methodology is ported from the Generic QA POC
+(sylwia-luczak/AI-QA-AGENT_GENERIC @ ac750bb), which does not declare a licence.

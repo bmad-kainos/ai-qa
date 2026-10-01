@@ -1,356 +1,261 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Keep the implementation local to this file so it can be copied with a checkout.
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-export AI_QA_INSTALL_SOURCE="$SCRIPT_DIR"
-exec python3 - "$@" <<'PY'
-import argparse
-import hashlib
-import json
-import os
-from pathlib import Path
-import re
-import shutil
-import sys
+usage() {
+  printf '%s\n' 'Usage: install.sh [install|update|verify|uninstall] [target] [options]' \
+    '  --dry-run       Print planned changes without modifying the target.' \
+    '  --prefix NAME   Rename qa agents and skills into NAME namespace.' \
+    '  --purge         With uninstall, remove project data and qa-work after confirmation.' \
+    '  --yes           Confirm --purge without prompting.' \
+    '  -h, --help      Show this help.'
+}
+fail() { printf 'Error: %s\n' "$1" >&2; exit 1; }
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+SOURCE="$SCRIPT_DIR/payload/.github"
+[[ -f "$SCRIPT_DIR/VERSION" ]] || fail 'Missing VERSION next to installer'
+VERSION="$(sed -n '1{s/[[:space:]]//g;p;}' "$SCRIPT_DIR/VERSION")"
+[[ -n "$VERSION" ]] || fail 'VERSION is empty'
+COMMAND=install TARGET=. PREFIX=qa PREFIX_SET=0 DRY=0 PURGE=0 YES=0 COMMAND_SET=0
+while (($#)); do
+  case "$1" in
+    install|update|verify|uninstall) ((COMMAND_SET == 0)) || fail 'Only one command may be specified'; COMMAND="$1"; COMMAND_SET=1 ;;
+    --dry-run) DRY=1 ;;
+    --prefix) shift; (($#)) || fail '--prefix requires a value'; PREFIX="$1"; PREFIX_SET=1 ;;
+    --purge) PURGE=1 ;;
+    --yes) YES=1 ;;
+    -h|--help) usage; exit 0 ;;
+    --*) fail "Unknown option: $1" ;;
+    *) [[ "$TARGET" == . ]] || fail 'Only one target may be specified'; TARGET="$1" ;;
+  esac
+  shift
+done
+[[ "$PREFIX" =~ ^[A-Za-z0-9_-]+$ ]] || fail 'Prefix must contain only letters, digits, underscores and hyphens'
+if ((PURGE)) && [[ "$COMMAND" != uninstall ]]; then fail '--purge requires uninstall'; fi
+[[ -d "$TARGET" ]] || fail "Target is not a directory: $TARGET"
+[[ ! -L "$TARGET" ]] || fail "Refusing symlink target: $TARGET"
+TARGET="$(cd "$TARGET" && pwd -P)"
+if [[ "$COMMAND" != verify && ( "$TARGET" == "$SCRIPT_DIR" || ( -f "$TARGET/install.sh" && -d "$TARGET/payload/.github/ai-qa/framework" ) ) ]]; then fail 'Refusing to modify the AI-QA source repository itself'; fi
+[[ -d "$SOURCE" ]] || fail 'Missing payload/.github next to installer'
 
-BEGIN = "<!-- ai-qa:start -->"
-END = "<!-- ai-qa:end -->"
-BLOCK = BEGIN + "\nAI-QA agents: `.github/agents/qa.agent.md` and `.github/agents/qa-configure.agent.md`.\n" + END
-IGNORE_BEGIN = "# ai-qa:start"
-IGNORE_END = "# ai-qa:end"
-IGNORE_BLOCK = "\n".join((IGNORE_BEGIN, "qa-work/**", "!qa-work/*/", "!qa-work/*/index.md",
-                          "!qa-work/*/outputs/", "!qa-work/*/outputs/**", IGNORE_END))
-FRAMEWORK_VERSION = "1.0.0"
-MANIFEST = Path(".github/ai-qa/manifest.json")
-INSTRUCTIONS = Path(".github/copilot-instructions.md")
-GITIGNORE = Path(".gitignore")
+hash_file() {
+    if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | awk '{print $1}'
+  elif command -v shasum >/dev/null 2>&1; then shasum -a 256 "$1" | awk '{print $1}'
+  else fail 'Neither sha256sum nor shasum is available'
+  fi
+}
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/ai-qa-install.XXXXXX")"
+trap 'rm -rf "$tmp"' EXIT HUP INT TERM
+MANIFEST_REL=.github/ai-qa/manifest.json
+MANIFEST="$TARGET/$MANIFEST_REL"
+safe_rel() {
+  local rel="$1" item cur="$TARGET" saved="$IFS"
+  [[ "$rel" != /* && "$rel" != *'..'* && "$rel" != *'|'* && "$rel" != *'"'* ]] || fail "Unsafe manifest path: $rel"
+  case "$rel" in
+    .github/agents/*|.github/skills/*|.github/ai-qa/framework/*|.github/ai-qa/manifest.json|.github/copilot-instructions.md|.gitignore|.github/ai-qa/project|.github/ai-qa/project/*|.github/ai-qa/baselines|.github/ai-qa/baselines/*|qa-work|qa-work/*) ;;
+    *) fail "Unsafe path: $rel" ;;
+  esac
+  IFS=/; for item in $rel; do cur="$cur/$item"; [[ ! -L "$cur" ]] || fail "Refusing symlink: $cur"; done; IFS="$saved"
+}
+assert_no_links() {
+  local tree="$1" found
+  [[ ! -L "$tree" ]] || fail "Refusing symlink: $tree"
+  if [[ -d "$tree" ]]; then found="$(find "$tree" -type l -print)"; [[ -z "$found" ]] || fail "Refusing symlink in managed path: $(printf '%s\n' "$found" | sed -n '1p')"; fi
+}
+meta() { awk -v k="$1" 'index($0, "\"" k "\"") { sub(/^.*: "/, ""); sub(/".*$/, ""); print; exit }' "${MANIFEST_SRC:-$MANIFEST}"; }
+ver_gt() { awk -v a="$1" -v b="$2" 'BEGIN{n=split(a,x,".");m=split(b,y,".");l=(n>m?n:m);for(i=1;i<=l;i++){if(x[i]+0>y[i]+0)exit 0;if(x[i]+0<y[i]+0)exit 1}exit 1}'; }
+extract() { [[ -f "$1" ]] || return 1; awk -v b="$2" -v e="$3" '$0==b{inside=1;n++} inside{print} $0==e&&inside{inside=0} END{if(n!=1||inside)exit 1}' "$1"; }
+markers_ok() { [[ ! -f "$1" ]] && return 0; awk -v b="$2" -v e="$3" '$0==b{a++}$0==e{z++}END{exit !(a==z&&a<=1)}' "$1"; }
+merge_block() {
+  local file="$1" begin="$2" end="$3" block="$4" out="$5" remove="$6"
+  if [[ -f "$file" ]]; then
+    # On removal, drop the blank separator line the installer added before the block.
+    awk -v b="$begin" -v e="$end" -v r="$block" -v del="$remove" '
+      held&&$0!=b{print "";held=0}
+      $0==b{held=0;if(!done){if(del==0)while((getline line<r)>0)print line;close(r);done=1}skip=1;next}
+      skip&&$0==e{skip=0;next}
+      !skip&&del==1&&$0==""{held=1;next}
+      !skip{print}
+    END{if(held)print "";if(!done&&del==0){if(NR)print "";while((getline line<r)>0)print line;close(r)}}
+    ' "$file" > "$out"
+    if [[ "$remove" == 1 && "$7" == 0 && -s "$out" ]]; then printf '%s' "$(cat "$out")" > "$out.noeol"; mv "$out.noeol" "$out"; fi
+  elif [[ "$remove" == 0 ]]; then cp "$block" "$out"; else : > "$out"; fi
+}
 
+safe_rel "$MANIFEST_REL"
+old_files="$tmp/old-files" old_dirs="$tmp/old-dirs" desired="$tmp/desired"
+: > "$old_files"; : > "$old_dirs"; : > "$desired"
+OLD_PREFIX= OLD_VERSION= OLD_BLOCK= OLD_IGNORE= OLD_INS_CREATED=0 OLD_GIT_CREATED=0 OLD_INS_EOL=1 OLD_GIT_EOL=1
+if [[ -e "$MANIFEST" ]]; then
+  [[ -f "$MANIFEST" ]] || fail "Invalid install manifest: $MANIFEST"
+  # Normalise to one JSON token per line so hand-edited or single-line manifests parse the same way.
+  awk '{ gsub(/[{\[,]/, "&\n"); gsub(/[}\]]/, "\n&\n"); print }' "$MANIFEST" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' | grep -v '^$' > "$tmp/manifest-norm" || :
+  MANIFEST_SRC="$tmp/manifest-norm"
+  OLD_PREFIX="$(meta prefix)"; OLD_VERSION="$(meta framework_version)"; OLD_BLOCK="$(meta instructions_block_sha256)"; OLD_IGNORE="$(meta gitignore_block_sha256)"
+  OLD_INS_EOL="$(meta instructions_eol)"; OLD_GIT_EOL="$(meta gitignore_eol)"
+  [[ "$OLD_PREFIX" =~ ^[A-Za-z0-9_-]+$ && -n "$OLD_VERSION" ]] || fail 'Invalid install manifest metadata'
+  [[ "$OLD_BLOCK" =~ ^[0-9a-f]{64}$ && "$OLD_IGNORE" =~ ^[0-9a-f]{64}$ ]] || fail 'Invalid manifest block hashes'
+  section() { awk -v k="\"$1\"" -v op="$2" -v cl="$3" 'index($0, k)==1 && substr($0, length($0))==op {f=1; next} f && $0==cl {exit} f {print}' "$MANIFEST_SRC"; }
+  section files '{' '}' > "$tmp/manifest-files"
+  while IFS= read -r line; do
+    [[ "$line" =~ ^\"([^\"]+)\":[[:space:]]*\"([0-9a-f]{64})\",?$ ]] || fail "Invalid manifest entry: $line"
+    printf '%s|%s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" >> "$old_files"
+  done < "$tmp/manifest-files"
+  section created_dirs '[' ']' | sed -E 's/^"([^"]*)",?$/\1/' > "$old_dirs"
+  section created_files '[' ']' | sed -E 's/^"([^"]*)",?$/\1/' > "$tmp/created-files"
+    grep -Fxq '.github/copilot-instructions.md' "$tmp/created-files" && OLD_INS_CREATED=1 || :
+    grep -Fxq '.gitignore' "$tmp/created-files" && OLD_GIT_CREATED=1 || :
+  while IFS='|' read -r rel sum; do
+    [[ -n "$rel" ]] || continue; [[ "$sum" =~ ^[0-9a-f]{64}$ ]] || fail "Invalid manifest checksum: $rel"; safe_rel "$rel"
+    case "$rel" in .github/agents/"$OLD_PREFIX"*.agent.md|.github/skills/"$OLD_PREFIX"-*/*|.github/ai-qa/framework/*) ;; *) fail "Unsafe manifest path: $rel" ;; esac
+  done < "$old_files"
+fi
 
-def digest(data):
-    return hashlib.sha256(data).hexdigest()
+if [[ "$COMMAND" == verify ]]; then
+  [[ -f "$MANIFEST" ]] || fail 'AI-QA manifest missing'
+  problems="$tmp/problems"; : > "$problems"
+  while IFS='|' read -r rel sum; do [[ -n "$rel" ]] || continue; path="$TARGET/$rel"; safe_rel "$rel"; [[ -f "$path" && "$(hash_file "$path")" == "$sum" ]] || printf '%s\n' "$rel" >> "$problems"; done < "$old_files"
+  instructions="$TARGET/.github/copilot-instructions.md" gitignore="$TARGET/.gitignore"
+  markers_ok "$instructions" '<!-- ai-qa:start -->' '<!-- ai-qa:end -->' || printf '%s\n' 'copilot-instructions.md (invalid markers)' >> "$problems"
+  markers_ok "$gitignore" '# ai-qa:start' '# ai-qa:end' || printf '%s\n' '.gitignore (invalid markers)' >> "$problems"
+  extract "$instructions" '<!-- ai-qa:start -->' '<!-- ai-qa:end -->' > "$tmp/block" 2>/dev/null || :
+  extract "$gitignore" '# ai-qa:start' '# ai-qa:end' > "$tmp/ignore" 2>/dev/null || :
+  [[ -s "$tmp/block" && "$(hash_file "$tmp/block")" == "$OLD_BLOCK" ]] || printf '%s\n' 'copilot-instructions.md (managed block)' >> "$problems"
+  [[ -s "$tmp/ignore" && "$(hash_file "$tmp/ignore")" == "$OLD_IGNORE" ]] || printf '%s\n' '.gitignore (managed block)' >> "$problems"
+  [[ ! -s "$problems" ]] || fail "Verification failed: $(awk 'BEGIN{ORS=", "}{print}' "$problems" | sed 's/, $//')"
+  [[ "$OLD_VERSION" == "$VERSION" ]] || printf 'WARN: installed framework version %s differs from source %s\n' "$OLD_VERSION" "$VERSION"
+  if [[ ! -f "$TARGET/.github/ai-qa/project/project.md" ]]; then printf 'WARN: project layer is not configured; run qa-configure\n'; fi
+  printf 'Verified AI-QA framework %s, %s files and instruction blocks\n' "$OLD_VERSION" "$(wc -l < "$old_files" | awk '{print $1}')"; exit 0
+fi
+if [[ "$COMMAND" == update || "$COMMAND" == uninstall ]]; then [[ -f "$MANIFEST" ]] || fail "No managed installation to $COMMAND"; fi
+if [[ "$COMMAND" == install && -f "$MANIFEST" ]]; then fail 'Already installed; use update or verify'; fi
+if [[ "$COMMAND" == update && "$PREFIX_SET" == 0 ]]; then PREFIX="$OLD_PREFIX"; fi
+if [[ -f "$MANIFEST" && "$COMMAND" != uninstall && "$PREFIX" != "$OLD_PREFIX" ]]; then fail "Installed prefix is '$OLD_PREFIX'; use the same --prefix"; fi
+if ((PURGE)) && ((YES == 0)); then
+  [[ -t 0 ]] || fail '--purge requires confirmation; use --yes for non-interactive use'
+  target_name="$(basename "$TARGET")"; printf 'Purge project data and qa-work from %s? Type %s or yes: ' "$target_name" "$target_name" >&2
+  IFS= read -r answer || answer=; [[ "$answer" == "$target_name" || "$answer" == yes ]] || fail 'Purge not confirmed'
+fi
+if ((PURGE)); then for rel in .github/ai-qa/project .github/ai-qa/baselines qa-work; do assert_no_links "$TARGET/$rel"; done; fi
 
+if [[ "$COMMAND" != uninstall ]]; then
+  for dir in agents skills ai-qa/framework; do assert_no_links "$SOURCE/$dir"; done
+  find "$SOURCE/agents" -type f -name 'qa*.agent.md' -print 2>/dev/null | while IFS= read -r f; do basename "$f" .agent.md; done > "$tmp/agent-names"
+  find "$SOURCE/skills" -mindepth 1 -maxdepth 1 -type d -name 'qa-*' -print 2>/dev/null | sed 's|.*/||' | sort -u > "$tmp/skill-names"
+  cat "$tmp/agent-names" "$tmp/skill-names" | sort -u > "$tmp/names"
+  for d in agents skills ai-qa/framework; do [[ ! -d "$SOURCE/$d" ]] || find "$SOURCE/$d" -type f -print; done | sort > "$tmp/source-list"
+  while IFS= read -r src; do
+    rel="${src#"$SOURCE/"}"; case "$rel" in agents/qa*.agent.md|skills/qa-*/*|ai-qa/framework/*) ;; *) continue ;; esac
+    dest="$rel"
+    if [[ "$PREFIX" != qa ]]; then case "$rel" in agents/qa*) dest="agents/${PREFIX}${rel#agents/qa}" ;; skills/qa-*) dest="skills/${PREFIX}-${rel#skills/qa-}" ;; esac; fi
+    outrel=".github/$dest"; safe_rel "$outrel"; staged="$tmp/assets/$outrel"; mkdir -p "$(dirname "$staged")"; cp "$src" "$staged"
+    case "$src" in *.md|*.txt|*.json|*.yaml|*.yml)
+      if [[ "$PREFIX" != qa ]]; then while IFS= read -r name; do [[ -n "$name" ]] || continue; old="$name"; new="$PREFIX${name#qa}"; sed -E "s/(^|[^[:alnum:]_-])${old}([^[:alnum:]_-]|$)/\\1${new}\\2/g" "$staged" > "$tmp/rewrite"; cp "$tmp/rewrite" "$staged"; done < "$tmp/names"; fi ;;
+    esac
+    printf '%s|%s\n' "$outrel" "$staged" >> "$desired"
+  done < "$tmp/source-list"
+  [[ -s "$desired" ]] || fail 'No framework-owned files found in payload'
+fi
 
-def fail(message):
-    raise ValueError(message)
+collisions="$tmp/collisions" plan="$tmp/plan" new_files="$tmp/new-files" modified="$tmp/modified"
+: > "$collisions"; : > "$plan"; : > "$new_files"; : > "$modified"
+if [[ "$COMMAND" != uninstall ]]; then
+  for category in agents instructions; do
+    [[ "$category" != instructions || "$PREFIX" == qa ]] || continue
+    dir="$TARGET/.github/$category"; [[ ! -L "$dir" ]] || fail "Refusing symlink: $dir"; [[ -d "$dir" ]] || continue
+    pattern="$PREFIX*.agent.md"; [[ "$category" != instructions ]] || pattern="$PREFIX*.instructions.md"
+    for path in "$dir"/$pattern; do [[ -e "$path" ]] || continue; rel="${path#"$TARGET/"}"; awk -F'|' -v p="$rel" '$1==p{f=1}END{exit !f}' "$old_files" || printf '%s (occupied namespace)\n' "$rel" >> "$collisions"; done
+  done
+  dir="$TARGET/.github/skills"; [[ ! -L "$dir" ]] || fail "Refusing symlink: $dir"
+  if [[ -d "$dir" ]]; then for path in "$dir"/"$PREFIX"-*; do [[ -e "$path" ]] || continue; rel="${path#"$TARGET/"}"; awk -F'|' -v p="$rel/" '$1==p||index($1,p)==1{f=1}END{exit !f}' "$old_files" || printf '%s/ (occupied namespace)\n' "$rel" >> "$collisions"; done; fi
+fi
+while IFS='|' read -r rel staged; do
+  [[ -n "$rel" ]] || continue; path="$TARGET/$rel"; safe_rel "$rel"
+  old_hash="$(awk -F'|' -v p="$rel" '$1==p{print $2}' "$old_files")"; desired_hash="$(hash_file "$staged")"
+  if [[ -n "$old_hash" ]]; then
+    if [[ -f "$path" && "$(hash_file "$path")" == "$desired_hash" ]]; then printf '%s|%s\n' "$rel" "$desired_hash" >> "$new_files"
+    elif [[ -f "$path" && "$(hash_file "$path")" == "$old_hash" ]]; then printf 'write|%s|%s\n' "$rel" "$staged" >> "$plan"; printf '%s|%s\n' "$rel" "$desired_hash" >> "$new_files"
+    else printf '%s\n' "$rel" >> "$modified"; review="$path.ai-qa-new"; [[ ! -e "$review" || "$(hash_file "$review")" == "$desired_hash" ]] || fail "Refusing to overwrite existing review copy: $review"; printf 'write|%s.ai-qa-new|%s\n' "$rel" "$staged" >> "$plan"; printf '%s|%s\n' "$rel" "$old_hash" >> "$new_files"; fi
+  elif [[ -e "$path" ]]; then printf '%s\n' "$rel" >> "$collisions"
+  else printf 'write|%s|%s\n' "$rel" "$staged" >> "$plan"; printf '%s|%s\n' "$rel" "$desired_hash" >> "$new_files"; fi
+done < "$desired"
+if [[ "$COMMAND" == update || "$COMMAND" == uninstall ]]; then
+  while IFS='|' read -r rel sum; do
+    [[ -n "$rel" ]] || continue
+    if [[ "$COMMAND" == uninstall ]] || ! awk -F'|' -v p="$rel" '$1==p{f=1}END{exit !f}' "$desired"; then path="$TARGET/$rel"; safe_rel "$rel"; if [[ -f "$path" && "$(hash_file "$path")" == "$sum" ]]; then printf 'remove|%s|\n' "$rel" >> "$plan"; elif [[ -e "$path" ]]; then printf '%s\n' "$rel" >> "$modified"; fi; fi
+  done < "$old_files"
+fi
 
+begin='<!-- ai-qa:start -->' end='<!-- ai-qa:end -->' ibegin='# ai-qa:start' iend='# ai-qa:end'
+pointer="$tmp/pointer" ignore="$tmp/ignore"
+printf '%s\n%s\n%s\n%s\n%s\n%s\n' "$begin" "AI-QA agents: @${PREFIX} and @${PREFIX}-configure." 'Framework: .github/ai-qa/framework/.' "Project layer: .github/ai-qa/project/ (written only by ${PREFIX}-configure)." 'Safety: .github/ai-qa/framework/method/safety.md.' "$end" > "$pointer"
+printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n' "$ibegin" 'qa-work/**' '!qa-work/*/' '!qa-work/*/index.md' '!qa-work/*/outputs/' '!qa-work/*/outputs/**' "$iend" > "$ignore"
+block_hash="$(hash_file "$pointer")" ignore_hash="$(hash_file "$ignore")"
+ins_created="$OLD_INS_CREATED" git_created="$OLD_GIT_CREATED" ins_eol="${OLD_INS_EOL:-1}" git_eol="${OLD_GIT_EOL:-1}"
+ends_eol() { [[ ! -s "$1" || -z "$(tail -c 1 "$1")" ]] && echo 1 || echo 0; }
+if [[ ! -f "$MANIFEST" ]]; then
+  [[ -e "$TARGET/.github/copilot-instructions.md" ]] || ins_created=1; [[ -e "$TARGET/.gitignore" ]] || git_created=1
+  ins_eol="$(ends_eol "$TARGET/.github/copilot-instructions.md")"; git_eol="$(ends_eol "$TARGET/.gitignore")"
+fi
+for kind in instructions ignore; do
+  if [[ "$kind" == instructions ]]; then rel=.github/copilot-instructions.md; path="$TARGET/$rel"; b="$begin"; e="$end"; block="$pointer"; oldhash="$OLD_BLOCK"; eol="$ins_eol"; else rel=.gitignore; path="$TARGET/$rel"; b="$ibegin"; e="$iend"; block="$ignore"; oldhash="$OLD_IGNORE"; eol="$git_eol"; fi
+  safe_rel "$rel"; markers_ok "$path" "$b" "$e" || fail "Invalid AI-QA markers in $path"
+  current="$tmp/current-$kind"; extract "$path" "$b" "$e" > "$current" 2>/dev/null || :
+  if [[ -f "$MANIFEST" ]]; then
+    if [[ ! -s "$current" || "$(hash_file "$current")" != "$oldhash" ]]; then printf '%s (managed block)\n' "$rel" >> "$modified"; [[ "$COMMAND" == uninstall ]] || printf 'write|%s.ai-qa-new|%s\n' "$rel" "$block" >> "$plan"; continue; fi
+  elif [[ -s "$current" ]]; then printf '%s (existing markers)\n' "$rel" >> "$collisions"; continue; fi
+  merged="$tmp/merged-$kind"; remove=0; [[ "$COMMAND" != uninstall ]] || remove=1; merge_block "$path" "$b" "$e" "$block" "$merged" "$remove" "$eol"
+  if [[ "$COMMAND" != uninstall ]]; then printf 'write|%s|%s\n' "$rel" "$merged" >> "$plan"
+  elif [[ "$(awk 'NF{f=1}END{print f+0}' "$merged")" == 1 ]]; then printf 'write|%s|%s\n' "$rel" "$merged" >> "$plan"
+  elif [[ "$kind" == instructions && "$ins_created" == 1 || "$kind" == ignore && "$git_created" == 1 ]]; then printf 'remove|%s|\n' "$rel" >> "$plan"; fi
+done
+[[ ! -s "$collisions" ]] || fail "Conflicting or modified files (left untouched): $(awk 'BEGIN{ORS=", "}{print}' "$collisions" | sed 's/, $//')"
 
-def source_files(source, prefix):
-    root = source / ".github"
-    if root.is_symlink():
-        fail(f"Refusing symlink source: {root}")
-    found = {}
-    for pattern in ("agents/qa*.agent.md", "skills/qa-*/**/*", "ai-qa/framework/**/*",
-                    "instructions/qa*.instructions.md"):
-        for path in root.glob(pattern):
-            if path.is_file():
-                relative = path.relative_to(source)
-                if any((source / Path(*relative.parts[:index])).is_symlink()
-                       for index in range(1, len(relative.parts) + 1)):
-                    fail(f"Refusing symlink source: {relative}")
-                found[str(relative)] = path.read_bytes()
-    # The prefix is a namespace for the installed assets, not the target path.
-    if prefix != "qa":
-        names = {Path(name).name.removesuffix(".agent.md") for name in found
-                 if name.startswith(".github/agents/")}
-        names.update(Path(name).parts[2] for name in found if name.startswith(".github/skills/"))
-        replacements = {name: prefix + name[2:] for name in names}
-        symbol = re.compile(r"(?<![A-Za-z0-9_-])(" +
-                            "|".join(re.escape(name) for name in sorted(names, key=len, reverse=True)) +
-                            r")(?![A-Za-z0-9_-])")
-        renamed = {}
-        for name, data in found.items():
-            parts = list(Path(name).parts)
-            if parts[1] == "agents":
-                parts[-1] = prefix + parts[-1][2:]
-            elif parts[1] == "skills":
-                parts[2] = prefix + parts[2][2:]
-            elif parts[1] == "instructions":
-                parts[-1] = prefix + parts[-1][2:]
-            if Path(name).suffix.lower() in (".md", ".txt", ".json", ".yaml", ".yml"):
-                text = data.decode("utf-8")
-                data = symbol.sub(lambda match: replacements[match.group()], text).encode()
-            renamed[str(Path(*parts))] = data
-        found = renamed
-    if not found:
-        fail("No framework-owned files found next to installer")
-    return dict(sorted(found.items()))
+created_dirs="$tmp/created-dirs"; : > "$created_dirs"
+if [[ "$COMMAND" != uninstall ]]; then
+  cat "$old_dirs" > "$created_dirs"
+  while IFS='|' read -r action rel staged; do [[ "$action" == write ]] || continue; parent="$(dirname "$rel")"; while [[ "$parent" != . && ! -d "$TARGET/$parent" ]]; do grep -Fxq "$parent" "$created_dirs" || printf '%s\n' "$parent" >> "$created_dirs"; parent="$(dirname "$parent")"; done; done < "$plan"
+  parent="$(dirname "$MANIFEST_REL")"; while [[ "$parent" != . && ! -d "$TARGET/$parent" ]]; do grep -Fxq "$parent" "$created_dirs" || printf '%s\n' "$parent" >> "$created_dirs"; parent="$(dirname "$parent")"; done
+fi
+if [[ "$COMMAND" == uninstall ]]; then printf 'remove|%s|\n' "$MANIFEST_REL" >> "$plan"; if ((PURGE)); then printf 'purge|.github/ai-qa/project|\npurge|.github/ai-qa/baselines|\npurge|qa-work|\n' >> "$plan"; fi; fi
+if ((DRY)); then
+  while IFS='|' read -r action rel staged; do [[ -n "$action" ]] && printf '[dry-run] %s %s\n' "$action" "$TARGET/$rel"; done < "$plan"
+  while IFS= read -r rel; do [[ -n "$rel" ]] && printf '[dry-run] preserve modified %s; review %s.ai-qa-new\n' "$rel" "$TARGET/$rel"; done < "$modified"
+  [[ "$COMMAND" == uninstall ]] || printf '[dry-run] write %s\n' "$MANIFEST"
+  exit 0
+fi
+while IFS='|' read -r action rel staged; do
+  [[ -n "$action" ]] || continue; path="$TARGET/$rel"
+  case "$action" in
+    write) safe_rel "$rel"; mkdir -p "$(dirname "$path")"; cp "$staged" "$path" ;;
+    remove) safe_rel "$rel"; [[ ! -e "$path" ]] || rm -f "$path" ;;
+    purge) safe_rel "$rel"; if [[ -e "$path" ]]; then assert_no_links "$path"; rm -rf "$path"; fi ;;
+  esac
+done < "$plan"
+if [[ "$COMMAND" == uninstall ]]; then
+  awk -F/ '{print NF "\t" $0}' "$old_dirs" | sort -rn | cut -f2- | while IFS= read -r rel; do [[ -n "$rel" ]] || continue; path="$TARGET/$rel"; [[ ! -d "$path" ]] || rmdir "$path" 2>/dev/null || :; done
+  printf 'Uninstalled AI-QA framework assets\n'; while IFS= read -r rel; do [[ -n "$rel" ]] && printf 'Preserved modified %s\n' "$rel"; done < "$modified"; exit 0
+fi
 
-
-def read_manifest(path):
-    if not path.exists():
-        return None
-    if path.is_symlink():
-        fail(f"Refusing symlink manifest: {path}")
-    try:
-        manifest = json.loads(path.read_text(encoding="utf-8"))
-        if manifest["version"] != 1 or not isinstance(manifest["files"], dict):
-            raise ValueError("invalid manifest schema")
-        prefix = manifest.get("prefix")
-        if not isinstance(prefix, str) or not re.fullmatch(r"[A-Za-z0-9_-]+", prefix):
-            raise ValueError("invalid prefix")
-        for key in ("block", "ignore_block"):
-            value = manifest.get(key)
-            if not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value):
-                raise ValueError(f"invalid {key} checksum")
-        for name, checksum in manifest["files"].items():
-            relative = Path(name)
-            if (relative.is_absolute() or ".." in relative.parts
-                    or not name.startswith(".github/") or not isinstance(checksum, str)
-                    or not re.fullmatch(r"[0-9a-f]{64}", checksum)
-                    or not (re.fullmatch(r"\.github/agents/" + re.escape(prefix) + r"[^/]*\.agent\.md", name)
-                            or re.fullmatch(r"\.github/skills/" + re.escape(prefix) + r"-[^/]+/.+", name)
-                            or name.startswith(".github/ai-qa/framework/")
-                            or re.fullmatch(r"\.github/instructions/" + re.escape(prefix) + r"[^/]*\.instructions\.md", name))):
-                raise ValueError("unsafe manifest file")
-        return manifest
-    except (KeyError, ValueError, TypeError) as error:
-        fail(f"Invalid install manifest {path}: {error}")
-
-
-def safe_path(target, relative):
-    if relative != GITIGNORE and (relative.is_absolute() or ".." in relative.parts
-                                  or relative.parts[0] != ".github"):
-        fail(f"Unsafe path: {relative}")
-    current = target
-    for part in relative.parts:
-        current = current / part
-        if current.is_symlink():
-            fail(f"Refusing symlink: {current}")
-    return current
-
-
-def get_block(path, begin=BEGIN, end=END):
-    if not path.exists():
-        return None
-    text = path.read_text(encoding="utf-8")
-    if text.count(begin) != text.count(end) or text.count(begin) > 1:
-        fail(f"Invalid AI-QA markers in {path}")
-    if begin not in text:
-        return None
-    start = text.index(begin)
-    finish = text.index(end, start) + len(end)
-    return text[start:finish]
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Install, update, verify or uninstall AI-QA framework assets.")
-    parser.add_argument("command", nargs="?", default="install", help="install, update, verify or uninstall")
-    parser.add_argument("target", nargs="?", default=".", help="Target repository (default: current directory)")
-    parser.add_argument("--prefix", default="qa", help="Framework asset namespace (default: qa)")
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--update", action="store_true", help="Update a managed installation")
-    parser.add_argument("--uninstall", action="store_true", help="Remove a managed installation")
-    parser.add_argument("--purge", action="store_true", help="With --uninstall, also remove modified managed files")
-    parser.add_argument("--yes", action="store_true", help="Confirm permanent deletion of project data with --purge")
-    parser.add_argument("--verify", action="store_true", help="Check manifest and installed hashes")
-    args = parser.parse_intermixed_args()
-    if args.command in ("install", "update", "verify", "uninstall", "purge"):
-        args.update |= args.command == "update"
-        args.verify |= args.command == "verify"
-        args.uninstall |= args.command in ("uninstall", "purge")
-        args.purge |= args.command == "purge"
-    elif args.target == ".":
-        args.target = args.command
-    else:
-        fail(f"Unknown command: {args.command}")
-    if not re.fullmatch(r"[A-Za-z0-9_-]+", args.prefix):
-        fail("Prefix must contain only letters, digits, underscores and hyphens")
-    if args.purge and not args.uninstall:
-        fail("--purge requires --uninstall")
-    if args.purge and not args.yes and not args.dry_run:
-        fail("--purge deletes project data and baselines; rerun with --yes to confirm")
-    if sum((args.update, args.uninstall, args.verify)) > 1:
-        fail("--update, --uninstall and --verify are mutually exclusive")
-    source = Path(os.environ["AI_QA_INSTALL_SOURCE"]).resolve()
-    target = Path(args.target).resolve()
-    if not target.is_dir():
-        fail(f"Target is not a directory: {target}")
-    if target == source and not args.verify:
-        fail("Refusing to modify the AI-QA source repository itself")
-    manifest_path = safe_path(target, MANIFEST)
-    old = read_manifest(manifest_path)
-    if args.verify:
-        if old is None:
-            fail("AI-QA manifest missing")
-        problems = []
-        for name, checksum in old["files"].items():
-            path = safe_path(target, Path(name))
-            if not path.is_file() or digest(path.read_bytes()) != checksum:
-                problems.append(name)
-        instructions = safe_path(target, INSTRUCTIONS)
-        block = get_block(instructions)
-        if block is None or digest(block.encode()) != old.get("block"):
-            problems.append(str(INSTRUCTIONS) + " (managed block)")
-        if old.get("framework_version") != FRAMEWORK_VERSION:
-            problems.append(f"framework version (expected {FRAMEWORK_VERSION}, found {old.get('framework_version')})")
-        ignore = get_block(safe_path(target, GITIGNORE), IGNORE_BEGIN, IGNORE_END)
-        if ignore is None or digest(ignore.encode()) != old.get("ignore_block"):
-            problems.append(str(GITIGNORE) + " (managed block)")
-        if problems:
-            fail("Verification failed: " + ", ".join(problems))
-        project = target / ".github/ai-qa/project"
-        if not (project / "project.md").is_file() or not (project / "conventions").is_dir():
-            print("WARN: project layer is not configured; run qa-configure")
-        print(f"Verified AI-QA framework {FRAMEWORK_VERSION}, {len(old['files'])} files and instruction blocks")
-        return
-    if args.uninstall and old is None:
-        fail("No managed installation to uninstall")
-    if args.update and old is None:
-        fail("No managed installation to update")
-    if not args.update and not args.uninstall and old is not None:
-        fail("Already installed; use --update or --verify")
-
-    files = {} if args.uninstall else source_files(source, args.prefix)
-    if old and not args.uninstall and old.get("prefix") != args.prefix:
-        fail(f"Installed prefix is {old.get('prefix')!r}; use the same --prefix")
-    previous = old["files"] if old else {}
-    conflicts = []
-    github = target / ".github"
-    for directory, pattern in ((github / "agents", args.prefix + "*.agent.md"),
-                               (github / "instructions", args.prefix + "*.instructions.md")):
-        if directory.is_symlink():
-            fail(f"Refusing symlink: {directory}")
-        if directory.is_dir():
-            for path in directory.glob(pattern):
-                name = str(path.relative_to(target))
-                if name not in previous and old is None and not args.uninstall:
-                    conflicts.append(name + " (occupied namespace)")
-    skill_dir = github / "skills"
-    if skill_dir.is_symlink():
-        fail(f"Refusing symlink: {skill_dir}")
-    if skill_dir.is_dir() and old is None and not args.uninstall:
-        for path in skill_dir.glob(args.prefix + "-*"):
-            name = str(path.relative_to(target)) + "/"
-            if not any(owned.startswith(name) for owned in previous):
-                conflicts.append(name + " (occupied namespace)")
-    modified = []
-    writes, deletes = {}, []
-    retained = {}
-    for name in sorted(set(previous) | set(files)):
-        path = safe_path(target, Path(name))
-        exists = path.exists()
-        current = path.read_bytes() if path.is_file() else None
-        owned = name in previous
-        clean = owned and current is not None and digest(current) == previous[name]
-        if name in files:
-            desired = files[name]
-            if owned:
-                if current == desired:
-                    continue
-                if not clean:
-                    modified.append(name)
-                    retained[name] = previous[name]
-                    writes[safe_path(target, Path(name + ".ai-qa-new"))] = desired
-                else:
-                    writes[path] = desired
-            elif exists:
-                conflicts.append(name)
-            else:
-                writes[path] = desired
-        elif exists:
-            if clean or (args.uninstall and args.purge):
-                deletes.append(path)
-            else:
-                modified.append(name)
-                if not args.uninstall:
-                    retained[name] = previous[name]
-    instruction_block = BLOCK.replace(".github/agents/qa", f".github/agents/{args.prefix}")
-    blocks = ((INSTRUCTIONS, instruction_block, "block", BEGIN, END),
-              (GITIGNORE, IGNORE_BLOCK, "ignore_block", IGNORE_BEGIN, IGNORE_END))
-    block_actions = []
-    hashes = {}
-    for relative, desired, key, begin, end in blocks:
-        path = safe_path(target, relative)
-        current = get_block(path, begin, end)
-        if old:
-            if current is None or digest(current.encode()) != old.get(key):
-                modified.append(str(relative) + " (managed block)")
-                if not args.uninstall:
-                    hashes[key] = old.get(key)
-                    writes[safe_path(target, Path(str(relative) + ".ai-qa-new"))] = (desired + "\n").encode()
-                continue
-        elif current is not None:
-            conflicts.append(str(relative) + " (existing markers)")
-            continue
-        text = path.read_text(encoding="utf-8") if path.exists() else ""
-        if current is not None:
-            text = text.replace(current, "", 1).strip("\n")
-        if not args.uninstall:
-            text = text.rstrip("\n") + ("\n\n" if text.strip() else "") + desired + "\n"
-            hashes[key] = digest(desired.encode())
-        elif text:
-            text += "\n"
-        block_actions.append((path, text))
-    if conflicts:
-        fail("Conflicting or modified files (left untouched): " + ", ".join(conflicts))
-    for path, data in writes.items():
-        if path.name.endswith(".ai-qa-new") and path.exists() and path.read_bytes() != data:
-            fail(f"Refusing to overwrite existing review copy: {path}")
-
-    if args.dry_run:
-        for path in writes:
-            print(f"[dry-run] write {path}")
-        for path in deletes:
-            print(f"[dry-run] remove {path}")
-        for path, _ in block_actions:
-            print(f"[dry-run] update managed block in {path}")
-        for name in modified:
-            print(f"[dry-run] preserve modified {name}")
-        if args.purge:
-            print("[dry-run] remove project data and baselines under .github/ai-qa/project, .github/ai-qa/baselines and qa-work")
-        print(f"[dry-run] {'remove' if args.uninstall else 'write'} {manifest_path}")
-        return
-    for path in deletes:
-        path.unlink()
-    for path, data in writes.items():
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(data)
-    for path, text in block_actions:
-        if text:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(text, encoding="utf-8")
-        elif path.exists():
-            path.unlink()
-    if args.uninstall:
-        manifest_path.unlink()
-        if args.purge:
-            for relative in (Path(".github/ai-qa/project"), Path(".github/ai-qa/baselines"),
-                             Path("qa-work")):
-                path = safe_path(target, relative) if relative.parts[0] == ".github" else target / relative
-                if path.is_symlink():
-                    fail(f"Refusing symlink: {path}")
-                if path.is_dir():
-                    shutil.rmtree(path)
-        for path in deletes + [manifest_path]:
-            parent = path.parent
-            while parent != target and parent.is_dir():
-                try:
-                    parent.rmdir()
-                except OSError:
-                    break
-                parent = parent.parent
-        print("Uninstalled AI-QA framework assets")
-    else:
-        manifest_path.parent.mkdir(parents=True, exist_ok=True)
-        manifest_path.write_text(json.dumps({"version": 1, "prefix": args.prefix,
-                                             "framework_version": FRAMEWORK_VERSION,
-                                             "files": {name: retained.get(name, digest(data)) for name, data in files.items()} | retained,
-                                             **hashes},
-                                            indent=2) + "\n", encoding="utf-8")
-        for name in modified:
-            print(f"Preserved modified {name}; review .ai-qa-new if present")
-        print(f"{'Updated' if args.update else 'Installed'} {len(files)} AI-QA framework files")
-        if args.update:
-            changelog = source / "CHANGELOG.md"
-            if changelog.is_file():
-                print("\nCHANGELOG.md:\n" + changelog.read_text(encoding="utf-8").rstrip())
-            print("\nReview .ai-qa-new copies and run qa-configure refresh after reviewing framework changes.")
-
-
-try:
-    main()
-except (OSError, UnicodeError, ValueError) as error:
-    print(f"Error: {error}", file=sys.stderr)
-    sys.exit(1)
-PY
+mkdir -p "$(dirname "$MANIFEST")"
+{
+  printf '{\n  "schema": 1,\n  "framework_version": "%s",\n  "prefix": "%s",\n  "instructions_block_sha256": "%s",\n  "gitignore_block_sha256": "%s",\n  "instructions_eol": "%s",\n  "gitignore_eol": "%s",\n  "created_files": [' "$VERSION" "$PREFIX" "$block_hash" "$ignore_hash" "$ins_eol" "$git_eol"
+  sep=''; [[ "$ins_created" != 1 ]] || { printf '".github/copilot-instructions.md"'; sep=,; }
+  [[ "$git_created" != 1 ]] || printf '%s".gitignore"' "$sep"
+  printf '],\n  "created_dirs": ['
+  sep=''; while IFS= read -r rel; do [[ -n "$rel" ]] || continue; printf '%s\n    "%s"' "$sep" "$rel"; sep=,; done < "$created_dirs"
+  printf '\n  ],\n  "files": {\n'
+  first=1; while IFS='|' read -r rel sum; do [[ -n "$rel" ]] || continue; [[ $first == 1 ]] || printf ',\n'; printf '    "%s": "%s"' "$rel" "$sum"; first=0; done < "$new_files"
+  printf '\n  }\n}\n'
+} > "$tmp/manifest"
+cp "$tmp/manifest" "$MANIFEST"
+while IFS= read -r rel; do [[ -n "$rel" ]] && printf 'Preserved modified %s; review .ai-qa-new if present\n' "$rel"; done < "$modified"
+if [[ "$COMMAND" == update ]]; then
+  printf 'Updated %s AI-QA framework files\n' "$(wc -l < "$new_files" | awk '{print $1}')"
+  if [[ -f "$SCRIPT_DIR/CHANGELOG.md" ]]; then printf '\nCHANGELOG.md:\n'; awk -v old="## v$OLD_VERSION" '$0==old{exit}/^## /{s=1}s{print}' "$SCRIPT_DIR/CHANGELOG.md"; fi
+  needs_refresh=0
+  while IFS= read -r v; do
+    [[ -n "$v" ]] || continue
+    if ver_gt "$v" "$OLD_VERSION" && ! ver_gt "$v" "$VERSION"; then needs_refresh=1; fi
+  done < <(sed -n 's/^[[:space:]]*refresh-required:[[:space:]]*\([0-9.]*\).*/\1/p' "$SCRIPT_DIR/docs/migrations.md" 2>/dev/null)
+  ((needs_refresh == 0)) || printf '\nThis update requires qa-configure refresh (see docs/migrations.md).\n'
+else printf 'Installed %s AI-QA framework files\n' "$(wc -l < "$new_files" | awk '{print $1}')"; fi

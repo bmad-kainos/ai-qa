@@ -1,0 +1,14 @@
+{
+  "name": "pricing-service",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "playwright test tests/integration"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.57.0",
+    "vitest": "2.1.8"
+  }
+}
