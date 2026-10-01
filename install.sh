@@ -154,7 +154,7 @@ def main():
         args.target = args.command
     else:
         fail(f"Unknown command: {args.command}")
-    if not args.prefix or not args.prefix.replace("-", "").replace("_", "").isalnum():
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", args.prefix):
         fail("Prefix must contain only letters, digits, underscores and hyphens")
     if args.purge and not args.uninstall:
         fail("--purge requires --uninstall")

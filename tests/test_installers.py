@@ -142,6 +142,13 @@ class InstallersTest(unittest.TestCase):
                     manifest_path.write_text(json.dumps(manifest))
                     self.call(runner, "uninstall", ok=False)
 
+    def test_non_ascii_prefix_is_rejected_consistently(self):
+        for runner in ("sh", "ps1"):
+            with self.subTest(runner=runner):
+                with self.recreate():
+                    self.call(runner, "--prefix", "café", ok=False)
+                    self.assertFalse((self.target / ".github/ai-qa/manifest.json").exists())
+
     def test_namespace_collision_and_prefixed_metadata(self):
         for runner in ("sh", "ps1"):
             with self.subTest(runner=runner):

@@ -2,3 +2,8 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .DS_Store
+/tests/.installer-*/
+/tests/.installer-fixtures-*/
+/examples/fixtures/**/bin/
+/examples/fixtures/**/obj/
+/examples/fixtures/**/.vs/
