@@ -1,0 +1,5 @@
+trigger:
+  - main
+steps:
+  - script: dotnet test Billing.sln --logger trx
+    displayName: Run billing tests
