@@ -37,7 +37,7 @@ Read [migrations](docs/migrations.md) before updating.
 | Engineering | `qa-create-branch` · `qa-create-pr` · `qa-tech-report` · `qa-update-docs` |
 | Discovery | `qa-discover` |
 
-See the [user guide](docs/user-guide.md) for workflows and walkthroughs.
+See the [user guide](docs/user-guide.md) for workflows, gates and artefacts.
 
 ## Where information lives
 
@@ -55,7 +55,7 @@ Never put credentials in configuration. Record environment-variable **names** on
 
 ## Safety
 
-Safety gates are authoritative, and agent tool lists are not a safety mechanism. See [safety](docs/safety.md).
+Safety gates are authoritative, and agent tool lists are not a safety mechanism. The full rules are in [`method/safety.md`](.github/ai-qa/framework/method/safety.md).
 
 | Level | Covers | Gate |
 |---|---|---|
@@ -74,7 +74,7 @@ AI-QA never edits the default branch. Creating a branch never pushes it, and AI-
 |---|---|
 | `.github/` | The framework itself: `agents/`, `skills/` and `ai-qa/framework/`. These are the only files the installer copies into a project. VS Code also loads them in this repo, so you can try changes in place |
 | `install.sh`, `install.ps1`, `VERSION`, `CHANGELOG.md` | Installers and release metadata |
-| `docs/` | [Flows and diagrams](docs/flows/README.md), [architecture](docs/architecture.md), [user guide](docs/user-guide.md), [configure](docs/configure.md), [safety](docs/safety.md), [adding a pack](docs/adding-a-pack.md), [adding a provider](docs/adding-a-provider.md), [migrations](docs/migrations.md), [manual install](docs/manual-install.md) |
+| `docs/` | [Flows and diagrams](docs/flows/README.md), [architecture](docs/architecture.md), [user guide](docs/user-guide.md), [contributing](docs/contributing.md), [migrations](docs/migrations.md), [manual install](docs/manual-install.md) |
 | `tools/qa-stats.py` | Optional standard-library helper for baseline percentiles and flaky-SHA detection. It runs from this checkout only and is never installed |
 | `tests/` | Installer and `qa-stats` tests (`python3 -m unittest discover -s tests`) |
 

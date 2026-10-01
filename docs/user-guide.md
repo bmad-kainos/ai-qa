@@ -8,7 +8,7 @@
 
 ## Configure
 
-Ask `@qa-configure`. It runs the procedure described in [configure](configure.md):
+Ask `@qa-configure`. It runs the 11-step procedure in `.github/agents/qa-configure.agent.md` (diagram: [configure flow](flows/02-configure.md)):
 
 - It runs read-only discovery.
 - It asks one question at a time, each with evidence and an *Option A (recommended)*. You can say "accept all".

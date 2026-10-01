@@ -9,7 +9,7 @@ Mermaid diagrams for how AI-QA is installed, configured and used, and which file
 | [03-usage.md](03-usage.md) | `@qa` routing, the four workflows, and the provider/transport layer |
 | [04-file-lifecycle.md](04-file-lifecycle.md) | Which files are created, changed, removed or kept at each stage |
 
-The same flow in prose: [README](../../README.md) (install), [configure](../configure.md) (11 steps) and [user guide](../user-guide.md) (workflows, gates, artefacts).
+The same flow in prose: [README](../../README.md) (install), the [user guide](../user-guide.md) (workflows, gates, artefacts) and the `qa-configure` agent file (11 steps).
 
 ## What changes in the target project
 
