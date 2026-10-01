@@ -81,7 +81,7 @@ Packs live in `framework/packs/<id>/`. Each has a `pack.md` (detection signals, 
 Out of scope for v1:
 
 - Binaries, discovery or transport code.
-- Zephyr and Azure Test Plans (reference material only, in `reference/zephyr/`).
+- Zephyr and Azure Test Plans.
 - Monorepo overlays (v1 configures a single scope path).
 - More full packs.
 - GitLab and Jenkins.

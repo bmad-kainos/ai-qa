@@ -76,7 +76,6 @@ AI-QA never edits the default branch. Creating a branch never pushes it, and AI-
 | `install.sh`, `install.ps1`, `VERSION`, `CHANGELOG.md` | Installers and release metadata |
 | `docs/` | [Flows and diagrams](docs/flows/README.md), [architecture](docs/architecture.md), [user guide](docs/user-guide.md), [configure](docs/configure.md), [safety](docs/safety.md), [adding a pack](docs/adding-a-pack.md), [adding a provider](docs/adding-a-provider.md), [migrations](docs/migrations.md), [manual install](docs/manual-install.md) |
 | `tools/qa-stats.py` | Optional standard-library helper for baseline percentiles and flaky-SHA detection. It runs from this checkout only and is never installed |
-| `reference/zephyr/` | Zephyr knowledge kept for future work; not installed |
 | `tests/` | Installer and `qa-stats` tests (`python3 -m unittest discover -s tests`) |
 
 ## Provenance
