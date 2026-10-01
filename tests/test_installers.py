@@ -32,7 +32,6 @@ class SyntheticInstallerTests(unittest.TestCase):
         shutil.copy2(ROOT / "install.sh", self.source / "install.sh")
         shutil.copy2(ROOT / "install.ps1", self.source / "install.ps1")
         (self.source / "VERSION").write_text("1.0.0\n")
-        (self.source / "CHANGELOG.md").write_text("# Changelog\n\n## v1.0.0\nSynthetic notes.\n")
         (self.source / "docs").mkdir()
         (self.source / "docs/migrations.md").write_text("# Migrations\n\nrefresh-required: 1.0.0\n")
         self.framework_file("agents/qa.agent.md", "Agent uses qa-plan and qa-configure.\n")
@@ -94,10 +93,8 @@ class SyntheticInstallerTests(unittest.TestCase):
                 (self.source / ".github/ai-qa/framework/method/retired.md").unlink()
                 self.framework_file("ai-qa/framework/method/new.md", "New framework file.\n")
                 (self.source / "VERSION").write_text("1.1.0\n")
-                (self.source / "CHANGELOG.md").write_text("# Changelog\n\n## v1.1.0\nUpdate notes.\n\n## v1.0.0\nOld.\n")
                 (self.source / "docs/migrations.md").write_text("# Migrations\n\nrefresh-required: 1.1.0\n")
                 output = self.call(runner, "update").stdout
-                self.assertIn("Update notes.", output)
                 self.assertIn("qa-configure refresh", output)
                 self.assertEqual(edited.read_text(), "project edit\n")
                 self.assertEqual(Path(str(edited) + ".ai-qa-new").read_text(), "Framework v1.\n")

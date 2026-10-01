@@ -73,7 +73,7 @@ AI-QA never edits the default branch. Creating a branch never pushes it, and AI-
 | Path | Purpose |
 |---|---|
 | `.github/` | The framework itself: `agents/`, `skills/` and `ai-qa/framework/`. These are the only files the installer copies into a project. VS Code also loads them in this repo, so you can try changes in place |
-| `install.sh`, `install.ps1`, `VERSION`, `CHANGELOG.md` | Installers and release metadata |
+| `install.sh`, `install.ps1`, `VERSION` | Installers and release version |
 | `docs/` | [Flows and diagrams](docs/flows/README.md), [architecture](docs/architecture.md), [user guide](docs/user-guide.md), [contributing](docs/contributing.md), [migrations](docs/migrations.md), [manual install](docs/manual-install.md) |
 | `tools/qa-stats.py` | Optional standard-library helper for baseline percentiles and flaky-SHA detection. It runs from this checkout only and is never installed |
 | `tests/` | Installer and `qa-stats` tests (`python3 -m unittest discover -s tests`) |

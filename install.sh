@@ -251,7 +251,6 @@ cp "$tmp/manifest" "$MANIFEST"
 while IFS= read -r rel; do [[ -n "$rel" ]] && printf 'Preserved modified %s; review .ai-qa-new if present\n' "$rel"; done < "$modified"
 if [[ "$COMMAND" == update ]]; then
   printf 'Updated %s AI-QA framework files\n' "$(wc -l < "$new_files" | awk '{print $1}')"
-  if [[ -f "$SCRIPT_DIR/CHANGELOG.md" ]]; then printf '\nCHANGELOG.md:\n'; awk -v old="## v$OLD_VERSION" '$0==old{exit}/^## /{s=1}s{print}' "$SCRIPT_DIR/CHANGELOG.md"; fi
   needs_refresh=0
   while IFS= read -r v; do
     [[ -n "$v" ]] || continue

@@ -2,9 +2,8 @@
 
 How to add a test pack or a provider. For every change:
 
-1. Add a CHANGELOG entry.
-2. If existing installations must re-render or reconfigure, add a `refresh-required: <version>` line to [migrations](migrations.md).
-3. Run `python3 -m unittest discover -s tests`.
+1. If existing installations must re-render or reconfigure, add a `refresh-required: <version>` line to [migrations](migrations.md).
+2. Run `python3 -m unittest discover -s tests`.
 
 Don't pin models, add AI-generated markers, or add runtime dependencies or client code to the framework files.
 

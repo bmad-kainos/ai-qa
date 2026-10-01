@@ -41,8 +41,7 @@ flowchart TD
   C3 --> E
   D1 --> E
   D2 --> E
-  E --> F["Print CHANGELOG<br/>entries since installed version"]
-  F --> G{"refresh-required<br/>in docs/migrations.md?"}
+  E --> G{"refresh-required<br/>in docs/migrations.md?"}
   G -->|yes| H(["Run @qa-configure refresh"])
   G -->|no| I(["Done"])
 ```

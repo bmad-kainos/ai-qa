@@ -318,7 +318,6 @@ try {
     foreach($item in $modified){Write-Output "Preserved modified $item; review .ai-qa-new if present"}
     if($Command -eq 'update'){
         Write-Output "Updated $($newFiles.Count) AI-QA framework files"
-        $changeLog=Join-Path $ScriptDir 'CHANGELOG.md';if(Test-Path $changeLog){Write-Output "`nCHANGELOG.md:";$show=$false;foreach($line in (Get-Content $changeLog)){if($line -eq "## v$($Manifest.framework_version)"){break};if($line -match '^## '){$show=$true};if($show){Write-Output $line}}}
         $migration=Join-Path $ScriptDir 'docs/migrations.md';if(Test-Path $migration){$needsRefresh=$false;foreach($match in (Select-String $migration -Pattern '^\s*refresh-required:\s*([0-9.]+)')){$v=$match.Matches[0].Groups[1].Value;if((VersionGreater $v $Manifest.framework_version) -and -not (VersionGreater $v $Version)){$needsRefresh=$true}};if($needsRefresh){Write-Output "`nThis update requires qa-configure refresh (see docs/migrations.md)."}}
     } else {Write-Output "Installed $($newFiles.Count) AI-QA framework files"}
 } catch { [Console]::Error.WriteLine("Error: $($_.Exception.Message)"); exit 1 }
