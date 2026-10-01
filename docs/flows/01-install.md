@@ -1,62 +1,74 @@
 # 1. Install, update, verify and uninstall
 
-These commands are run from a separate AI-QA checkout and target a project repository. `install.sh` and `install.ps1` behave the same way.
+Run the installer from a separate AI-QA checkout, pointing at the project. `install.sh` and `install.ps1` behave the same way.
 
 ## Install
 
 ```mermaid
 flowchart TD
-  A([./install.sh install /path/to/project]) --> B{Target is the AI-QA<br/>checkout itself?}
-  B -- yes --> X1[/Refuse and exit/]
-  B -- no --> C{Manifest already<br/>exists?}
-  C -- yes --> X2[/Refuse: use update or verify/]
-  C -- no --> D{Existing qa* agents,<br/>qa-* skills or qa* instructions<br/>not owned by AI-QA?}
-  D -- yes, no --prefix --> X3[/Abort and list collisions/]
-  D -- "no, or --prefix x" --> E[Stage payload/.github files<br/>rename qa → x if --prefix]
-  E --> F{--dry-run?}
-  F -- yes --> P[/Print planned writes and exit - nothing changed/]
-  F -- no --> G[Copy agents, skills and framework files]
-  G --> H[Add or replace the marked pointer block in<br/>.github/copilot-instructions.md<br/>creating the file if absent]
-  H --> I[Add the marked qa-work block to .gitignore]
-  I --> J[Write .github/ai-qa/manifest.json<br/>with a SHA-256 for every installed file]
-  J --> K([Done: open the project in VS Code<br/>and run @qa-configure])
+  A(["install.sh install /path/to/project"])
+  A --> B{"Target is the AI-QA repo?"}
+  B -->|yes| X1["Refuse"]
+  B -->|no| C{"Already installed?"}
+  C -->|yes| X2["Refuse: use update"]
+  C -->|no| D{"Name collision with<br/>qa* agents, skills or<br/>instructions?"}
+  D -->|"yes, and no prefix given"| X3["Abort and list collisions"]
+  D -->|"no, or a prefix is given"| E{"Dry run?"}
+  E -->|yes| P["Print plan only"]
+  E -->|no| G["Copy agents, skills<br/>and framework files"]
+  G --> H["Add marked blocks to<br/>copilot-instructions.md<br/>and .gitignore"]
+  H --> J["Write manifest.json<br/>with SHA-256 hashes"]
+  J --> K(["Next: run @qa-configure"])
 ```
+
+Collisions are checked against existing `qa*` agents, `qa-*` skills and `qa*` instructions that AI-QA doesn't own. Passing `--prefix x` renames everything from `qa` to `x`.
 
 ## Update
 
 ```mermaid
 flowchart TD
-  A([./install.sh update /path/to/project]) --> B[Read the manifest and the installed version]
-  B --> C{For each payload file}
-  C -- unchanged --> C1[Skip]
-  C -- "installed hash == manifest hash<br/>(nobody edited it)" --> C2[Replace it]
-  C -- edited locally --> C3[Keep it and write file.ai-qa-new - warn]
-  B --> D{For each file dropped from the payload}
-  D -- unmodified --> D1[Delete it]
-  D -- modified --> D2[Keep it - warn]
-  C1 & C2 & C3 & D1 & D2 --> E[Rewrite the manifest]
-  E --> F[Print CHANGELOG sections newer than the installed version]
-  F --> G{docs/migrations.md has<br/>refresh-required: in range?}
-  G -- yes --> H([Tell the user to run @qa-configure refresh])
-  G -- no --> I([Done])
+  A(["install.sh update /path/to/project"])
+  A --> B["Read manifest and version"]
+  B --> C{"Each payload file"}
+  C -->|unchanged| C1["Skip"]
+  C -->|"hash matches manifest"| C2["Replace"]
+  C -->|"edited locally"| C3["Keep, write .ai-qa-new"]
+  B --> D{"Each file dropped<br/>from the payload"}
+  D -->|unmodified| D1["Delete"]
+  D -->|modified| D2["Keep and warn"]
+  C1 --> E["Rewrite manifest"]
+  C2 --> E
+  C3 --> E
+  D1 --> E
+  D2 --> E
+  E --> F["Print CHANGELOG<br/>entries since installed version"]
+  F --> G{"refresh-required<br/>in docs/migrations.md?"}
+  G -->|yes| H(["Run @qa-configure refresh"])
+  G -->|no| I(["Done"])
 ```
 
-## Verify and uninstall
+## Verify
 
 ```mermaid
-flowchart LR
-  subgraph verify
-    V1[Hash every manifest file] --> V2[Check both marked blocks]
-    V2 --> V3[Compare the version with the source VERSION]
-    V3 --> V4{Project layer present?}
-    V4 -- no --> V5[WARN: run qa-configure]
-  end
-  subgraph uninstall
-    U1[Remove unmodified manifest files] --> U2[Remove the marked blocks<br/>restoring the files byte-for-byte]
-    U2 --> U3[List modified files and leave them]
-    U3 --> U4[Remove the manifest and any empty dirs it created]
-    U4 --> U5{--purge confirmed?}
-    U5 -- yes --> U6[Also delete the project layer,<br/>baselines and qa-work]
-    U5 -- no --> U7[Keep the project layer, baselines and qa-work]
-  end
+flowchart TD
+  V1["Hash every manifest file"] --> V2["Check both marked blocks"]
+  V2 --> V3["Compare installed and source version"]
+  V3 --> V4{"Project layer present?"}
+  V4 -->|no| V5["Warn: run @qa-configure"]
+  V4 -->|yes| V6(["Verified"])
+  V5 --> V6
+```
+
+Verify exits non-zero if any hash or marked block doesn't match.
+
+## Uninstall
+
+```mermaid
+flowchart TD
+  U1["Remove unmodified<br/>manifest files"] --> U2["Remove marked blocks<br/>(byte-for-byte restore)"]
+  U2 --> U3["List modified files<br/>and leave them"]
+  U3 --> U4["Remove manifest and<br/>empty dirs it created"]
+  U4 --> U5{"--purge confirmed?"}
+  U5 -->|yes| U6["Also delete project layer,<br/>baselines and qa-work"]
+  U5 -->|no| U7["Keep project layer,<br/>baselines and qa-work"]
 ```
