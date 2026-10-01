@@ -1,12 +1,12 @@
 ---
 name: qa-publish
-description: Publish an approved QA artefact through a configured provider operation; use for every external comment, work item, documentation page or pull request write.
+description: Post approved QA output (test scenarios, test plans, bug reports, comments) to Jira, Confluence, Azure DevOps or GitHub, only after you approve the exact content. Use for every external write; falls back to a paste-ready file if the system is not reachable.
 argument-hint: "[artefact, operation and destination]"
 user-invocable: true
 ---
 
 # Publish QA artefacts
-Publish reviewed QA artefacts through the configured provider layer, converting content to the provider's format and requiring exact L4 approval before every external write.
+Post reviewed QA output to the configured external system (Jira, Confluence, Azure DevOps, Azure Wiki or GitHub) as a comment, work item, documentation page or pull request. The content is converted to the provider's format and nothing is sent until you approve the exact payload (L4). This skill never writes the content; other skills draft it.
 
 ## When to use
 Use for every external write: `workitem.comment`, `workitem.create`, `docs.publish` (`create`, `update` or `append`) and `repo.pr.create`. Invoke after content is reviewed, when the user asks to publish it, or as the final step of an approved workflow. Do not publish automatically after planning or test execution. The default is publish on request. Honour `.github/ai-qa/project/conventions/qa-process.md` `Test plan destination and timing`; if the team option “keep Confluence page empty until testing” is enabled, wait until the user is ready to test and confirms the page. This skill does not create branches, push code, merge or run tests.

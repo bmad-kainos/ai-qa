@@ -28,7 +28,7 @@ Read `.github/ai-qa/framework/method/{safety,precedence,discovery,work-id-and-gi
 | Run all tests, a path, tag, or risk-selected subset | `qa-run-tests` |
 | Diagnose a run, pasted failure, or CI failure | `qa-analyse-failure` |
 | Produce a ticket or sprint test plan | `qa-test-plan` |
-| Publish an approved external comment, work item, PR, or document operation | `qa-publish` |
+| Post approved QA output (comment, work item, Confluence/Wiki page, PR) to Jira, Confluence, Azure DevOps or GitHub | `qa-publish` |
 | Draft a bug report (no external write) | `qa-bug-report` |
 | Analyse local/approved remote documentation | `qa-ask-docs` |
 | Capture or compare a test/CI baseline | `qa-baseline` |
