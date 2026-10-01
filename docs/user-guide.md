@@ -27,7 +27,7 @@ Ask `@qa design <ticket>` (or `automate`, `full`, `triage`). In every workflow:
 
 | Workflow | Steps | Stops / gates |
 |---|---|---|
-| `design` | analyse-requirement → code-context (+ verify on a branch) → coverage-gaps (requirement) → design-tests → regression-risk → automation-plan → review-tests (design) → test-plan | Red readiness stops and offers refinement questions; design approval before the plan is finalised; QA Summary shown in chat |
+| `design` | analyse-requirement → map-code (+ verify on a branch) → coverage-gaps (requirement) → design-scenarios → regression-risk → automation-plan → review-tests (design) → test-plan | Red readiness stops and offers refinement questions; design approval before the plan is finalised; QA Summary shown in chat |
 | `automate` | design/spec → branch (propose / create local) → generate-tests → review-tests (code) → run-tests → analyse-failure loop → update index and test plan | L2 branch/commit, L3 unsafe runs, L5 dependency install |
 | `full` | design → checkpoint → automate → offer publish / create-pr | All of the above; QA Summary shown at the end |
 | `triage` | run or pasted/CI failure → analyse-failure → bug-report → publish | L4 for any external write |

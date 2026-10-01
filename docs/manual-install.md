@@ -8,9 +8,9 @@ Use these steps when the installer scripts cannot be run. The repository root is
 	```markdown
 	<!-- ai-qa:start -->
 	AI-QA agents: @qa and @qa-configure.
-	Framework: `.github/ai-qa/framework/`.
-	Project layer: `.github/ai-qa/project/` (written only by qa-configure).
-	Safety: `.github/ai-qa/framework/method/safety.md`.
+	Framework: .github/ai-qa/framework/.
+	Project layer: .github/ai-qa/project/ (written only by qa-configure).
+	Safety: .github/ai-qa/framework/method/safety.md.
 	<!-- ai-qa:end -->
 	```
 
@@ -26,7 +26,7 @@ qa-work/**
 # ai-qa:end
 ```
 
-4. Optionally create `.github/ai-qa/manifest.json` with `schema`, `framework_version`, `prefix`, `created_files`, and a `files` object containing one path-to-SHA-256 entry per installed agent, skill, and framework file. This allows the scripts to verify, update, and uninstall the manual installation safely. If you omit it, manage those assets manually.
+4. Don't hand-write `.github/ai-qa/manifest.json`. The installer requires block hashes and line-ending fields that are impractical to produce by hand. Without a manifest, `verify`, `update` and `uninstall` do not work on this installation, and `install` stops on the existing files. Manage the copied assets manually.
 
 To uninstall manually, remove only the copied agent files, skill directories, and `.github/ai-qa/framework/` files. Remove the two marked blocks, preserving all surrounding content. Remove `.github/copilot-instructions.md` or `.gitignore` only if you created the file and it is otherwise empty. Keep `.github/ai-qa/project/`, baselines, and `qa-work/`.
 

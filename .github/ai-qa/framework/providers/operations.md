@@ -83,15 +83,13 @@ Use approved secret storage for authentication and never include credential valu
 
 ## Execution and manual fallback
 
-## Read `conventions/integrations.md` for the capability's provider, deployment, base URL, identifiers, preferred-to-fallback transports, authentication method and environment-variable names. Verify the transport is actually available and authorised.
+1. Read `conventions/integrations.md` for the capability's provider, deployment, base URL, identifiers, preferred-to-fallback transports, authentication method and environment-variable names. Verify the transport is actually available and authorised.
 2. Use the configured preferred transport. MCP tool-name hints in provider files are discovery hints only: verify names and supported inputs against available tools. CLI commands require an already-installed, authenticated CLI. REST is a recipe, not a client. Do not install dependencies or write `.vscode/mcp.json` here.
 3. If the preferred transport fails, report which transport failed and why, then offer the next configured fallback. Do not silently switch tenant, deployment, auth scope or operation. Never blindly retry a non-idempotent write. A second transport for a write requires the same still-valid exact L4 approval; if target/payload changes, show it and ask again.
 4. If no approved transport works, use Manual: ask the user to paste source material or search results for reads; provide paste-ready provider-format content and destination instructions for writes. Write the handoff only to `qa-work/<work-id>/outputs/` after local L1 conditions are met. Label it `unverified / not published` (or `not created`); do not claim a remote ID or URL.
 
 For L4, show action, target, exact payload and side effect, then wait for explicit affirmative approval immediately before acting. After a write, read the result back; a 2xx response or returned ID alone is not verification. Report actual ID/URL and verification status, then log approval/action/result in `qa-work/<work-id>/index.md`. Other external writes such as pipeline triggers or uploads require their own L4 approval and are outside this operation catalog.
 
-## Status rules
+## Provenance
 
-`veProvenance
-
-Confluence Server/DC read/update/append and conversion facts, and Jira Server/DC issue and comment behaviour, derive from `sylwia-luczak/AI-QA-AGENT_GENERIC` at `ac750bb` (`tools/confluence_tool.py`, `tools/jira_tool.py` and the scenario-format guidance). That source declares no licence, so these files paraphrase behaviour and import no code. Other deployment and API examples remain **unverified** against any live tenant
+Confluence Server/DC read/update/append and conversion facts, and Jira Server/DC issue and comment behaviour, derive from `sylwia-luczak/AI-QA-AGENT_GENERIC` at `ac750bb` (`tools/confluence_tool.py`, `tools/jira_tool.py` and the scenario-format guidance). That source declares no licence, so these files paraphrase behaviour and import no code. Other deployment and API examples remain **unverified** against any live tenant.

@@ -15,11 +15,11 @@ Run the installer from a separate AI-QA checkout. Don't install into this reposi
 ./install.sh verify  /path/to/project
 ```
 
-On Windows, use `./install.ps1 install C:\path\to\project` (PowerShell 5.1+ or 7). Both installers behave the same and use only shell built-ins and standard OS tools. If existing `qa*` agents, skills or instructions collide, the installer stops. You can then pick a namespace with `--prefix <name>` or resolve the collision first. See [manual install](docs/manual-install.md) for a non-scripted option.
+On Windows, use `./install.ps1 install C:\path\to\project`. It takes the same options as PowerShell parameters (`-DryRun`, `-Prefix`, `-Purge`, `-Yes`) and is meant to behave the same as `install.sh`, but it has not been run yet (the tests cover `install.sh` only). Both use only shell built-ins and standard OS tools. If existing `qa*` agents, skills or instructions collide, the installer stops. You can then pick a namespace with `--prefix <name>` or resolve the collision first. See [manual install](docs/manual-install.md) for a non-scripted option. See [manual install](docs/manual-install.md) for a non-scripted option.
 
 ```sh
 ./install.sh update    /path/to/project    # modified files are kept; new versions are written as <file>.ai-qa-new
-./install.sh uninstall /path/to/project    # keeps project layer, baselines and qa-work unless --purge (confirmed)
+./install.sh uninstall /path/to/project    # keeps project layer, baselines and qa-work unless --purge (confirmed; add --yes when non-interactive)
 ```
 
 Read [migrations](docs/migrations.md) before updating.
