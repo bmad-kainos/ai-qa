@@ -64,7 +64,7 @@ git log --after="<start-date>" --before="<end-date>" --no-merges --format="%h | 
 Use the requested path/ref filters when supplied and record the exact command, ref, timezone and range. The live git history is the only valid source for what changed in that range; do not infer from prior conversation, cached knowledge or workspace files.
 
 ### No commits — hard stop rule
-If the command returns no output, the period has no commits. Calculate the exact calendar dates for the requested range (for example, “last 3 weeks” from today's date means today minus 21 days through today). Output only this, saved as the project-configured report file name:
+If the command returns no output, the period has no commits. Calculate the exact calendar dates for the requested range (for example, “last 3 weeks” from today's date means today minus 21 days through today). Output only this report body (front matter and Result/Do next are skipped for `.txt`; the outcome is carried in `index.md`), saved as the project-configured report file name:
 
 ```txt
 Period: [START DATE] to [END DATE]
@@ -72,7 +72,7 @@ Period: [START DATE] to [END DATE]
 No commits were made during this period.
 ```
 
-Stop. Do not fall back to an earlier period. Do not mention prior work or explain what the project does. Do not query work items or add commentary to this report. For an empty period, preserve this exact report text; record the report and the hard-stop outcome in the index gate/evidence log.
+Stop. Do not fall back to an earlier period. Do not mention prior work or explain what the project does. Do not add commentary to this report. For `weekly` mode only, still run the "Next week" `workitem.search` step below. For an empty period, preserve this exact report text; record the report and the hard-stop outcome in the index gate/evidence log.
 
 ### Prerequisites
 All modes require git access. Weekly mode additionally requires an available configured work-item provider to query in-progress items; without one, report that next-period data is not available rather than inventing commitments.

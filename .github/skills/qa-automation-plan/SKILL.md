@@ -94,7 +94,7 @@ Add a short example in the configured Scenario format only when it clarifies pla
 | Action | Level | Gate |
 |---|---|---|
 | Read project code, tests, CI and configuration | L0 | None |
-| Write `06_automation_plan.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Write `06_automation_plan.md` and update `index.md` on a non-default branch (default branch: `method/safety.md` fallback) | L1 | No gate; summarise changes |
 | Generate/edit tests, install dependencies, run shared/environment tests | L1/L3/L5 | Outside this skill; workflow approval, L3 run gate, L5 installation gate apply |
 | Publish, comment, push or create work items | L4 | Not performed; `qa-publish` only |
 | Edit project context/conventions | L5 | Never performed; `qa-configure` only |

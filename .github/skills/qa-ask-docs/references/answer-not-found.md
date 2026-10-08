@@ -9,5 +9,7 @@ When the information is not found in the documentation follow the steps below:
 
 ```md
 # Answer
-The answer to your question was NOT FOUND in the project documentation.
+The answer to your question was **Not documented** in the project documentation.
+
+**Scope searched:** <docs root, index and pages/sources searched>
 ```
