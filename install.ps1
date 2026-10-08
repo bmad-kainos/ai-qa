@@ -196,8 +196,8 @@ try {
             if (IsLink $item.FullName) { Fail "Refusing symlink source: $($item.FullName)" }
             $tail = $item.FullName.Substring($SourceRoot.Length + 1).Replace('\', '/')
             if ($tail -match '^ai-qa/framework/packs/([^/]+)/' -and $Matches[1] -ne '_TEMPLATE' -and $prunedPacks -contains $Matches[1]) { continue }
-            if ($tail -match '^agents/qa') { $tail = $tail -replace '^agents/qa', $Prefix }
-            elseif ($tail -match '^skills/qa-') { $tail = $tail -replace '^skills/qa-', "$Prefix-" }
+            if ($tail -match '^agents/qa') { $tail = $tail -replace '^agents/qa', "agents/$Prefix" }
+            elseif ($tail -match '^skills/qa-') { $tail = $tail -replace '^skills/qa-', "skills/$Prefix-" }
             $bytes = [IO.File]::ReadAllBytes($item.FullName)
             if ($Prefix -ne 'qa' -and $item.Extension -in @('.md', '.txt', '.json', '.yaml', '.yml')) {
                 $text = $Encoding.GetString($bytes)
