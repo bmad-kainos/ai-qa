@@ -32,7 +32,7 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. Ask o
 
 ### Core principle
 
-Manual scenarios exist to catch what unit and integration tests **cannot**: real business outcomes, cross-service behavior, and edge cases that surface with live data and infrastructure. They are not a re-run of unit-test logic in scenario form. A simple ticket with three ACs, all covered by passing unit tests, may need **2–4 manual scenarios**, not one per AC. This is a heuristic, not a target or cap (see `dedup-rule.md`); risk and real boundary coverage take precedence. Deduplication is provisional unless passing test-run evidence supports it. If `qa-work/<work-id>/01_requirement_analysis.md` shows Readiness Red, draft only scenarios the clear requirements support, list the blocked requirements under **Scenarios Not Written**, and say the set is provisional.
+Manual scenarios exist to catch what unit and integration tests **cannot**: real business outcomes, cross-service behavior, and edge cases that surface with live data and infrastructure. They are not a re-run of unit-test logic in scenario form. A simple ticket with three ACs, all covered by passing unit tests, may need **2–4 manual scenarios**, not one per AC. This is a heuristic, not a target or cap (see `dedup-rule.md`); risk and real boundary coverage take precedence. Deduplication is provisional unless passing test-run evidence supports it. If `qa-work/<work-id>/01_requirement_analysis.md` shows Readiness Red, stop the design workflow and present the refinement questions; do not draft or write scenario artefacts. Resume only after readiness is resolved.
 
 ### Deduplication rule
 

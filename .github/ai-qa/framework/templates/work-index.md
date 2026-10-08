@@ -65,7 +65,7 @@ Keep stable `FR`/`NFR` IDs. Distinguish assessed, automated and deliberately not
 
 | Ticket | Readiness | Max risk | Coverage verdict | Scenarios written/not written | Automated/manual/not needed | Run result | Published |
 |---|---|---|---|---|---|---|---|
-| <ticket or work ID> | <Green / Amber / Red> | <LOW / MEDIUM / HIGH / CRITICAL / Unknown> | <Pass / Needs Improvement / Insufficient / Not assessed> | <counts and IDs> | <decision and reason> | <PASS / FAIL / BLOCKED / Not run> | <destination and receipt / Not published> |
+| <ticket or work ID> | <Green / Amber / Red / Unknown> | <LOW / MEDIUM / HIGH / CRITICAL / Unknown> | <Pass / Needs Improvement / Insufficient / Not assessed> | <counts and IDs> | <decision and reason> | <PASS / FAIL / BLOCKED / Not run> | <destination and receipt / Not published> |
 
 ## Open questions
 

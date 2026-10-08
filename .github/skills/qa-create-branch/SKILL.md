@@ -28,19 +28,7 @@ Take task/work ID, optional requested name/base and whether the user is asking o
 6. **Never push on create.** If the user later requests a push, show the exact remote and branch plus effects and get a separate L4 approval. After an authorised push, report its result; do not merge. Recheck branch and work-item freshness before later automation.
 
 ## Output
-Present the proposal in chat. When creation is approved, record the step result in `qa-work/<work-id>/index.md` only (`09_execution.md` is reserved for test execution): current/base refs, branch name, dirty state, `Framework default (unconfirmed)` choices, L2 approval, local outcome and push state (`not pushed` unless separately approved). Use this front matter for any file written:
-
-```yaml
----
-work-id: "<work-id>"
-skill: "qa-create-branch"
-framework-version: "<installed-version-or-unknown>"
-created: "<UTC-ISO-8601>"
-inputs:
-  - source: "<task/conventions/git/repository path or link>"
-    revision: "<commit/document revision/observed time>"
----
-```
+Present the proposal in chat. When creation is approved, record the step result in the body of `qa-work/<work-id>/index.md` only (`09_execution.md` is reserved for test execution): current/base refs, branch name, dirty state, `Framework default (unconfirmed)` choices, L2 approval, local outcome and push state (`not pushed` unless separately approved). Preserve existing index front matter; when initializing an index, use `.github/ai-qa/framework/templates/work-index.md` unchanged, including its `skill: "qa-workflow"` metadata.
 
 Report: proposed/created/reused branch; validated pattern/ticket syntax; base name and SHA; protected/default status; dirty-tree handling; defaults used; L2 decision; remote state; and blockers. Do not create an index only to justify a branch proposal; if no branch was created and persistence was not requested, no artefact write is needed.
 

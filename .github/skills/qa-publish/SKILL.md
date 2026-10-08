@@ -32,7 +32,18 @@ Require the exact source artefact and revision, named operation and mode, config
 ### Test-plan timing and comment templates
 Use the project `Test plan destination and timing` and `Comment templates` exactly when configured. If no project-specific rule is present, use the framework default: publish on request, and for a Confluence scenario upload wait until the user has reviewed the plan, is ready to test and confirms the destination. For the team option to keep the page empty until testing, upload manual scenarios only, so the user can add screenshots and results during execution; never upload the full internal test plan in place of the scenarios.
 
-Do not upload scenarios immediately after generating a test plan. When the user indicates they are reviewing the plan or about to start testing, ask in the Option-A format of `.github/ai-qa/framework/method/clarifying-questions.md` (**Option A (recommended):** I find an empty page by work-item key via bounded `docs.search` and show it for confirmation; **Option B:** you share the Confluence page link) and use this wording: “Once you're ready to start testing, could you share the Confluence page link (ideally an empty page) where I should upload the manual scenarios? That way you can add screenshots and results directly on the page as you test.” If the user does not have a page, offer to find one by work-item key using bounded `docs.search` within the configured space, then show the selected page and wait for confirmation. Only after the page link/ID is confirmed and the user is ready to test, publish the scenarios file, not the full test plan.
+Do not upload scenarios immediately after generating a test plan. When the user indicates they are reviewing the plan or about to start testing and the destination is not known, ask one question in the Option-A format of `.github/ai-qa/framework/method/clarifying-questions.md`:
+
+```md
+**Question 1 — Confluence scenario destination**
+
+The manual scenarios should go on a Confluence page where screenshots and results can be added during testing. Which destination should I use?
+
+**Option A (recommended):** Find an empty page by work-item key in the configured space and show it for confirmation.
+**Option B:** I will provide the Confluence page link.
+```
+
+If Option A is selected, use bounded `docs.search` within the configured space, then `docs.get` to verify that the candidate page is empty; search results alone do not establish that a page is empty. Show the verified page for confirmation. Only after the exact page link/ID is confirmed and the user is ready to test, publish the scenarios file, not the full test plan.
 
 ### Confluence scenario format
 When the approved payload is manual test scenarios, follow the scenario-only format in `.github/ai-qa/framework/providers/confluence.md` and `.github/ai-qa/framework/method/scenario-format.md` (Publishing to Confluence), using the project's configured Scenario format: H3 `Test Scenario 01 — <Scenario Title>` headings, sequential zero-padded numbers, blue `rgb(0,82,204)` headings in rendered Confluence, and then either (`bdd`) bold GIVEN/WHEN/THEN/AND on separate lines with an empty evidence line after each step, or (`steps`) a table of numbered actions and expected results with an empty Evidence column, Preconditions above and Cleanup below. In both, verification snippets go in code blocks after the relevant step, and only Result/Status/Notes follow each scenario. The Confluence page contains only scenarios and execution results, not analysis summaries, risks or requirements breakdowns. Verify rendered formatting; do not assume Markdown conversion is lossless.
