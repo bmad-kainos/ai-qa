@@ -16,7 +16,7 @@ Read `safety.md`, `precedence.md`, relevant project conventions and the method f
 8. `qa-review-tests(design)`: check FR/NFR traceability, redundancy, determinism and risk gaps.
 9. Show design and draft test plan; obtain **design approval before finalising**. Then `qa-test-plan` produces ticket-scope sections and QA Summary. External publication is a separate L4 action via `qa-publish`.
 
-At the end of design, show the QA Summary in chat using the exact columns: Ticket · Readiness · Max risk · Coverage verdict · Scenarios written/not written · Automated/manual/not needed · Run result · Published.
+At the end of design, print the TL;DR and numbered Next Steps from `index.md`/the test plan, then show the QA Summary in chat using the exact columns: Ticket · Readiness · Max risk · Coverage verdict · Scenarios written/not written · Automated/manual/not needed · Run result · Published.
 
 ## automate
 
@@ -26,7 +26,7 @@ Start from approved design or supplied scenarios. Inspect the selected pack and 
 2. `qa-generate-tests` creates only test-owned files under L1, on a non-default branch, after workflow-plan approval. Dependency installation is L5.
 3. `qa-review-tests(code)` checks generated/existing tests against FR/NFR, project conventions and pack anti-patterns.
 4. `qa-run-tests` runs the appropriate path/tag/risk subset or configured static checks. Full, environment-dependent, long or shared-service runs require L3 unless expressly safe in `qa-process.md`.
-5. `qa-analyse-failure` classifies each result and applies the bounded fix loop: test defects only, only files created/modified in this work item, maximum 3 iterations, stop early on repeat, append every attempt to `execution.md`.
+5. `qa-analyse-failure` classifies each result and applies the bounded fix loop: test defects only, only files created/modified in this work item, maximum 3 iterations, stop early on repeat, append every attempt to `09_execution.md`.
 6. Update index and test plan with actual command, selector, environment, commit, results and evidence. Report local edits.
 
 Push, PR creation, external comments, bug creation and publication each require their own L4 gate. Never change product code to make QA tests pass.

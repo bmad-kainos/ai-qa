@@ -10,6 +10,20 @@ inputs:
 
 # QA Work Index
 
+## TL;DR
+
+- **Verdict:** <Go / Go with conditions / No-go / Not assessed, with one-line reason>
+- **Top risks:** 1. <risk, tier, evidence> 2. <risk> 3. <risk>
+- **Next action:** <single most important action and owner>
+
+## Next Steps
+
+Ordered: blockers first, then risk tier, then effort. Cite the source artefact number; de-duplicate.
+
+| # | Action | Owner | Evidence (FR/NFR/scenario ID) | Blocker | Source |
+|---|---|---|---|---|---|
+| 1 | <action> | <owner> | <ID> | <Yes / No> | <e.g. 03> |
+
 **Scope:** <ticket, feature or bounded investigation>
 **Branch / revision:** <confirmed branch and commit>
 **Workflow:** <design / automate / full / triage / independent skill>
@@ -21,21 +35,21 @@ Status values: Not started · In progress · Complete · Skipped · Blocked · S
 
 | Workflow | Step | Status | Artefact | Inputs checked / latest revision | Staleness / note |
 |---|---|---|---|---|---|
-| design | Analyse requirement | Not started | `requirement.md` | <revision> | <fresh / stale / unknown> |
-| design | Code context / branch verification | Not started | `context.md` | <revision> | <fresh / stale / unknown> |
-| design | Requirement coverage gaps | Not started | `coverage.md` | <revision> | <fresh / stale / unknown> |
-| design | Design manual scenarios | Not started | `design.md` | <revision> | <fresh / stale / unknown> |
-| design | Regression risk | Not started | `regression.md` | <revision> | <fresh / stale / unknown> |
-| design | Automation plan | Not started | `automation.md` | <revision> | <fresh / stale / unknown> |
-| design | Design review | Not started | `review.md` | <revision> | <fresh / stale / unknown> |
-| design | Final test plan | Not started | `outputs/test-plan.md` | <revision> | <fresh / stale / unknown> |
-| automate | Generate tests | Not started | <test paths> | <revision> | <fresh / stale / unknown> |
-| automate | Code review | Not started | `review.md` | <revision> | <fresh / stale / unknown> |
-| automate | Run tests | Not started | `execution.md`, `logs/` | <run ID/commit/environment> | <fresh / stale / unknown> |
-| automate | Analyse failures / fix loop | Not started | `execution.md` | <run IDs> | <fresh / stale / unknown> |
-| automate | Update index and plan | Not started | `index.md`, `outputs/test-plan.md` | <revision> | <fresh / stale / unknown> |
+| design | Analyse requirement | Not started | `01_requirement_analysis.md` | <revision> | <fresh / stale / unknown> |
+| design | Code context / branch verification | Not started | `02_code_context.md` | <revision> | <fresh / stale / unknown> |
+| design | Requirement coverage gaps | Not started | `03_coverage_assessment.md` | <revision> | <fresh / stale / unknown> |
+| design | Design manual scenarios | Not started | `04_test_scenarios.md` | <revision> | <fresh / stale / unknown> |
+| design | Regression risk | Not started | `05_regression_risk.md` | <revision> | <fresh / stale / unknown> |
+| design | Automation plan | Not started | `06_automation_plan.md` | <revision> | <fresh / stale / unknown> |
+| design | Design review | Not started | `07_design_review.md` | <revision> | <fresh / stale / unknown> |
+| design | Final test plan | Not started | `outputs/08_test_plan.md` | <revision> | <fresh / stale / unknown> |
+| automate | Generate tests | Not started | `10_test_generation.md`, <test paths> | <revision> | <fresh / stale / unknown> |
+| automate | Code review | Not started | `11_code_review.md` | <revision> | <fresh / stale / unknown> |
+| automate | Run tests | Not started | `09_execution.md`, `logs/` | <run ID/commit/environment> | <fresh / stale / unknown> |
+| automate | Analyse failures / fix loop | Not started | `09_execution.md` | <run IDs> | <fresh / stale / unknown> |
+| automate | Update index and plan | Not started | `index.md`, `outputs/08_test_plan.md` | <revision> | <fresh / stale / unknown> |
 | full | Design checkpoint / approval | Not started | Gate log | <approval scope/time> | <not applicable / pending> |
-| triage | Failure analysis | Not started | `execution.md` | <run/log revision> | <fresh / stale / unknown> |
+| triage | Failure analysis | Not started | `09_execution.md` | <run/log revision> | <fresh / stale / unknown> |
 | triage | Bug report draft | Not started | `outputs/bug-*.md` | <evidence revision> | <fresh / stale / unknown> |
 | triage | External publication | Not started | <provider receipt/link> | <exact destination/content> | <L4 gate state> |
 

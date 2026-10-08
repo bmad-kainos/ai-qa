@@ -10,6 +10,20 @@ inputs:
 
 # Test Plan — <ticket or sprint>
 
+## TL;DR
+
+- **Verdict:** <Go / Go with conditions / No-go / Not assessed, with one-line reason>
+- **Top risks:** 1. <risk, tier, evidence> 2. <risk> 3. <risk>
+- **Next action:** <single most important action and owner>
+
+## Next Steps
+
+Ordered: blockers first, then risk tier, then effort. Cite the source artefact number; de-duplicate.
+
+| # | Action | Owner | Evidence (FR/NFR/scenario ID) | Blocker | Source |
+|---|---|---|---|---|---|
+| 1 | <action> | <owner> | <ID> | <Yes / No> | <e.g. 03> |
+
 **Author:** <current user or role, if known>
 **Date:** <date>
 **Project:** <project name and confirmed identifier>

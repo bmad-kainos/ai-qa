@@ -7,23 +7,29 @@ Maintain one `qa-work/<work-id>/index.md` per ticket, feature or bounded investi
 ```text
 qa-work/<work-id>/
   index.md
-  requirement.md
-  context.md
-  coverage.md
-  design.md
-  regression.md
-  automation.md
-  review.md
-  execution.md
+  01_requirement_analysis.md
+  02_code_context.md
+  03_coverage_assessment.md
+  04_test_scenarios.md
+  05_regression_risk.md
+  06_automation_plan.md
+  07_design_review.md
+  09_execution.md
+  10_test_generation.md   # automate workflow
+  11_code_review.md       # automate workflow
   logs/
   outputs/
-    test-plan.md
+    08_test_plan.md
     comment.md
     bug-*.md
     test-data.*
 ```
 
-Create only files relevant to this work item, not empty placeholders. `index.md` links each produced artefact and records its status and staleness.
+Numbers give reading order; gaps are allowed when a step is skipped. Create only files relevant to this work item, not empty placeholders. `index.md` links each produced artefact and records its status and staleness.
+
+## Legacy filenames
+
+Always write the numbered names. When a numbered file is absent, read the legacy name as a fallback: `requirement.md`, `context.md`, `coverage.md`, `design.md`, `regression.md`, `automation.md` (plan or generation record), `review.md` (design or code review; decide from its `skill`/mode front matter and content), `outputs/test-plan.md`. `execution.md` is the legacy name of `09_execution.md`. Never silently rename or delete a legacy file: report it, write the new file, and let the user migrate (see `docs/migrations.md`). If both exist, the numbered file wins; note the legacy file in the index.
 
 ## Commit and ignore defaults
 
@@ -45,9 +51,15 @@ inputs:
 ---
 ```
 
-`inputs` lists every decision-relevant upstream source: ticket/AC revision, branch/commit, project context and conventions, applicable pack/version, earlier analysis artefacts and test-run IDs as appropriate. Do not put secrets in metadata. For non-Markdown outputs use a suitable metadata comment/header when the format supports it; log raw-log provenance in `execution.md` and the index, not by modifying logs.
+`inputs` lists every decision-relevant upstream source: ticket/AC revision, branch/commit, project context and conventions, applicable pack/version, earlier analysis artefacts and test-run IDs as appropriate. Do not put secrets in metadata. For non-Markdown outputs use a suitable metadata comment/header when the format supports it; log raw-log provenance in `09_execution.md` and the index, not by modifying logs.
+
+After the front-matter, every skill-produced artefact except `index.md` and `outputs/08_test_plan.md` opens with a header of two lines before any other section (those two open with the title and TL;DR instead, see below; the TL;DR verdict and next action serve as Result and Do next): **Result:** one-sentence verdict or outcome, and **Do next:** at most 3 ordered actions (or "None"). Details follow below it.
 
 Start each skill-produced artefact from `.github/ai-qa/framework/templates/artefact.md`. It provides this front-matter, a scope and status line, a skill-specific output section and the **Drift** section that every skill must include. Start `index.md` from `templates/work-index.md` instead.
+
+## TL;DR and Next Steps
+
+`index.md` and `outputs/08_test_plan.md` open, directly after the title, with a **TL;DR** block (verdict, top 3 risks, single next action) followed by a numbered **Next Steps** section. Each Next Steps row has: action, owner, evidence (FR/NFR/scenario ID) and blocker flag (Yes/No). Order: blockers first, then risk tier (CRITICAL to LOW), then effort (low first). `qa-test-plan` assembles it from the earlier artefacts' **Do next** lines, findings and gaps, de-duplicated, citing the source file number (e.g. `[03]`). Print TL;DR and Next Steps in chat before the QA Summary table.
 
 ## Staleness
 

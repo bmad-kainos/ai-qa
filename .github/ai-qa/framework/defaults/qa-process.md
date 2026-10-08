@@ -12,7 +12,7 @@ Candidate: stable FR/NFR IDs, evidence-linked coverage, scenario decisions inclu
 
 ## Test plan destination and timing
 
-Candidate local destination: `qa-work/<work-id>/outputs/test-plan.md`. Publish only on request after exact destination/content approval (L4). For Confluence scenario uploads, wait until the user has reviewed the plan and is ready to test.
+Candidate local destination: `qa-work/<work-id>/outputs/08_test_plan.md`. Publish only on request after exact destination/content approval (L4). For Confluence scenario uploads, wait until the user has reviewed the plan and is ready to test.
 
 ## Comment templates
 
@@ -24,7 +24,7 @@ No project-specific areas by default. Always include the 13 framework areas in `
 
 ## Fix loop
 
-Maximum 3 iterations; stop early if the same failure repeats. Fix test defects only, and only files created or modified in this work item. Never change product code, delete/skip/disable tests, or loosen assertions unless the relevant FR supports it. Append each iteration to `execution.md`.
+Maximum 3 iterations; stop early if the same failure repeats. Fix test defects only, and only files created or modified in this work item. Never change product code, delete/skip/disable tests, or loosen assertions unless the relevant FR supports it. Append each iteration to `09_execution.md`.
 
 ## Commands safe to run (L3 exemptions)
 

@@ -14,7 +14,7 @@ Use at any point to assess a diff, ticket, feature, change description or releas
 
 ## Reads
 
-Always read `.github/ai-qa/project/project.md`: use Components, Data stores and external dependencies, Environments, CI/CD and Constraints. Read `.github/ai-qa/project/conventions/qa-process.md` (Extra regression areas, Definition of done and QA evidence, Work-id rule), `conventions/git.md` (Ticket syntax and Branch patterns), and `conventions/testing.md` (Scopes) as relevant. Read `.github/ai-qa/framework/method/regression-areas.md`, `safety.md`, `artefacts.md`, `precedence.md`. Optional prior artefacts: `requirement.md`, `context.md`, `coverage.md`, `design.md`, `automation.md`, `index.md`.
+Always read `.github/ai-qa/project/project.md`: use Components, Data stores and external dependencies, Environments, CI/CD and Constraints. Read `.github/ai-qa/project/conventions/qa-process.md` (Extra regression areas, Definition of done and QA evidence, Work-id rule), `conventions/git.md` (Ticket syntax and Branch patterns), and `conventions/testing.md` (Scopes) as relevant. Read `.github/ai-qa/framework/method/regression-areas.md`, `safety.md`, `artefacts.md`, `precedence.md`. Optional prior artefacts: `01_requirement_analysis.md`, `02_code_context.md`, `03_coverage_assessment.md`, `04_test_scenarios.md`, `06_automation_plan.md`, `index.md`.
 
 If project context is missing, inspect available evidence, identify uncertainty and suggest `qa-configure`; never refuse due to absent upstream artefacts.
 
@@ -66,18 +66,20 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. This 
 
 ## Output
 
-Write `qa-work/<work-id>/regression.md` with front matter `work-id`, `skill: qa-regression-risk`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (ticket/diff/branch/source revision). Include scope and confidence, the complete 13-area matrix, project extra areas, highest overall risk, targeted scenarios/automation/production impact/rollout validation for each HIGH/CRITICAL area, optional ranked scores, assumptions and open questions. Update `qa-work/<work-id>/index.md` with the highest risk, matrix link, branch/source revision, mitigations and unknowns. Present highest risks and urgent actions in chat.
+Write `qa-work/<work-id>/05_regression_risk.md` with front matter `work-id`, `skill: qa-regression-risk`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (ticket/diff/branch/source revision). Include scope and confidence, the complete 13-area matrix, project extra areas, highest overall risk, targeted scenarios/automation/production impact/rollout validation for each HIGH/CRITICAL area, optional ranked scores, assumptions and open questions. Update `qa-work/<work-id>/index.md` with the highest risk, matrix link, branch/source revision, mitigations and unknowns. Present highest risks and urgent actions in chat.
+
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `regression.md` as a fallback; always write the new name and never silently rename.
 
 ## Side effects and safety
 
 | Action | Level | Gate |
 |---|---|---|
 | Read diff, ticket, project context and existing tests | L0 | None |
-| Write `regression.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Write `05_regression_risk.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
 | Run tests, inspect live systems, change feature flags or validate rollout | L3 | Not performed; separate approval required |
 | Publish or comment externally | L4 | Not performed; hand off to `qa-publish` |
 | Edit project conventions | L5 | Never performed; `qa-configure` only |
 
 ## Drift
 
-If evidence contradicts project conventions or `project.md`, record the contradiction under Drift in `regression.md` and suggest `qa-configure refresh`; never edit `.github/ai-qa/project/**`.
+If evidence contradicts project conventions or `project.md`, record the contradiction under Drift in `05_regression_risk.md` and suggest `qa-configure refresh`; never edit `.github/ai-qa/project/**`.

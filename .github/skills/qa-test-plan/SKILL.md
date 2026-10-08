@@ -14,7 +14,7 @@ Use for a ticket, feature/spec, requirement set, sprint or supplied group of wor
 
 ## Reads
 
-Always read `.github/ai-qa/project/project.md`: use Summary, Components, Environments, Data stores and external dependencies, CI/CD, Test landscape and Constraints. Read `.github/ai-qa/project/conventions/qa-process.md` (Test plan destination and timing, Definition of done and QA evidence, Scenario format, Work-id rule, Locale), `conventions/testing.md` (Scopes, Environments and base URLs, Test data rules), `conventions/integrations.md` for configured work-item search, and `conventions/git.md` for Ticket syntax. Read `.github/ai-qa/framework/method/traceability.md`, `dedup-rule.md`, `readiness.md`, `regression-areas.md`, `effort-estimation.md` for sprint scope, `safety.md`, `artefacts.md` and `precedence.md`. Optional prior artefacts: `requirement.md`, `context.md`, `coverage.md`, `design.md`, `regression.md`, `automation.md`, `review.md`, `index.md`.
+Always read `.github/ai-qa/project/project.md`: use Summary, Components, Environments, Data stores and external dependencies, CI/CD, Test landscape and Constraints. Read `.github/ai-qa/project/conventions/qa-process.md` (Test plan destination and timing, Definition of done and QA evidence, Scenario format, Work-id rule, Locale), `conventions/testing.md` (Scopes, Environments and base URLs, Test data rules), `conventions/integrations.md` for configured work-item search, and `conventions/git.md` for Ticket syntax. Read `.github/ai-qa/framework/method/traceability.md`, `dedup-rule.md`, `readiness.md`, `regression-areas.md`, `effort-estimation.md` for sprint scope, `safety.md`, `artefacts.md` and `precedence.md`. Optional prior artefacts: `01_requirement_analysis.md`, `02_code_context.md`, `03_coverage_assessment.md`, `04_test_scenarios.md`, `05_regression_risk.md`, `06_automation_plan.md`, `07_design_review.md`, `index.md`.
 
 Use `.github/ai-qa/framework/templates/test-plan.md` as the document template when present. If project context or template is absent, proceed from accessible evidence and mark the gap; suggest `qa-configure` for missing project configuration.
 
@@ -34,16 +34,18 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. Deriv
 2. Reuse current prior analyses when available. Otherwise derive requirements, readiness, coverage verdict, manual scenarios (configured format) and automation decisions from the minimum accessible evidence. Keep distinctions among assessed, automated, deliberately not automated and executed. Include a traceability matrix linking each FR/NFR to existing evidence, scenarios, automation decision, test files and last result.
 3. Complete the regression matrix with all 13 areas and justified risk levels. Never omit it for ticket scope. For every HIGH/CRITICAL area include targeted scenarios, automation reinforcement, production impact and rollout validation as applicable.
 4. Produce the ticket sections listed below, in order. Use configured locale (default en-GB unless conventions specify otherwise). In sprint scope also add the sprint-level approach, prerequisites and effort sections. For effort estimation use `.github/ai-qa/framework/method/effort-estimation.md`; state assumptions and units, do not invent hours.
-5. Show the complete QA Summary in chat. The summary columns are `Ticket · Readiness · Max risk · Coverage verdict · Scenarios written/not written · Automated/manual/not needed · Run result · Published`. Use actual readiness, maximum matrix risk, evidence-based coverage, written/omitted counts, justified decision, `Not run` absent results and `No` absent a publication receipt.
+5. Print the TL;DR and Next Steps in chat, then the complete QA Summary. The summary columns are `Ticket · Readiness · Max risk · Coverage verdict · Scenarios written/not written · Automated/manual/not needed · Run result · Published`. Use actual readiness, maximum matrix risk, evidence-based coverage, written/omitted counts, justified decision, `Not run` absent results and `Not published` absent a publication receipt.
 6. Save the final local plan and update the index. If design approval is required by the workflow, show the draft and obtain explicit approval before marking it final; standalone local writing does not itself require an L1 gate. This skill does not publish. Hand off to `qa-publish`, which must honour `conventions/qa-process.md` → Test plan destination and timing and the exact-payload L4 gate.
 
 ### Ticket-scope sections
 
 Include all of these sections, in this order:
 
+0. **TL;DR** — verdict, top 3 risks and single next action; first block after the title.
+0a. **Next Steps** — required numbered list (action, owner, evidence FR/NFR/scenario ID, blocker flag, source artefact number), assembled from earlier artefacts' **Do next** lines, findings and gaps, de-duplicated and ordered blockers first, then risk tier, then effort.
 1. **Summary** — brief description of the item and test scope.
-2. **QA Summary** — one-row ticket table, also shown in chat.
-3. **Risk** — key risks, assumptions and mitigations.
+2. **QA Summary** — one-row ticket table, also shown in chat after the TL;DR and Next Steps.
+3. **Risk Assessment** — key risks, assumptions and mitigations.
 4. **Requirements** — functional `FR1…` and non-functional `NFR1…`, edge cases, flags, integrations and ambiguities; preserve IDs.
 5. **Traceability Matrix** — requirement → existing evidence → scenarios → automation decision → test files → last result. Separate assessed, automated and deliberately not automated.
 6. **Scenarios** — numbered scenarios from design in the project's configured Scenario format (`method/scenario-format.md`), with requirement IDs, categories, environment/setup/cleanup and observable results, followed by **Scenarios Not Written** and reasons.
@@ -69,7 +71,7 @@ Do not fabricate ticket lists when a sprint/query is inaccessible; report the pr
 ```md
 | Ticket | Readiness | Max risk | Coverage verdict | Scenarios written/not written | Automated/manual/not needed | Run result | Published |
 |---|---|---|---|---|---|---|---|
-| <key> | <Green/Amber/Red/Unknown> | <LOW/MEDIUM/HIGH/CRITICAL> | <Pass/Needs Improvement/Insufficient/Not assessed> | <written>/<not written> | <decision> | <Not run/PASS/FAIL/BLOCKED with evidence> | <No or confirmed receipt> |
+| <key> | <Green/Amber/Red/Unknown> | <LOW/MEDIUM/HIGH/CRITICAL> | <Pass/Needs Improvement/Insufficient/Not assessed> | <written>/<not written> | <decision> | <Not run/PASS/FAIL/BLOCKED with evidence> | <Not published or confirmed receipt> |
 ```
 
 Do not claim publication until `qa-publish` returns a receipt/link. Do not claim tests pass without current run evidence. Mark unavailable information explicitly and list it as an open question or blocker.
@@ -80,7 +82,9 @@ When a later, explicitly approved publication targets Confluence, `qa-publish` f
 
 ## Output
 
-Write `qa-work/<work-id>/outputs/test-plan.md` with front matter `work-id`, `skill: qa-test-plan`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (work items, source revisions and prior artefact revisions). Update `qa-work/<work-id>/index.md` with plan link, FR/NFR traceability, readiness, max risk, coverage verdict, scenario counts, automation choice, run and publication status with evidence, open questions and design approval status. Present QA Summary in chat for both ticket and sprint scope.
+Read legacy filenames (see `method/artefacts.md`) as fallback inputs; always write the new name and never silently rename. Write `qa-work/<work-id>/outputs/08_test_plan.md` with front matter `work-id`, `skill: qa-test-plan`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (work items, source revisions and prior artefact revisions). Update `qa-work/<work-id>/index.md` with plan link, FR/NFR traceability, readiness, max risk, coverage verdict, scenario counts, automation choice, run and publication status with evidence, open questions and design approval status. Present QA Summary in chat for both ticket and sprint scope.
+
+Open the plan with the TL;DR and Next Steps directly after the title; the TL;DR verdict and next action replace the separate **Result** and **Do next** lines.
 
 ## Side effects and safety
 
@@ -96,4 +100,4 @@ Never switch branches, create a branch or commit as an implied follow-up. Never 
 
 ## Drift
 
-If evidence contradicts project conventions or `project.md`, record the conflict under Drift in `test-plan.md` and suggest `qa-configure refresh`; never edit `.github/ai-qa/project/**`.
+If evidence contradicts project conventions or `project.md`, record the conflict under Drift in `08_test_plan.md` and suggest `qa-configure refresh`; never edit `.github/ai-qa/project/**`.

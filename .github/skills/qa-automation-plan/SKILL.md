@@ -14,7 +14,7 @@ Use to plan automation for a ticket, feature or set of scenarios, or to assess w
 
 ## Reads
 
-Always read `.github/ai-qa/project/project.md`, especially Environments, CI/CD, Components, Constraints and Data stores/external dependencies. Read `.github/ai-qa/project/conventions/testing.md` (Scopes, Commands, Reports, Environments and base URLs, Test data rules), `conventions/qa-process.md` (Definition of done and QA evidence, Commands safe to run, Team options), and `conventions/integrations.md` only for external system dependencies. Read `.github/ai-qa/framework/method/automation-criteria.md`, `traceability.md`, `precedence.md`, `safety.md` and `artefacts.md`; read the observed test pack's `pack.md` when relevant. Optional prior artefacts: `requirement.md`, `context.md`, `coverage.md`, `design.md`, `regression.md`, `index.md`.
+Always read `.github/ai-qa/project/project.md`, especially Environments, CI/CD, Components, Constraints and Data stores/external dependencies. Read `.github/ai-qa/project/conventions/testing.md` (Scopes, Commands, Reports, Environments and base URLs, Test data rules), `conventions/qa-process.md` (Definition of done and QA evidence, Commands safe to run, Team options), and `conventions/integrations.md` only for external system dependencies. Read `.github/ai-qa/framework/method/automation-criteria.md`, `traceability.md`, `precedence.md`, `safety.md` and `artefacts.md`; read the observed test pack's `pack.md` when relevant. Optional prior artefacts: `01_requirement_analysis.md`, `02_code_context.md`, `03_coverage_assessment.md`, `04_test_scenarios.md`, `05_regression_risk.md`, `index.md`.
 
 If project context is missing, inspect existing tests and CI configuration, label inferences and suggest `qa-configure`; do not assume a framework or environment.
 
@@ -80,7 +80,9 @@ Do not estimate hours. Give an impact level for the work: **None** (existing cov
 
 ## Output
 
-Write `qa-work/<work-id>/automation.md` with front matter `work-id`, `skill: qa-automation-plan`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirements, source revision, test/CI evidence). Include all nine factor answers, an overall impact level and this table:
+Write `qa-work/<work-id>/06_automation_plan.md` with front matter `work-id`, `skill: qa-automation-plan`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirements, source revision, test/CI evidence). Include all nine factor answers, an overall impact level and this table:
+
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `automation.md` as a fallback; always write the new name and never silently rename.
 
 | Scenario / requirement | Decision | Level | Location | Mocking | Environment / data | CI impact | Justification / evidence |
 |---|---|---|---|---|---|---|---|
@@ -92,7 +94,7 @@ Add a short example in the configured Scenario format only when it clarifies pla
 | Action | Level | Gate |
 |---|---|---|
 | Read project code, tests, CI and configuration | L0 | None |
-| Write `automation.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Write `06_automation_plan.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
 | Generate/edit tests, install dependencies, run shared/environment tests | L1/L3/L5 | Outside this skill; workflow approval, L3 run gate, L5 installation gate apply |
 | Publish, comment, push or create work items | L4 | Not performed; `qa-publish` only |
 | Edit project context/conventions | L5 | Never performed; `qa-configure` only |
@@ -101,4 +103,4 @@ Do not include secret values, claim tests are implemented/passing, or use produc
 
 ## Drift
 
-If evidence contradicts project conventions or `project.md`, record the conflict under Drift in `automation.md` and suggest `qa-configure refresh`; never edit `.github/ai-qa/project/**`.
+If evidence contradicts project conventions or `project.md`, record the conflict under Drift in `06_automation_plan.md` and suggest `qa-configure refresh`; never edit `.github/ai-qa/project/**`.

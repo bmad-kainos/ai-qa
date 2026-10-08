@@ -171,7 +171,9 @@ When the spec changes, rerun this method with the updated spec. The inventory ma
 - Removed fields → review and update affected tests against current requirements; never delete, skip or disable tests merely to silence a failure.
 
 ## Output
-Write the inventory and generation record to `qa-work/<work-id>/automation.md`; write only the approved, work-item-owned test files. Update `qa-work/<work-id>/index.md` with step status, source/branch revisions, inventory and test paths, per-requirement assessed/automated/not-automated decisions, validation evidence, gaps, approvals and gate log. Use the required artefact front matter:
+Write the inventory and generation record to `qa-work/<work-id>/10_test_generation.md`; write only the approved, work-item-owned test files. Update `qa-work/<work-id>/index.md` with step status, source/branch revisions, inventory and test paths, per-requirement assessed/automated/not-automated decisions, validation evidence, gaps, approvals and gate log. Use the required artefact front matter:
+
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `automation.md` as a fallback; always write the new name and never silently rename.
 
 ```yaml
 ---
@@ -191,7 +193,7 @@ The saved output contains the inventory table above, then a generated-files tabl
 | Action | Level | Gate |
 |---|---:|---|
 | Read project, pack, requirement and neighbouring test evidence | L0 | None |
-| Edit owned test files and `automation.md` on a non-default branch | L1 | No separate gate; workflow plan approval first in orchestrated workflows |
+| Edit owned test files and `10_test_generation.md` on a non-default branch | L1 | No separate gate; workflow plan approval first in orchestrated workflows |
 | Run documented lint/compile validation | L0/L3 | No gate for safe local static check; L3 for full, environment-dependent or long runs unless documented safe |
 | Install a test dependency or scaffold dependency | L5 | Always show exact changes and obtain explicit approval |
 | Publish, create work item, push or commit | L4/L2 | Not performed here; hand off to the appropriate skill |

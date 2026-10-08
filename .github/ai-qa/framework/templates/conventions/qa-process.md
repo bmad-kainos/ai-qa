@@ -76,4 +76,4 @@ Configure renders this source into `.github/ai-qa/project/conventions/qa-process
 | Use `.sql` test data | <yes/no> | <status> | <source/confirmation> |
 | Branch description length 10–45 characters | <yes/no> | <status> | <source/confirmation> |
 
-Options are not defaults; enable only with project evidence or user confirmation. Default fix loop is maximum 3 iterations, stopping early on repeat; fix test defects only and append attempts to `execution.md`.
+Options are not defaults; enable only with project evidence or user confirmation. Default fix loop is maximum 3 iterations, stopping early on repeat; fix test defects only and append attempts to `09_execution.md`.

@@ -8,7 +8,7 @@
 | default paths | `tests/unit/test_*.py`, `tests/integration/test_*.py`, `tests/e2e/test_*.py` (only absent project conventions) |
 | run by path | `pytest "<path-or-node-id>"` (template only; use configured `Commands` first) |
 | run by tag | `pytest -m "<registered-marker>"` (marker must already be registered) |
-| report format | Configured JUnit XML and/or pytest JSON report, plus command, environment and evidence in `execution.md` |
+| report format | Configured JUnit XML and/or pytest JSON report, plus command, environment and evidence in `09_execution.md` |
 | anti-patterns | Sleeps, shared mutable fixtures, network in unit tests, unregistered markers, order-dependent tests, debug prints, secrets |
 
 Select when repository evidence confirms pytest. Inspect existing client and fixtures to distinguish `requests`, `httpx` and Playwright Python; never install or assume a client/plugin.

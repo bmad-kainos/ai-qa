@@ -34,6 +34,8 @@ Ask `@qa design <ticket>` (or `automate`, `full`, `triage`). In every workflow:
 
 Refinement is `qa-analyse-requirement` in `batch` mode (sprint, JQL or WIQL). Use `clarify` mode for an Option-A interview about one ticket.
 
+`index.md` and the test plan open with a TL;DR (verdict, top 3 risks, single next action) and a numbered Next Steps list (action, owner, evidence, blocker flag); both are printed in chat before the QA Summary. Artefacts are numbered in reading order (`01_requirement_analysis.md` … `08_test_plan.md`, `09_execution.md`) and each starts with `Result` and `Do next`. Legacy names (`requirement.md`, `design.md`, …) are still read as a fallback but never renamed silently.
+
 The QA Summary columns are: Ticket · Readiness · Max risk · Coverage verdict · Scenarios written/not written · Automated/manual/not needed · Run result · Published.
 
 ## Using skills directly
@@ -63,9 +65,9 @@ The work id is resolved in this order:
 | File | Contents | Default |
 |---|---|---|
 | `index.md` | Step status, staleness, traceability matrix, QA Summary, gate log | committed |
-| `requirement.md` … `execution.md` | Per-step outputs | ignored |
+| `01_requirement_analysis.md` … `07_design_review.md`, `09_execution.md` … `11_code_review.md` | Per-step outputs | ignored |
 | `logs/` | Raw logs | ignored |
-| `outputs/` | `test-plan.md`, `comment.md`, `bug-*.md`, `test-data.*` | committed |
+| `outputs/` | `08_test_plan.md`, `comment.md`, `bug-*.md`, `test-data.*` | committed |
 
 Change the policy through `qa-configure` (`qa-process.md` → *qa-work policy*).
 

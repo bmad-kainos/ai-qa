@@ -12,6 +12,8 @@ inputs:
 
 **Scope:** <work item and intended output>
 **Status:** <draft / complete / blocked>
+**Result:** <one-sentence verdict or outcome>
+**Do next:** <max 3 ordered actions, or None>
 
 ## <Skill-specific output>
 

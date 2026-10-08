@@ -8,7 +8,7 @@
 | default paths | `tests/api/*.spec.ts`, `tests/e2e/*.spec.ts`, `tests/fixtures/` (only absent project conventions) |
 | run by path | `npx playwright test "<path>"` (template only; use configured `Commands` first) |
 | run by tag | `npx playwright test --grep "<tag-or-title>"` (existing project tag/title only) |
-| report format | Configured Playwright reporter, preferably JSON where already configured; include command, case, environment and evidence in `execution.md` |
+| report format | Configured Playwright reporter, preferably JSON where already configured; include command, case, environment and evidence in `09_execution.md` |
 | anti-patterns | `waitForTimeout`, brittle CSS/XPath or positional selectors, shared mutable data, embedded credentials, undocumented status assertions, order-dependent tests |
 
 Select only when repository evidence confirms the runner and language. If the project uses Playwright Python, use the `pytest` pack; do not silently generate TypeScript tests. Project paths, naming, fixtures, auth and commands always override these defaults.

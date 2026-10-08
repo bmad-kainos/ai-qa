@@ -327,7 +327,7 @@ def main() -> None:
 Examples:
   python confluence_tool.py find --space DOCS "Exact page title"
   python confluence_tool.py get 123456789
-  python confluence_tool.py update 123456789 --file qa-work/PROJ-123/outputs/test-plan.md
+  python confluence_tool.py update 123456789 --file qa-work/PROJ-123/outputs/08_test_plan.md
   python confluence_tool.py append 123456789 --file qa-work/PROJ-123/outputs/comment.md
         """,
     )
