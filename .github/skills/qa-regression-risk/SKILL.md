@@ -14,6 +14,8 @@ Use at any point to assess a diff, ticket, feature, change description or releas
 
 ## Reads
 
+For each optional prior artefact, fall back to its legacy name per `artefacts.md` and report it.
+
 Always read `.github/ai-qa/project/project.md`: use Components, Data stores and external dependencies, Environments, CI/CD and Constraints. Read `.github/ai-qa/project/conventions/qa-process.md` (Extra regression areas, Definition of done and QA evidence, Work-id rule), `conventions/git.md` (Ticket syntax and Branch patterns), and `conventions/testing.md` (Scopes) as relevant. Read `.github/ai-qa/framework/method/regression-areas.md`, `safety.md`, `artefacts.md`, `precedence.md`. Optional prior artefacts: `01_requirement_analysis.md`, `02_code_context.md`, `03_coverage_assessment.md`, `04_test_scenarios.md`, `06_automation_plan.md`, `index.md`.
 
 If project context is missing, inspect available evidence, identify uncertainty and suggest `qa-configure`; never refuse due to absent upstream artefacts.
@@ -75,7 +77,7 @@ Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 
 | Action | Level | Gate |
 |---|---|---|
 | Read diff, ticket, project context and existing tests | L0 | None |
-| Write `05_regression_risk.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Write `05_regression_risk.md` and update `index.md` on a non-default branch (default branch: `method/safety.md` fallback) | L1 | No gate; summarise changes |
 | Run tests, inspect live systems, change feature flags or validate rollout | L3 | Not performed; separate approval required |
 | Publish or comment externally | L4 | Not performed; hand off to `qa-publish` |
 | Edit project conventions | L5 | Never performed; `qa-configure` only |

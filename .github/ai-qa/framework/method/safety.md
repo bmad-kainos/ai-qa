@@ -15,7 +15,7 @@ These rules apply to the `qa` and `qa-configure` agents, every skill, every prov
 
 ## Hard rules
 
-- No edits on the default branch.
+- No edits on the default branch. **Default-branch fallback:** on the default branch, show the artefact in chat, write nothing and offer `qa-create-branch` (L2).
 - Creating a branch never implies pushing it.
 - Never merge.
 - The fix loop never touches product code.

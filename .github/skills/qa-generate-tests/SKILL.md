@@ -193,7 +193,7 @@ The saved output contains the inventory table above, then a generated-files tabl
 | Action | Level | Gate |
 |---|---:|---|
 | Read project, pack, requirement and neighbouring test evidence | L0 | None |
-| Edit owned test files and `10_test_generation.md` on a non-default branch | L1 | No separate gate; workflow plan approval first in orchestrated workflows |
+| Edit owned test files and `10_test_generation.md` on a non-default branch (default branch: `method/safety.md` fallback) | L1 | No separate gate; workflow plan approval first in orchestrated workflows |
 | Run documented lint/compile validation | L0/L3 | No gate for safe local static check; L3 for full, environment-dependent or long runs unless documented safe |
 | Install a test dependency or scaffold dependency | L5 | Always show exact changes and obtain explicit approval |
 | Publish, create work item, push or commit | L4/L2 | Not performed here; hand off to the appropriate skill |

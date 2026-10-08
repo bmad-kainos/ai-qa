@@ -14,6 +14,8 @@ Use for focused codebase exploration before coverage/design, or independently wh
 
 ## Reads
 
+For each optional prior artefact, fall back to its legacy name per `artefacts.md` and report it.
+
 Always read `.github/ai-qa/project/project.md`, especially Components, Technology stack, Data stores and external dependencies, Environments and Constraints. Read `.github/ai-qa/project/conventions/git.md` for branch/ticket syntax, `conventions/testing.md` for Scopes and Commands, `conventions/integrations.md` only when external integration behavior matters, and `conventions/qa-process.md` for Work-id rule and safe-command expectations. Read `.github/ai-qa/framework/method/traceability.md`, `precedence.md`, `safety.md` and `artefacts.md`. Optional prior artefacts: `01_requirement_analysis.md`, `03_coverage_assessment.md`, `05_regression_risk.md`, `index.md`.
 
 If the project layer is missing, proceed with read-only local evidence and suggest `qa-configure`; do not refuse. Do not treat an inferred component map as confirmed project context.
@@ -54,7 +56,7 @@ Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 
 | Action | Level | Gate |
 |---|---|---|
 | Read project context, source, tests, docs and Git objects | L0 | None |
-| Write `02_code_context.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Write `02_code_context.md` and update `index.md` on a non-default branch (default branch: `method/safety.md` fallback) | L1 | No gate; summarise changes |
 | Switch branches, alter files, commit, execute tests or make environment calls | L2/L3 | Not performed here; separate gate applies |
 | Modify project adaptation files | L5 | Never performed; `qa-configure` only |
 

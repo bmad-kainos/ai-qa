@@ -14,6 +14,8 @@ Use `design` mode to check proposed scenarios against requirements, deduplicatio
 
 ## Reads
 
+For each optional prior artefact, fall back to its legacy name per `artefacts.md` and report it.
+
 Always read `.github/ai-qa/project/project.md`, especially Components, Test landscape, Environments, Dependencies and Constraints. Read `.github/ai-qa/project/conventions/testing.md` (Scopes, Commands, Reports, Environments and base URLs, Test data rules) and `conventions/qa-process.md` (Definition of done and QA evidence, Scenario format, Work-id rule). Read `.github/ai-qa/framework/method/traceability.md`, `dedup-rule.md`, `regression-areas.md`, `safety.md`, `artefacts.md` and `precedence.md`. In `code` mode, read the selected `.github/ai-qa/framework/packs/<id>/pack.md` for anti-patterns and the observed level-specific test conventions; apply Feabhas test-quality guidance ported into the selected pack where available (API contract, assertions, isolation, fixture and boundary quality). Optional prior artefacts: `01_requirement_analysis.md`, `02_code_context.md`, `03_coverage_assessment.md`, `04_test_scenarios.md`, `05_regression_risk.md`, `06_automation_plan.md`, `index.md`.
 
 If the project layer or pack is missing, inspect neighboring tests and code, identify the missing convention/pack as a limitation, and suggest `qa-configure`; never refuse due to missing prior artefacts. Do not invent a framework's rules.
@@ -71,7 +73,7 @@ State whether every FR/NFR is covered or justified Not Written, dedup decisions,
 | Action | Level | Gate |
 |---|---|---|
 | Read requirements, test files, conventions and reports | L0 | None |
-| Write `07_design_review.md` / `11_code_review.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Write `07_design_review.md` / `11_code_review.md` and update `index.md` on a non-default branch (default branch: `method/safety.md` fallback) | L1 | No gate; summarise changes |
 | Modify tests, run a shared/full suite, install dependencies or access an environment | L1/L3/L5 | Not performed by reviewer; separate workflow and safety gates apply |
 | Publish, comment, push or update work items | L4 | Not performed; `qa-publish` only |
 | Edit project-owned context/conventions | L5 | Never performed; `qa-configure` only |
