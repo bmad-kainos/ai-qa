@@ -4,12 +4,14 @@ Ask only when an essential scope, requirement, target branch, contradictory fact
 
 ## Missing required input: ask, never bare-refuse
 
-When a skill cannot continue because required input is missing, never end with a bare refusal such as "I need more context". Instead:
+When required input is missing, never stop or end with a bare refusal such as "I need more context". Draft first, then ask:
 
-1. Name exactly which required fields are missing (after checking supplied text and the repository).
-2. Ask for them in one concise question or a short numbered list, stating what is needed for each.
-3. Continue the work once answered.
-4. If the user cannot or will not supply a field, mark it `Not provided` and still produce the draft or output, labelling the limitation. Do not fabricate values.
+1. Scan the user's text, branch, runs, logs and repository first; never ask what they already answer.
+2. Produce the draft now with what is known. Mark each gap `Not provided`, keep the status `DRAFT` and note the gaps in confidence. Do not fabricate values.
+3. In the same reply, ask at most about 5 targeted questions, ordered by how much each answer improves the output. Build each from something the user said (the named element, page, trigger or symptom) and say what it unlocks. Answers are optional.
+4. When answers arrive, re-draft. Ask a follow-up only for a still-significant gap, and stop after two rounds.
+
+Exception: when almost nothing is known (no feature, page or symptom), skip the draft and ask the 2 or 3 questions that anchor the rest, then draft.
 
 ## Option-A interview format
 
