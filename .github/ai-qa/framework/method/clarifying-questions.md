@@ -2,6 +2,15 @@
 
 Ask only when an essential scope, requirement, target branch, contradictory fact, access dependency or gated side effect cannot be resolved from available evidence. Start with a read-only repository scan and current project context. Never ask what the repository already answers. When ambiguity is non-blocking, record it and proceed with a bounded, clearly stated assumption.
 
+## Missing required input: ask, never bare-refuse
+
+When a skill cannot continue because required input is missing, never end with a bare refusal such as "I need more context". Instead:
+
+1. Name exactly which required fields are missing (after checking supplied text and the repository).
+2. Ask for them in one concise question or a short numbered list, stating what is needed for each.
+3. Continue the work once answered.
+4. If the user cannot or will not supply a field, mark it `Not provided` and still produce the draft or output, labelling the limitation. Do not fabricate values.
+
 ## Option-A interview format
 
 Ask **one question at a time**. Show the evidence and why the answer matters, then give a recommendation and alternatives:
