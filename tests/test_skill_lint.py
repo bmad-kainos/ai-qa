@@ -21,6 +21,11 @@ def front_matter(text):
     return match.group(1) if match else None
 
 
+def front_matter_name(metadata):
+    match = re.search(r"^name:[ \t]+([a-z][a-z0-9-]*)[ \t]*$", metadata, re.M)
+    return match.group(1) if match else None
+
+
 def has_legacy_artefact_filename(line):
     return bool(LEGACY_PATTERN.search(line.replace(TEMPLATE_REFERENCE, "")))
 
@@ -31,13 +36,16 @@ class SkillLintTests(unittest.TestCase):
             text = (d / "SKILL.md").read_text(encoding="utf-8")
             metadata = front_matter(text)
             self.assertIsNotNone(metadata, d.name)
-            match = re.search(r"^name:\s*(\S+)", metadata, re.M)
-            self.assertIsNotNone(match, d.name)
-            self.assertEqual(match.group(1).strip("\"'"), d.name)
+            self.assertEqual(front_matter_name(metadata), d.name)
 
     def test_front_matter_must_be_at_start_of_file(self):
         text = "# Example\n\nname: qa-test-plan\n"
         self.assertIsNone(front_matter(text))
+
+    def test_front_matter_name_must_be_a_valid_plain_scalar(self):
+        self.assertIsNone(front_matter_name('name: "qa-test-plan'))
+        self.assertIsNone(front_matter_name("name: qa-test-plan'"))
+        self.assertEqual(front_matter_name("name: qa-test-plan"), "qa-test-plan")
 
     def test_referenced_framework_files_exist(self):
         pattern = re.compile(r"\.github/ai-qa/framework/[\w./-]+?\.md")
