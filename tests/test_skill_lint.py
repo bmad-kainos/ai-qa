@@ -1,4 +1,4 @@
-"""Cheap lint checks for skill prompt files (spike #13)."""
+"""Cheap lint checks for skill prompt files."""
 
 from pathlib import Path
 import re
