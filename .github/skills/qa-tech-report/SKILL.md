@@ -24,7 +24,7 @@ Use when someone asks to generate a tech report, weekly update or team notes; su
 - Publishing reports without `qa-publish`
 
 ## Reads
-Always read `.github/ai-qa/project/project.md` for project components and report grouping; `.github/ai-qa/project/conventions/reporting.md` sections `Audiences`, `Formats`, `Channel templates`, `Tech-report defaults` and `File naming`; `conventions/git.md` section `Commit types`; and `conventions/integrations.md` for the work-item provider if weekly mode is requested. Read `.github/ai-qa/framework/method/safety.md`, `git.md`, `artefacts.md`, `precedence.md`, `.github/ai-qa/framework/defaults/reporting.md` only when conventions are absent, the selected file under `references/`, live git history and any current prior artefacts. If the project layer is missing, use read-only session evidence and suggest `qa-configure`.
+Always read `.github/ai-qa/project/project.md` for project components and report grouping; `.github/ai-qa/project/conventions/reporting.md` sections `Audiences`, `Formats`, `Channel templates`, `Tech-report defaults` and `File naming`; `conventions/git.md` section `Commit types`; and `conventions/integrations.md` for the work-item provider if weekly mode is requested. Read `.github/ai-qa/framework/method/safety.md`, `work-id-and-git.md`, `artefacts.md`, `precedence.md`, `.github/ai-qa/framework/defaults/reporting.md` only when conventions are absent, the selected file under `references/`, live git history and any current prior artefacts. If the project layer is missing, use read-only session evidence and suggest `qa-configure`.
 
 ## Work-id
 Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
@@ -58,7 +58,7 @@ Before writing a single word of report output, run the git log command matching 
 git log --since="<start-date>" --no-merges --format="%h | %ad | %an | %s" --date=short
 
 # Bounded range (start and end given)
-git log --after="<start-date>" --before="<end-date>" --no-merges --format="%h | %ad | %an | %s" --date=short
+git log --after="<start-date>" --before="<end-date + 1 day>" --no-merges --format="%h | %ad | %an | %s" --date=short
 ```
 
 Use the requested path/ref filters when supplied and record the exact command, ref, timezone and range. The live git history is the only valid source for what changed in that range; do not infer from prior conversation, cached knowledge or workspace files.
@@ -131,7 +131,7 @@ git log --since="2 weeks ago" --no-merges --oneline -- <confirmed-path>/
 
 #### Date range between two specific dates
 ```bash
-git log --after="<start-date>" --before="<end-date>" --no-merges --oneline
+git log --after="<start-date>" --before="<end-date + 1 day>" --no-merges --oneline
 ```
 
 #### Supported `--since` date formats
