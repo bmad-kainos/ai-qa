@@ -24,7 +24,7 @@ Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argume
 
 ## Inputs
 
-Accept a ticket, feature/change, requirements, candidate scenarios or automation request. Use existing FR/NFR IDs or derive stable provisional IDs. If a ticket key is supplied and configured access is available, fetch with `workitem.get`; provider/transport come from `conventions/integrations.md`, with pasted text as manual fallback. Use an existing test inventory, CI setup, coverage and regression analysis if available. If an environment or credential is unknown, plan around the blocker rather than inventing access.
+Accept a ticket, feature/change, requirements, candidate scenarios or automation request. Use existing FR/NFR IDs or derive stable provisional IDs. If a ticket key is supplied and configured access is available, fetch with `workitem.get`; provider/transport come from `conventions/integrations.md`, with pasted text as manual fallback (if retrieval fails, retry once, then ask for the pasted title, description and acceptance criteria per `clarifying-questions.md`). Use an existing test inventory, CI setup, coverage and regression analysis if available. If an environment or credential is unknown, plan around the blocker rather than inventing access.
 
 If prior artefacts are missing, gather the minimum yourself; never refuse. Distinguish recommendation from implemented tests and passing results.
 
@@ -63,7 +63,7 @@ When in doubt for API tests, prefer integration over E2E.
 
 ### Decide each scenario
 
-For every requirement/scenario choose exactly one: **Automate**, **Manual**, or **Not needed**. For `Automate`, specify:
+For every requirement/scenario choose exactly one: **Automate**, **Automate (blocked)**, **Manual**, or **Not needed**. Use `Automate (blocked)` when automation is desirable but a named dependency or decision prevents it; downstream skills must not generate tests for it until unblocked. For `Automate`, specify:
 
 - Level: unit, integration or E2E, justified by boundary and outcome.
 - Location: concrete configured scope/path and likely test file naming pattern.
@@ -72,17 +72,17 @@ For every requirement/scenario choose exactly one: **Automate**, **Manual**, or 
 - Environment/data: configured environment, test-data convention and lifecycle, safe ticket-linked identifiers, secrets through approved configuration only, isolation and cleanup.
 - CI impact: configured command/marker, trigger, runtime, flake/stability risk, dependencies and ownership. These are a plan, not authorization to run CI or install dependencies.
 
-For `Manual`, state the exact observable check and environment/access required. For `Not needed`, explain existing evidence or why no additional coverage adds value. If automation is blocked, say what dependency or decision would unblock it.
+For `Manual`, state the exact observable check and environment/access required. For `Not needed`, explain existing evidence or why no additional coverage adds value. If automation is blocked, use `Automate (blocked)` and say what dependency or decision would unblock it.
 
 ### Classify automation impact
 
-Do not estimate hours. Give an impact level for the work: **None** (existing coverage sufficient), **Low** (small additions to existing test files/fixtures), **Medium** (new scenarios requiring a file/class), **High** (significant effort or framework work such as new fixture types/helpers/conftest patterns). Explain the classification. This impact level does not replace each scenario's automate/manual/not-needed decision.
+Do not estimate hours here (the hour bands in `effort-estimation.md` are used only by `qa-test-plan` for sprint scope). Give an impact level for the work: **None** (existing coverage sufficient), **Low** (small additions to existing test files/fixtures), **Medium** (new scenarios requiring a file/class), **High** (significant effort or framework work such as new fixture types/helpers/conftest patterns). Explain the classification. This impact level does not replace each scenario's automate/manual/not-needed decision.
 
 ## Output
 
 Write `qa-work/<work-id>/06_automation_plan.md` with front matter `work-id`, `skill: qa-automation-plan`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirements, source revision, test/CI evidence). Include all nine factor answers, an overall impact level and this table:
 
-Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `automation.md` as a fallback; always write the new name and never silently rename.
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `automation.md` as a fallback; always write the new name and never silently rename.
 
 | Scenario / requirement | Decision | Level | Location | Mocking | Environment / data | CI impact | Justification / evidence |
 |---|---|---|---|---|---|---|---|

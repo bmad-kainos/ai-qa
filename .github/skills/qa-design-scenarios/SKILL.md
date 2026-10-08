@@ -32,7 +32,7 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. Ask o
 
 ### Core principle
 
-Manual scenarios exist to catch what unit and integration tests **cannot**: real business outcomes, cross-service behavior, and edge cases that surface with live data and infrastructure. They are not a re-run of unit-test logic in scenario form. A simple ticket with three ACs, all covered by passing unit tests, may need **2–4 manual scenarios**, not one per AC.
+Manual scenarios exist to catch what unit and integration tests **cannot**: real business outcomes, cross-service behavior, and edge cases that surface with live data and infrastructure. They are not a re-run of unit-test logic in scenario form. A simple ticket with three ACs, all covered by passing unit tests, may need **2–4 manual scenarios**, not one per AC. This is a heuristic, not a target or cap (see `dedup-rule.md`); risk and real boundary coverage take precedence. Deduplication is provisional unless passing test-run evidence supports it. If `qa-work/<work-id>/01_requirement_analysis.md` shows Readiness Red, draft only scenarios the clear requirements support, list the blocked requirements under **Scenarios Not Written**, and say the set is provisional.
 
 ### Deduplication rule
 
@@ -64,7 +64,7 @@ Avoid one scenario per AC when a single business journey verifies several; combi
 
 ### Write scenarios
 
-Each scenario must have a descriptive name, sequential number, relevant category tags, requirement IDs in `Covers: FRn, NFRn`, reproducible preconditions and a deterministic observable outcome. State the configured environment, setup and cleanup. Write every scenario in the format set by `conventions/qa-process.md` → Scenario format, using the templates in `.github/ai-qa/framework/method/scenario-format.md`; if the setting is absent, use `bdd` and say it is the framework default. Never mix formats within one work item. In `bdd` the form is:
+Each scenario must have a descriptive name, sequential number, relevant category tags, requirement IDs in `Covers: FRn, NFRn`, reproducible preconditions and a deterministic observable outcome. State the configured environment, setup and cleanup. Write every scenario in the format set by `conventions/qa-process.md` → Scenario format, using the templates in `.github/ai-qa/framework/method/scenario-format.md` (including its "Fields common to both formats" list); if the setting is absent, use `bdd` and say it is the framework default. Never mix formats within one work item. In `bdd` the form is:
 
 ```gherkin
 GIVEN <precondition>
@@ -88,7 +88,7 @@ When creating test data, use a consistent identifier pattern linking data to the
 
 Write `qa-work/<work-id>/04_test_scenarios.md` with front matter `work-id`, `skill: qa-design-scenarios`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirement, coverage and environment revisions). Include numbered/tagged scenarios in the configured format (state the format used at the top of the file), each with `Covers: FRn, NFRn`, environment/setup/cleanup and expected evidence. Add **Scenarios Not Written** listing IDs/categories deliberately omitted and one-line evidence-based justifications; if coverage evidence is unavailable, say so and mark the decision provisional. Update `qa-work/<work-id>/index.md` with requirement-to-scenario links, omitted coverage, environment, assumptions and artefact link. Provide scenario count and important omissions in chat.
 
-Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `design.md` as a fallback; always write the new name and never silently rename.
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `design.md` as a fallback; always write the new name and never silently rename.
 
 ## Side effects and safety
 

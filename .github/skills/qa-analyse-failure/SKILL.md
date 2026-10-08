@@ -17,7 +17,7 @@ Always read `.github/ai-qa/project/project.md` for the environment, components, 
 Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
-Accept a run or report, pasted output, failed test ID, or CI run URL. Gather exact assertion/error, expected and observed values, run ID/SHA/time, branch, environment, reproduction conditions, linked FR/NFR and available baseline. For CI data use `ci.run.get` / `ci.test-results` via configured integrations. If evidence is missing, inspect authorised read-only evidence or mark the evidence needed; never infer cause from a test title or a lone HTTP/CI error.
+Accept a run or report, pasted output, failed test ID, or CI run URL. Gather exact assertion/error, expected and observed values, run ID/SHA/time, branch, environment, reproduction conditions, linked FR/NFR and available baseline. For CI data use `ci.run.get` / `ci.test-results` via configured integrations; if retrieval fails, retry once, then ask the user to paste the log or failure output (per `.github/ai-qa/framework/method/clarifying-questions.md`). If evidence is missing, inspect authorised read-only evidence or mark the evidence needed; never infer cause from a test title or a lone HTTP/CI error.
 
 ## Procedure
 1. Reconstruct the failing step, preconditions and asserted contract. Preserve the original result; cite the exact log/report evidence, test and code paths, run, revision and environment. Separate observed facts, hypotheses and unknowns.
@@ -47,8 +47,8 @@ skill: "qa-analyse-failure"
 framework-version: "<installed-version-or-unknown>"
 created: "<UTC-ISO-8601>"
 inputs:
-	- source: "<run/log/CI URL/test/requirement path or link>"
-		revision: "<run ID/SHA/document revision/observed time>"
+  - source: "<run/log/CI URL/test/requirement path or link>"
+    revision: "<run ID/SHA/document revision/observed time>"
 ---
 ```
 

@@ -26,7 +26,7 @@ Take mode, test/repository scope, reference revision or dates, environment, opti
 3. Retrieve CI history through configured `ci.runs` for the project-defined or requested last N runs. Record run identifiers, SHA, start/time, duration, outcome and reruns on the same SHA when actually present. Use `ci.run.get` or `ci.test-results` only when details are needed. If the configured operation/transport is unavailable, record the failure and data gap; never assume CI history exists.
 4. If a local run was requested, select the smallest documented test command from `conventions/testing.md` and follow `qa-run-tests` safety. Full, long or environment-dependent execution is L3 unless the exact command is marked safe in `qa-process.md`. Report unrun tests as `Not run`; missing prerequisites as `BLOCKED`.
 5. Use counts only from structured CLI output or existing structured reports; state source and revision. Percentiles and flaky-test detection may be computed **only** by running `python3 tools/qa-stats.py` from the AI-QA framework checkout, with the user-supplied checkout path. Never run the helper from or install it into the target project. If the checkout/path or usable history is not supplied, report percentiles and flaky detection as **not computed**.
-6. Present findings before writing. Write both `.github/ai-qa/baselines/<date>.md` and `.github/ai-qa/baselines/<date>.json` on a non-default branch. Show differences and obtain confirmation before replacing any existing dated baseline.
+6. Present findings before writing. Write both `.github/ai-qa/baselines/<date>.md` and `.github/ai-qa/baselines/<date>.json` on a non-default branch. When a snapshot of a different scope already exists for the same date, use `<date>-<scope-slug>` instead. Show differences and obtain confirmation before replacing any existing dated baseline.
 
 ### Compare
 1. Load the requested dated Markdown/JSON snapshots and validate source revisions, scopes, environment/config and report provenance. Mark missing, stale or unlike-for-like inputs explicitly; do not compare incomparable counts as deltas.
@@ -43,10 +43,12 @@ skill: "qa-baseline"
 framework-version: "<installed-version-or-unknown>"
 created: "<UTC-ISO-8601>"
 inputs:
-	- source: "<repository/report/CI/snapshot path or link>"
-		revision: "<commit/run ID/document revision/observed time>"
+  - source: "<repository/report/CI/snapshot path or link>"
+    revision: "<commit/run ID/document revision/observed time>"
 ---
 ```
+
+Start the Markdown file from `.github/ai-qa/framework/templates/artefact.md`: after the title it carries the **Scope**/**Status** lines, **Result:** (one-sentence verdict) and **Do next:** (max 3 actions, or None), then the sections below.
 
 The JSON companion must be valid JSON and include equivalent provenance in a `metadata` object. Use this Markdown structure:
 

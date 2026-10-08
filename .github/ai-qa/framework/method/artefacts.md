@@ -7,6 +7,7 @@ Maintain one `qa-work/<work-id>/index.md` per ticket, feature or bounded investi
 ```text
 qa-work/<work-id>/
   index.md
+  00_discovery.md         # qa-discover standalone
   01_requirement_analysis.md
   02_code_context.md
   03_coverage_assessment.md
@@ -29,7 +30,7 @@ Numbers give reading order; gaps are allowed when a step is skipped. Create only
 
 ## Legacy filenames
 
-Always write the numbered names. When a numbered file is absent, read the legacy name as a fallback: `requirement.md`, `context.md`, `coverage.md`, `design.md`, `regression.md`, `automation.md` (plan or generation record), `review.md` (design or code review; decide from its `skill`/mode front matter and content), `outputs/test-plan.md`. `execution.md` is the legacy name of `09_execution.md`. Never silently rename or delete a legacy file: report it, write the new file, and let the user migrate (see `docs/migrations.md`). If both exist, the numbered file wins; note the legacy file in the index.
+Always write the numbered names. When a numbered file is absent, read the legacy name as a fallback: `requirement.md`, `context.md`, `coverage.md`, `design.md`, `regression.md`, `automation.md` (plan or generation record), `review.md` (design or code review; decide from its `skill`/mode front matter and content), `outputs/test-plan.md`. `execution.md` is the legacy name of `09_execution.md`; `discovery.md` is the legacy name of `00_discovery.md`. Never silently rename or delete a legacy file: report it, write the new file, and let the user migrate (see `docs/migrations.md`). If both exist, the numbered file wins; note the legacy file in the index.
 
 ## Commit and ignore defaults
 

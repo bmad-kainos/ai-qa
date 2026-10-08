@@ -34,7 +34,7 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. In `c
 
 #### Single
 
-1. Resolve the work item from the supplied key using `workitem.get`, or use the user's pasted context. Capture the source and revision/date if available. Preserve distinctions between stated requirements, assumptions and unknowns.
+1. Resolve the work item from the supplied key using `workitem.get` (if retrieval fails, retry once, then ask for the pasted title, description and acceptance criteria per `.github/ai-qa/framework/method/clarifying-questions.md`), or use the user's pasted context. Capture the source and revision/date if available. Preserve distinctions between stated requirements, assumptions and unknowns.
 2. Assign stable IDs `FR1`, `FR2`, … to individual functional requirements and `NFR1`, `NFR2`, … to non-functional requirements. Reuse prior IDs unchanged; do not silently renumber. Link every ID to its exact acceptance criterion or source. Identify core behaviours, business rules and validation; performance, security, logging and environment-specific behaviour; edge/negative cases; flags and both runtime states; environmental dependencies; APIs, databases and external services; risks, ambiguities, missing information and potential implementation risks.
 3. Assess all six refinement dimensions on a 1–5 scale with a brief evidence-based reason:
 
@@ -126,7 +126,7 @@ For every item, score **Change Impact** and **Failure Criticality** from 1–5 a
 | 2 | Minor UI/content change or low-traffic path | Minor inconvenience; easily recoverable |
 | 1 | Cosmetic, documentation or configuration tweak | No user impact if it fails |
 
-Apply these optional modifiers and show raw and adjusted scores: recently changed code with no existing tests `+5`; known flaky area or bug history `+3`; external service/integration dependency `+2`; high-quality automated coverage `−3`; out of release scope forces score to `0`. When items tie, prioritise higher failure criticality. Items with no existing test coverage rise one tier regardless of score. Risk is a starting point: explain domain overrides. Suggested tiers: Must Test (risk ≥16), Should Test (6–15), Smoke/Spot Check (3–5), Skip (≤2).
+Apply these optional modifiers and show raw and adjusted scores: recently changed code with no existing tests `+5`; known flaky area or bug history `+3`; external service/integration dependency `+2`; high-quality automated coverage `−3`; out of release scope forces score to `0`. When items tie, prioritise higher failure criticality. Items with no existing test coverage rise one tier regardless of score. Risk is a starting point: explain domain overrides. Suggested tiers: Must Test (risk ≥16), Should Test (6–15), Smoke/Spot Check (3–5), Skip (≤2). For the QA Summary `Max risk` column map the adjusted score to a level: ≥16 CRITICAL, 11–15 HIGH, 6–10 MEDIUM, ≤5 LOW; use `Unknown` when it was not scored. Leave unset QA Summary cells as `Not assessed`, `Not run` or `Not published`, never blank.
 
 ### Per-ticket output template
 
@@ -190,7 +190,7 @@ E2E Coverage:              X
 QA Summary
 | Ticket | Readiness | Max risk | Coverage verdict | Scenarios written/not written | Automated/manual/not needed | Run result | Published |
 |---|---|---|---|---|---|---|---|
-| <key> | <Green/Amber/Red> | <level and score> | <Pass/Needs Improvement/Insufficient/Not assessed> | <counts> | <decision> | <Not run or evidenced result> | <No or receipt> |
+| <key> | <Green/Amber/Red> | <LOW/MEDIUM/HIGH/CRITICAL/Unknown and score> | <Pass/Needs Improvement/Insufficient/Not assessed> | <counts> | <decision> | <Not run or evidenced result> | <Not published or receipt> |
 
 Highest Priority Refinement Items
 - <ticket and decision required before planning/development>
@@ -231,7 +231,7 @@ Common gaps include missing negative scenarios, observability, error handling, a
 
 Write `qa-work/<work-id>/01_requirement_analysis.md` with front matter `work-id`, `skill: qa-analyse-requirement`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (source/revision). Include the applicable per-item template, stable requirement register with ID/source/testable outcome, risk ranking and explicit assumptions. In batch mode include each ticket result and the batch summaries; in clarify mode include confirmed decisions and remaining questions. Update `qa-work/<work-id>/index.md` with item IDs and source revisions, FR/NFR IDs, readiness, blockers, impact/criticality and risk ranking, and link the artefact. Show the batch QA Summary in chat.
 
-Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `requirement.md` as a fallback; always write the new name and never silently rename.
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `requirement.md` as a fallback; always write the new name and never silently rename.
 
 ## Side effects and safety
 

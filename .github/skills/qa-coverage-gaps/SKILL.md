@@ -44,7 +44,7 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. With 
    - Is the happy path the only path tested?
 3. Check the relevant flags, environment variations, auth/permissions, cross-service behavior, persistence and externally observable outcomes. For an API contract, identify absent assertions for status **and** error-body structure; do not fabricate undocumented response codes.
 4. Apply the role boundary: developers write and execute unit tests. The tester verifies tests exist and cover ACs; recommend improvements but do not write or run unit tests here.
-5. Assign exactly one evidence-based verdict: **Pass** — adequate coverage found; **Needs Improvement** — gaps exist but are not critical; **Insufficient** — significant gaps require action before sign-off. Distinguish test existence, observed/measured coverage and execution status. A pass verdict is not a claim that tests currently pass.
+5. Assign exactly one evidence-based verdict: **Pass** — adequate coverage found; **Needs Improvement** — gaps exist but are not critical; **Insufficient** — significant gaps require action before sign-off; **Not assessed** — no source or tests were accessible, so no verdict can be given (state what was missing). Distinguish test existence, observed/measured coverage and execution status. A pass verdict is not a claim that tests currently pass.
 
 ### Repository scope and inventory
 
@@ -71,7 +71,7 @@ Prioritise code handling money/billing, auth/security, persistence and public AP
 
 Write `qa-work/<work-id>/03_coverage_assessment.md` with front matter `work-id`, `skill: qa-coverage-gaps`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (scope, branch/source/report revision). Update `qa-work/<work-id>/index.md` with scope, requirement IDs, source/report provenance, assessed versus measured evidence, unit verdict where applicable, gaps and link.
 
-Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `coverage.md` as a fallback; always write the new name and never silently rename.
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `coverage.md` as a fallback; always write the new name and never silently rename.
 
 For `requirement` scope, include:
 
@@ -79,7 +79,7 @@ For `requirement` scope, include:
 |---|---|---|---|---|
 | FR/NFR ID | test path and assertion, or none found | test path/assertion, or none found | test path/assertion, or none found | behavior and next action |
 
-Then provide the eight checklist answers, evidence-ranked gaps, exact recommendations and the Pass/Needs Improvement/Insufficient verdict. State execution status separately.
+Then provide the eight checklist answers, evidence-ranked gaps, exact recommendations and the Pass/Needs Improvement/Insufficient/Not assessed verdict. State execution status separately.
 
 For `repo` scope, use this report template:
 

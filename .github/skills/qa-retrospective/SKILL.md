@@ -47,7 +47,7 @@ Use CI operations `ci.runs`, `ci.run.get` and `ci.test-results` when configured 
 From gathered data, derive only metrics whose source counts and denominators are known:
 - **Test pass rate** = passing tests / total executed tests × 100%; exclude skipped and blocked from the denominator and disclose them.
 - **Defect detection rate** = bugs found in testing / (bugs found in testing + escaped defects); calculate only when both counts are known and the denominator is greater than zero.
-- **Automation coverage change** = tests added minus tests removed this sprint.
+- **Net new automated tests** = tests added minus tests removed this sprint (a count, not a coverage percentage).
 - **Flaky test count** = number of tests with repeated intermittent outcomes; never label one failed run flaky.
 - **Percentiles** (including duration percentiles) may be reported only from supplied output of `tools/qa-stats.py`; otherwise say `not computed`. The helper is optional and runs from the framework checkout only.
 
@@ -60,7 +60,7 @@ Produce the following structure, grouping components according to `.github/ai-qa
 ## QA Sprint Retrospective — <Sprint Name>
 
 **Period:** <start date> → <end date>
-**Prepared by:** QA / Test Engineer
+**Prepared by:** <author, or Not provided>
 
 ---
 
@@ -80,19 +80,19 @@ Produce the following structure, grouping components according to `.github/ai-qa
 
 ## 2. What Went Well
 
-- <Positive outcome — e.g. all high-risk stories had integration tests before merging>
-- <Positive outcome — e.g. no escaped defects this sprint, if verified>
+- <Positive outcome, only if supported by cited evidence>
+- <Positive outcome, only if supported by cited evidence>
 - <Positive outcome or not available>
 
 ## 3. What Could Be Improved
 
-- <Issue — e.g. stories entered test with incomplete acceptance criteria, causing rework>
-- <Issue — e.g. a flaky test blocked CI, with run evidence>
+- <Process issue, only if supported by cited evidence>
+- <Process issue, only if supported by cited evidence>
 - <Issue or not available>
 
 ## 4. Bugs Found This Sprint
 
-| Ticket | Summary | Severity | Found by | Status |
+| Ticket | Summary | Severity | Detected in | Status |
 |---|---|---|---|---|
 | <work-item ID or not available> | <summary> | <severity or not available> | <source> | <status> |
 
@@ -148,7 +148,7 @@ Use the requested channel template from `conventions/reporting.md` if a channel 
 - Cite run/work-item links for each material claim when permitted; distinguish observation from inference.
 
 ## Output
-Return the period, sources, metric table with denominators and `not available` fields, wins, improvement themes, escaped defects, flaky tests, limitations, actions and optional stakeholder summary. If a saved report is requested, write `qa-work/<work-id>/outputs/<configured-name>.md` with frontmatter required by `.github/ai-qa/framework/method/artefacts.md`: `work-id`, `skill: qa-retrospective`, `framework-version`, `created` (UTC ISO-8601) and `inputs` (dated run/work-item artefacts and revisions). Cite runs and work items where permitted. Link the report from `qa-work/<work-id>/index.md`; mark older reports stale on source/run drift.
+Return the period, sources, metric table with denominators and `not available` fields, wins, improvement themes, escaped defects, flaky tests, limitations, actions and optional stakeholder summary. If a saved report is requested, write `qa-work/<work-id>/outputs/<configured-name>.md` with frontmatter required by `.github/ai-qa/framework/method/artefacts.md`: `work-id`, `skill: qa-retrospective`, `framework-version`, `created` (UTC ISO-8601) and `inputs` (dated run/work-item artefacts and revisions). Start the file from `.github/ai-qa/framework/templates/artefact.md`: **Result:**/**Do next:** lines after the title, the retrospective as the skill-specific section, then **Drift**. Cite runs and work items where permitted. Link the report from `qa-work/<work-id>/index.md`; mark older reports stale on source/run drift.
 
 ## Side effects and safety
 | Action | Level | Gate |

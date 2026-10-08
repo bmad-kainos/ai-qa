@@ -24,7 +24,7 @@ Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argume
 
 ## Inputs
 
-Accept a diff/commit, ticket, feature, pasted change description or release scope. If a ticket key is supplied and its provider is configured, use `workitem.get`; provider and transport come from `conventions/integrations.md`. If the preferred transport fails, say so and fall back; manual fallback is pasted ticket text. Assess from whatever evidence is available. If implementation is unavailable, score stated design provisionally. Never equate missing evidence with LOW risk.
+Accept a diff/commit, ticket, feature, pasted change description or release scope. If a ticket key is supplied and its provider is configured, use `workitem.get`; provider and transport come from `conventions/integrations.md`. If the preferred transport fails, say so, retry once and fall back; manual fallback is pasted ticket text (ask for the title, description and acceptance criteria per `clarifying-questions.md`). Assess from whatever evidence is available. If implementation is unavailable, score stated design provisionally. Never equate missing evidence with LOW risk.
 
 If prior artefacts are missing, gather the minimum yourself; never refuse. This skill is read-only apart from its QA work artefact. It does not require a branch checkout.
 
@@ -68,7 +68,7 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. This 
 
 Write `qa-work/<work-id>/05_regression_risk.md` with front matter `work-id`, `skill: qa-regression-risk`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (ticket/diff/branch/source revision). Include scope and confidence, the complete 13-area matrix, project extra areas, highest overall risk, targeted scenarios/automation/production impact/rollout validation for each HIGH/CRITICAL area, optional ranked scores, assumptions and open questions. Update `qa-work/<work-id>/index.md` with the highest risk, matrix link, branch/source revision, mitigations and unknowns. Present highest risks and urgent actions in chat.
 
-Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `regression.md` as a fallback; always write the new name and never silently rename.
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `regression.md` as a fallback; always write the new name and never silently rename.
 
 ## Side effects and safety
 
