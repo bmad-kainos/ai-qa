@@ -25,7 +25,7 @@ Take mode, test/repository scope, reference revision or dates, environment, opti
 2. Produce a static inventory of test paths/frameworks/levels and existing assertions, not filenames alone. Include coverage only when a coverage report already exists; record its format, path, revision and age. Do not run the suite unless explicitly requested.
 3. Retrieve CI history through configured `ci.runs` for the project-defined or requested last N runs. Record run identifiers, SHA, start/time, duration, outcome and reruns on the same SHA when actually present. Use `ci.run.get` or `ci.test-results` only when details are needed. If the configured operation/transport is unavailable, record the failure and data gap; never assume CI history exists.
 4. If a local run was requested, select the smallest documented test command from `conventions/testing.md` and follow `qa-run-tests` safety. Full, long or environment-dependent execution is L3 unless the exact command is marked safe in `qa-process.md`. Report unrun tests as `Not run`; missing prerequisites as `BLOCKED`.
-5. Use counts only from structured CLI output or existing structured reports; state source and revision. Percentiles and flaky-test detection may be computed **only** by running `python3 tools/qa-stats.py` from the AI-QA framework checkout, with the user-supplied checkout path. Never run the helper from or install it into the target project. If the checkout/path or usable history is not supplied, report percentiles and flaky detection as **not computed**.
+5. Use counts only from structured CLI output or existing structured reports; state source and revision. Percentiles and flaky-SHA/rerun detection (same SHA with both passed and failed runs; not per-test flakiness) may be computed **only** by running `python3 tools/qa-stats.py` from the AI-QA framework checkout, with the user-supplied checkout path. The helper accepts only `passed`/`failed` outcomes and aborts otherwise, so map or filter CI conclusions (drop cancelled/skipped) first. Per-test flaky counts come from `ci.test-results` history or the user, never from the helper. Never run the helper from or install it into the target project. If the checkout/path or usable history is not supplied, report percentiles and flaky-SHA detection as **not computed**.
 6. Present findings before writing. Write both `.github/ai-qa/baselines/<date>.md` and `.github/ai-qa/baselines/<date>.json` on a non-default branch. Show differences and obtain confirmation before replacing any existing dated baseline.
 
 ### Compare
@@ -61,7 +61,7 @@ The JSON companion must be valid JSON and include equivalent provenance in a `me
 ## Drift
 ```
 
-Report counts only with structured-source evidence. Statistics must explicitly say either the helper path/run and result or `Percentiles: not computed; flaky detection: not computed.` The index links both files; no raw credential-bearing logs are committed.
+Report counts only with structured-source evidence. Statistics must explicitly say either the helper path/run and result or `Percentiles: not computed; flaky-SHA detection: not computed.` The index links both files; no raw credential-bearing logs are committed.
 
 ## Side effects and safety
 | Action | Level | Gate |

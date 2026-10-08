@@ -48,7 +48,7 @@ From gathered data, derive only metrics whose source counts and denominators are
 - **Test pass rate** = passing tests / total executed tests × 100%; exclude skipped and blocked from the denominator and disclose them.
 - **Defect detection rate** = bugs found in testing / (bugs found in testing + escaped defects); calculate only when both counts are known and the denominator is greater than zero.
 - **Automation coverage change** = tests added minus tests removed this sprint.
-- **Flaky test count** = number of tests with repeated intermittent outcomes; never label one failed run flaky.
+- **Flaky test count** = number of tests with repeated intermittent outcomes, taken from per-test history (`ci.test-results`) or the user, never from `tools/qa-stats.py` (which reports flaky SHAs/reruns only and needs outcomes mapped to passed/failed first); never label one failed run flaky.
 - **Percentiles** (including duration percentiles) may be reported only from supplied output of `tools/qa-stats.py`; otherwise say `not computed`. The helper is optional and runs from the framework checkout only.
 
 Use “not available” for missing input, not zero. Use “not computed” for unavailable calculations. Compare trends only across comparable periods, environments and denominators. Trend analysis is meaningful from the third sprint onward; note this if prior data is absent.
