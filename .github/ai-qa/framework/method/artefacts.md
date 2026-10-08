@@ -33,7 +33,7 @@ Always write the numbered names. When a numbered file is absent, read the legacy
 
 ## Gap markers
 
-Use only these markers for missing or unrun content: `Not provided` (required input missing), `Unknown` (optional value missing), `Not assessed` (area not analysed), `Not run` (no execution evidence), `Not published` (nothing posted externally), `Not configured` (project setting absent). Do not use `N/A` or `NOT FOUND` as gap markers; `qa-ask-docs` states a documentation gap as `Not documented` with `Scope searched`. `qa-retrospective` and `qa-tech-report` keep `not available` / `not computed` for now (wording decision pending). This complements the `Not provided` rule in `clarifying-questions.md`.
+Use these markers for missing or unrun information: `Not provided` (required input missing), `Unknown` (optional value missing), `Not assessed` (area not analysed), `Not run` (no execution evidence), `Not published` (nothing posted externally), and `Not configured` (project setting absent). These are gap markers, not workflow statuses or result values: use the required status/result vocabulary where specified, including `Blocked` and `PASS` / `FAIL` / `BLOCKED` / `Not run` with provenance. Do not use `N/A` or `NOT FOUND` as generic gap markers; `qa-ask-docs` states a documentation gap as `Not documented` with `Scope searched`. `qa-retrospective` and `qa-tech-report` keep `not available` / `not computed` for now (wording decision pending). This complements the `Not provided` rule in `clarifying-questions.md`.
 
 ## Commit and ignore defaults
 

@@ -24,7 +24,7 @@ No project-specific areas by default. Always include the 13 framework areas in `
 
 ## Fix loop
 
-Maximum 3 iterations; stop early if the same failure repeats. Fix test defects only, and only files created or modified in this work item. Never change product code, delete/skip/disable tests, or loosen assertions unless the relevant FR supports it. Append each iteration to `09_execution.md`.
+Maximum 3 iterations; stop early if the same failure repeats. Fix test defects only, and change only test files created or modified in this work item, or pre-existing test files explicitly named in its owned list and logged in `index.md` (L1). Never change product code, delete/skip/disable tests, or loosen assertions unless the relevant FR supports it. Append each iteration to `09_execution.md`.
 
 ## Commands safe to run (L3 exemptions)
 
