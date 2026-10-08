@@ -121,7 +121,7 @@ class SyntheticInstallerTests(unittest.TestCase):
                 (packs / "beta").rmdir()
                 project = self.target / ".github/ai-qa/project"
                 project.mkdir(parents=True)
-                (project / "pruned-packs.txt").write_text("beta\n_TEMPLATE-not-listed\n")
+                (project / "pruned-packs.txt").write_text("beta\n_TEMPLATE\n")
                 self.call(runner, "update")
                 self.call(runner, "update")
                 self.assertFalse((packs / "beta").exists())
