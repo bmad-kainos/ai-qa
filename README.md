@@ -1,6 +1,6 @@
 # AI-QA
 
-AI-QA v1 is a project-aware QA/QE framework for **GitHub Copilot in VS Code**. It installs Markdown agents, skills and framework references into a repository. It doesn't install an application runtime, a test runner, a binary or a client library. The project's own tooling runs its tests. MCP is optional: every external operation has a manual fallback.
+AI-QA v1 is a project-aware QA/QE framework for **GitHub Copilot in VS Code**. It installs Markdown agents, skills and framework references into a repository, not an application runtime, test runner, binary or client library. As an optional exception, `@qa-configure` can install a user-selected local MCP server, but only after separate L5 approval. The project's own tooling runs its tests. MCP is optional: every external operation has a manual fallback.
 
 ```text
 INSTALL → CONFIGURE (DISCOVER → CONFIRM → ADAPT) → USE → REFRESH
@@ -64,7 +64,7 @@ Safety gates are authoritative, and agent tool lists are not a safety mechanism.
 | L2 | Create local branch, commit | Gated |
 | L3 | Full / environment-dependent / long test runs | Gated unless marked safe in `qa-process.md` |
 | L4 | Push, PR, comments, work items, publishing | Always gated |
-| L5 | Dependency install, adaptation-layer writes, `mcp.json` | Always gated |
+| L5 | Dependency install, adaptation-layer writes, `mcp.json` | Always gated; installing an optional local MCP server requires separate L5 approval |
 
 AI-QA never edits the default branch. Creating a branch never pushes it, and AI-QA never merges. The failure fix loop never touches product code.
 
