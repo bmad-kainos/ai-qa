@@ -190,8 +190,8 @@ try {
         if (Test-Path -LiteralPath $prunedFile -PathType Leaf) { $prunedPacks = @(Get-Content -LiteralPath $prunedFile | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^[A-Za-z0-9_-]+$' }) }
         $items = @()
         $items += Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'agents') -Filter 'qa*.agent.md' -File -Recurse -ErrorAction SilentlyContinue
-        foreach ($folder in (Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'skills') -Directory -Filter 'qa-*' -ErrorAction SilentlyContinue)) { $items += Get-ChildItem -LiteralPath $folder.FullName -File -Recurse }
-        $items += Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'ai-qa/framework') -File -Recurse
+        foreach ($folder in (Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'skills') -Directory -Filter 'qa-*' -ErrorAction SilentlyContinue)) { $items += Get-ChildItem -LiteralPath $folder.FullName -File -Recurse -Force }
+        $items += Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'ai-qa/framework') -File -Recurse -Force
         foreach ($item in $items) {
             if (IsLink $item.FullName) { Fail "Refusing symlink source: $($item.FullName)" }
             $tail = $item.FullName.Substring($SourceRoot.Length + 1).Replace('\', '/')
