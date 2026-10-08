@@ -56,7 +56,7 @@ flowchart LR
   U --> A["Created"]
   U --> M["Modified"]
   U --> G["Gated, not files"]
-  A --> A1["qa-work/id/index.md<br/>and outputs/<br/>committed by default"]
+  A --> A1["qa-work/id/index.md<br/>and outputs/<br/>committed by default<br/>(numbered artefacts 01_ to 11_ ignored)"]
   A --> A2["qa-work/id/*.md<br/>and logs/<br/>git-ignored by default"]
   A --> A3["baselines/date.md<br/>and .json"]
   A --> A4["test files<br/>L1, non-default branch"]

@@ -8,7 +8,7 @@
 | default paths | Package-matched test classes under `src/test/java/**` (only absent project conventions) |
 | run by path | Maven: `./mvnw -Dtest="<ClassOrMethod>" test`; Gradle: `./gradlew test --tests "<fully.qualified.Class>"` (templates only) |
 | run by tag | Maven: `./mvnw -Dgroups="<tag>" test`; Gradle: `./gradlew test -DincludeTags="<tag>"` (only when project runner is configured for JUnit tags) |
-| report format | Existing JUnit XML/Surefire or Gradle test report, plus command, environment and evidence in `execution.md` |
+| report format | Existing JUnit XML/Surefire or Gradle test report, plus command, environment and evidence in `09_execution.md` |
 | anti-patterns | Mutable global request/auth/base URI, unsafe destructive tests, credential logging, guessed statuses, new dependencies without approval |
 
 Select only when repository evidence confirms both JUnit Jupiter and REST Assured. Match the existing language, package, build runner, fixtures, serializers, auth and naming. Do not add dependencies or assume the environment.

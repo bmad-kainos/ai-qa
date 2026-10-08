@@ -47,7 +47,7 @@ flowchart TD
   D6 --> D7["qa-review-tests (design)"]
   D7 --> DA{"Design approved?"}
   DA -->|yes| D8["qa-test-plan"]
-  D8 --> DS(["QA Summary in chat"])
+  D8 --> DS(["TL;DR, Next Steps and QA Summary in chat"])
 ```
 
 `qa-map-code` also runs `verify` when you give it a branch. `qa-coverage-gaps` runs at requirement scope. `qa-review-tests` runs as a subagent where the host supports it.

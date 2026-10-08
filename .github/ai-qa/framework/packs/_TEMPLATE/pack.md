@@ -10,7 +10,7 @@
 | default paths | `<paths, used only when project conventions do not specify them>` |
 | run by path | `<runner command template; project Commands take precedence>` |
 | run by tag | `<runner command template; require existing tag support>` |
-| report format | `<configured structured report and execution.md evidence>` |
+| report format | `<configured structured report and 09_execution.md evidence>` |
 | anti-patterns | `<stack-specific prohibited patterns>` |
 
 ## Locators / selectors

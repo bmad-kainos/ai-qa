@@ -14,7 +14,7 @@ Use `single` mode for one ticket or requirement, `batch` mode for a sprint, back
 
 ## Reads
 
-Always read `.github/ai-qa/project/project.md`: use Components and Constraints to identify affected scope, derive relevant NFRs and evaluate readiness. Read `.github/ai-qa/project/conventions/integrations.md` (Work items: provider, deployment, identifiers and preferred/fallback transports), `conventions/qa-process.md` (Readiness, Definition of done and QA evidence, Work-id rule, Locale and Team options), and `conventions/git.md` (Ticket syntax and Branch patterns). Read `.github/ai-qa/framework/method/readiness.md`, `.github/ai-qa/framework/method/traceability.md`, `questions.md`, `safety.md`, `artefacts.md` and `precedence.md`. Optional prior artefacts: `qa-work/<work-id>/requirement.md`, `context.md`, `coverage.md`, `regression.md` and `index.md`.
+Always read `.github/ai-qa/project/project.md`: use Components and Constraints to identify affected scope, derive relevant NFRs and evaluate readiness. Read `.github/ai-qa/project/conventions/integrations.md` (Work items: provider, deployment, identifiers and preferred/fallback transports), `conventions/qa-process.md` (Readiness, Definition of done and QA evidence, Work-id rule, Locale and Team options), and `conventions/git.md` (Ticket syntax and Branch patterns). Read `.github/ai-qa/framework/method/readiness.md`, `.github/ai-qa/framework/method/traceability.md`, `questions.md`, `safety.md`, `artefacts.md` and `precedence.md`. Optional prior artefacts: `qa-work/<work-id>/01_requirement_analysis.md`, `02_code_context.md`, `03_coverage_assessment.md`, `05_regression_risk.md` and `index.md`.
 
 If the project layer is missing, use only supplied text and read-only repository/session evidence, label the limits, and suggest `qa-configure`; never refuse solely because a prior artefact is absent. A missing provider does not block analysis: ask the user to paste the work-item title, description and acceptance criteria.
 
@@ -229,7 +229,9 @@ Common gaps include missing negative scenarios, observability, error handling, a
 
 ## Output
 
-Write `qa-work/<work-id>/requirement.md` with front matter `work-id`, `skill: qa-analyse-requirement`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (source/revision). Include the applicable per-item template, stable requirement register with ID/source/testable outcome, risk ranking and explicit assumptions. In batch mode include each ticket result and the batch summaries; in clarify mode include confirmed decisions and remaining questions. Update `qa-work/<work-id>/index.md` with item IDs and source revisions, FR/NFR IDs, readiness, blockers, impact/criticality and risk ranking, and link the artefact. Show the batch QA Summary in chat.
+Write `qa-work/<work-id>/01_requirement_analysis.md` with front matter `work-id`, `skill: qa-analyse-requirement`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (source/revision). Include the applicable per-item template, stable requirement register with ID/source/testable outcome, risk ranking and explicit assumptions. In batch mode include each ticket result and the batch summaries; in clarify mode include confirmed decisions and remaining questions. Update `qa-work/<work-id>/index.md` with item IDs and source revisions, FR/NFR IDs, readiness, blockers, impact/criticality and risk ranking, and link the artefact. Show the batch QA Summary in chat.
+
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `requirement.md` as a fallback; always write the new name and never silently rename.
 
 ## Side effects and safety
 
@@ -237,7 +239,7 @@ Write `qa-work/<work-id>/requirement.md` with front matter `work-id`, `skill: qa
 |---|---|---|
 | Read supplied text, repository evidence, or configured work items with `workitem.get`/`workitem.search` | L0 | None |
 | Ask clarification questions in chat | L0 | None |
-| Write `requirement.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Write `01_requirement_analysis.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
 | Comment on or update an external work item | L4 | Not performed by this skill; hand off to `qa-publish` after exact-payload approval |
 | Change branches, commit, run shared/environment tests, install dependencies, or edit project conventions | L2/L3/L5 | Not performed by this skill; separate gate and owner apply |
 

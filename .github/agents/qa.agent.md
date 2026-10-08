@@ -60,7 +60,7 @@ The six-stage ticket-to-test-plan flow is: (1) requirements with stable `FR`/`NF
 
 Resolve work ID per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in project `conventions/git.md` → `adhoc-<yyyymmdd>-<slug>`. Maintain `qa-work/<work-id>/index.md` using `.github/ai-qa/framework/templates/work-index.md`, `.github/ai-qa/framework/method/artefacts.md`, and project qa-work policy. Record step status, source revisions/freshness, traceability, gate log and links to artefacts. The index and `outputs/` are committed by default; other work artefacts/logs follow configured policy. Do not claim an uninspected test is coverage or a PASS without a run or user-supplied result.
 
-Follow each skill's output template and side-effect table. End design and full workflows with the QA Summary columns: Ticket · Readiness · Max risk · Coverage verdict · Scenarios written/not written · Automated/manual/not needed · Run result · Published. `qa-bug-report` drafts only. All provider writes go through `qa-publish`; PR creation goes through `qa-create-pr`. Provider setup is not publication permission.
+Follow each skill's output template and side-effect table. End design and full workflows by printing the TL;DR and ordered Next Steps (blockers first), then the QA Summary with columns: Ticket · Readiness · Max risk · Coverage verdict · Scenarios written/not written · Automated/manual/not needed · Run result · Published. `qa-bug-report` drafts only. All provider writes go through `qa-publish`; PR creation goes through `qa-create-pr`. Provider setup is not publication permission.
 
 ## Safety and boundaries
 

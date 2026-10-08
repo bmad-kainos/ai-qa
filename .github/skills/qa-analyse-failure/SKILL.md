@@ -34,11 +34,11 @@ Accept a run or report, pasted output, failed test ID, or CI run URL. Gather exa
 	 State confidence (`high`, `medium` or `low`) per classification. Describe results as “consistent with”, “does not establish” or “evidence is insufficient”; do not assert unsupported root cause. Distinguish timing/order evidence from an ordinary test defect and do not call a test flaky from one failure.
 3. Identify a minimal deterministic reproduction and environmental preconditions. A rerun must use the same revision and environment when possible. It is L3 when full, long, shared-service or environment-dependent unless the exact command is documented safe; obtain approval before it. A transient pass does not erase the original failure or establish a fix. Compare same-SHA reruns only when real history is available.
 4. Give minimal remediation/next diagnostic step and owner, plus collateral regression tests. Fix test defects only, and only when explicitly requested or authorised by the workflow. On a non-default branch, change only test files created or modified in this work item. Never change product code, delete/skip/disable tests, or loosen assertions unless the relevant FR supports it.
-5. Apply the bounded fix loop exactly: make one evidence-backed test-only fix; run the same targeted test with the documented command and required L3 approval; append the change, command, environment, result and evidence to `execution.md`; repeat only if the failure changed and another test-only fix is justified. Allow at most 3 iterations. Stop immediately when the same failure repeats, after iteration 3, when evidence is uncertain/blocked, or when the class is application defect, environment/infra or test data rather than a fixable test defect. Preserve the original run and every iteration. Do not retry an unsafe operation.
+5. Apply the bounded fix loop exactly: make one evidence-backed test-only fix; run the same targeted test with the documented command and required L3 approval; append the change, command, environment, result and evidence to `09_execution.md`; repeat only if the failure changed and another test-only fix is justified. Allow at most 3 iterations. Stop immediately when the same failure repeats, after iteration 3, when evidence is uncertain/blocked, or when the class is application defect, environment/infra or test data rather than a fixable test defect. Preserve the original run and every iteration. Do not retry an unsafe operation.
 6. If evidence supports an application defect, offer `qa-bug-report`. Do not create a work item or publish automatically.
 
 ## Output
-Append the analysis and every fix-loop iteration to `qa-work/<work-id>/execution.md`; save only redacted, safe supporting evidence under `qa-work/<work-id>/logs/`. Update `qa-work/<work-id>/index.md` with original and rerun status, classifications, confidence, evidence links, iteration count, current owner/action and approvals. Use:
+Append the analysis and every fix-loop iteration to `qa-work/<work-id>/09_execution.md`; save only redacted, safe supporting evidence under `qa-work/<work-id>/logs/`. Update `qa-work/<work-id>/index.md` with original and rerun status, classifications, confidence, evidence links, iteration count, current owner/action and approvals. Use:
 
 ```yaml
 ---
@@ -81,7 +81,7 @@ Clearly separate the original FAIL from any rerun and investigation status. Incl
 | Action | Level | Gate |
 |---|---:|---|
 | Read run reports, logs, source and CI via `ci.run.get` / `ci.test-results` | L0 | None |
-| Edit work-item-owned test files and append `execution.md` on a non-default branch | L1 | No separate gate; workflow plan approval first in orchestrated workflows |
+| Edit work-item-owned test files and append `09_execution.md` on a non-default branch | L1 | No separate gate; workflow plan approval first in orchestrated workflows |
 | Rerun full, long, shared or environment-dependent tests | L3 | Explicit approval unless the exact command is documented safe |
 | Create a bug/work item or publish | L4 | Separate exact destination/content approval through `qa-publish` |
 | Install dependencies or change project configuration | L5 | Always; not performed by this skill |

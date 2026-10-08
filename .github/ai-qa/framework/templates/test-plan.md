@@ -16,6 +16,20 @@ inputs:
 **Scope:** <ticket / sprint / feature>
 **Status:** Draft
 
+## TL;DR
+
+- **Verdict:** <Go / Go with conditions / No-go / Not assessed, with one-line reason>
+- **Top risks:** 1. <risk, tier, evidence> 2. <risk> 3. <risk>
+- **Next action:** <single most important action and owner>
+
+## Next Steps
+
+Ordered: blockers first, then risk tier, then effort. Cite the source artefact number; de-duplicate.
+
+| # | Action | Owner | Evidence (FR/NFR/scenario ID) | Blocker | Source |
+|---|---|---|---|---|---|
+| 1 | <action> | <owner> | <ID> | <Yes / No> | <e.g. 03> |
+
 ## Summary
 
 <Brief description of the work and test scope. State exclusions and source revision.>

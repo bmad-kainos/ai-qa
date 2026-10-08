@@ -14,7 +14,7 @@ Use for focused codebase exploration before coverage/design, or independently wh
 
 ## Reads
 
-Always read `.github/ai-qa/project/project.md`, especially Components, Technology stack, Data stores and external dependencies, Environments and Constraints. Read `.github/ai-qa/project/conventions/git.md` for branch/ticket syntax, `conventions/testing.md` for Scopes and Commands, `conventions/integrations.md` only when external integration behavior matters, and `conventions/qa-process.md` for Work-id rule and safe-command expectations. Read `.github/ai-qa/framework/method/traceability.md`, `precedence.md`, `safety.md` and `artefacts.md`. Optional prior artefacts: `requirement.md`, `coverage.md`, `regression.md`, `index.md`.
+Always read `.github/ai-qa/project/project.md`, especially Components, Technology stack, Data stores and external dependencies, Environments and Constraints. Read `.github/ai-qa/project/conventions/git.md` for branch/ticket syntax, `conventions/testing.md` for Scopes and Commands, `conventions/integrations.md` only when external integration behavior matters, and `conventions/qa-process.md` for Work-id rule and safe-command expectations. Read `.github/ai-qa/framework/method/traceability.md`, `precedence.md`, `safety.md` and `artefacts.md`. Optional prior artefacts: `01_requirement_analysis.md`, `03_coverage_assessment.md`, `05_regression_risk.md`, `index.md`.
 
 If the project layer is missing, proceed with read-only local evidence and suggest `qa-configure`; do not refuse. Do not treat an inferred component map as confirmed project context.
 
@@ -45,14 +45,16 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. If th
 
 ## Output
 
-Write `qa-work/<work-id>/context.md` with front matter `work-id`, `skill: qa-map-code`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (branch/base/commit/source revision). Include scope and evidence revision; component map and requirement IDs; minimal affected file/symbol list and control/data-flow summary; dependencies, boundaries, side effects, flags, environment logic and failure/observability paths; related tests, docs and relevant configured commands (references only); in `verify` mode, the per-requirement status table plus explicit flag/environment findings; unknowns, confidence and what was not inspected. Update `qa-work/<work-id>/index.md` with requirement-to-component links, branch/base/commit, evidence source, verification statuses, unknown paths and artefact link. The concise chat response should identify the highest-value paths and any missing or deviating behavior.
+Write `qa-work/<work-id>/02_code_context.md` with front matter `work-id`, `skill: qa-map-code`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (branch/base/commit/source revision). Include scope and evidence revision; component map and requirement IDs; minimal affected file/symbol list and control/data-flow summary; dependencies, boundaries, side effects, flags, environment logic and failure/observability paths; related tests, docs and relevant configured commands (references only); in `verify` mode, the per-requirement status table plus explicit flag/environment findings; unknowns, confidence and what was not inspected. Update `qa-work/<work-id>/index.md` with requirement-to-component links, branch/base/commit, evidence source, verification statuses, unknown paths and artefact link. The concise chat response should identify the highest-value paths and any missing or deviating behavior.
+
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `context.md` as a fallback; always write the new name and never silently rename.
 
 ## Side effects and safety
 
 | Action | Level | Gate |
 |---|---|---|
 | Read project context, source, tests, docs and Git objects | L0 | None |
-| Write `context.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Write `02_code_context.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
 | Switch branches, alter files, commit, execute tests or make environment calls | L2/L3 | Not performed here; separate gate applies |
 | Modify project adaptation files | L5 | Never performed; `qa-configure` only |
 
@@ -60,4 +62,4 @@ Write `qa-work/<work-id>/context.md` with front matter `work-id`, `skill: qa-map
 
 ## Drift
 
-If evidence contradicts project conventions or `project.md`, record the conflict and its source under Drift in `context.md` and suggest `qa-configure refresh`; never edit `.github/ai-qa/project/**`.
+If evidence contradicts project conventions or `project.md`, record the conflict and its source under Drift in `02_code_context.md` and suggest `qa-configure refresh`; never edit `.github/ai-qa/project/**`.

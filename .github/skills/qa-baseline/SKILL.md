@@ -34,7 +34,7 @@ Take mode, test/repository scope, reference revision or dates, environment, opti
 3. Recompute helper statistics only when the exact framework-checkout requirement and sufficient structured history are met; otherwise state `not computed`. Do not mutate historical snapshot files in compare mode.
 
 ## Output
-`snapshot` writes `.github/ai-qa/baselines/<date>.md` and `.github/ai-qa/baselines/<date>.json`; `compare` returns a comparison report and, only when requested, records it in `qa-work/<work-id>/execution.md`. Update `qa-work/<work-id>/index.md` with snapshot links or comparison scope, source revisions, evidence, staleness, status and approval/gate log. Markdown front matter:
+`snapshot` writes `.github/ai-qa/baselines/<date>.md` and `.github/ai-qa/baselines/<date>.json`; `compare` returns a comparison report and, only when requested, records it in `qa-work/<work-id>/09_execution.md`. Update `qa-work/<work-id>/index.md` with snapshot links or comparison scope, source revisions, evidence, staleness, status and approval/gate log. Markdown front matter:
 
 ```yaml
 ---

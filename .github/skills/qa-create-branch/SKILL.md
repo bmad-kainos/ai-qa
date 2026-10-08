@@ -28,7 +28,7 @@ Take task/work ID, optional requested name/base and whether the user is asking o
 6. **Never push on create.** If the user later requests a push, show the exact remote and branch plus effects and get a separate L4 approval. After an authorised push, report its result; do not merge. Recheck branch and work-item freshness before later automation.
 
 ## Output
-Present the proposal in chat. When creation is approved, write the step result to `qa-work/<work-id>/execution.md` and update `qa-work/<work-id>/index.md` with current/base refs, branch name, dirty state, `★ Default` choices, L2 approval, local outcome and push state (`not pushed` unless separately approved). Use:
+Present the proposal in chat. When creation is approved, write the step result to `qa-work/<work-id>/09_execution.md` and update `qa-work/<work-id>/index.md` with current/base refs, branch name, dirty state, `★ Default` choices, L2 approval, local outcome and push state (`not pushed` unless separately approved). Use:
 
 ```yaml
 ---

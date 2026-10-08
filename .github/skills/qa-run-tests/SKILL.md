@@ -28,7 +28,9 @@ Take the requested scope (`all`, path/node, tag, or risk), work ID, target revis
 6. Compare against an available baseline only when revision, environment and configuration are comparable. Separate known failures from new observations, disclose incomparable or stale evidence, and offer `qa-analyse-failure` for failures.
 
 ## Output
-Write the execution summary to `qa-work/<work-id>/execution.md` and safe, redacted run logs/reports to `qa-work/<work-id>/logs/`. Update `qa-work/<work-id>/index.md` with scope, revision, environment, command, result, failed IDs, artefact links, status and any approval/gate log. Each Markdown artefact uses:
+Write the execution summary to `qa-work/<work-id>/09_execution.md` and safe, redacted run logs/reports to `qa-work/<work-id>/logs/`. Update `qa-work/<work-id>/index.md` with scope, revision, environment, command, result, failed IDs, artefact links, status and any approval/gate log. Each Markdown artefact uses:
+
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `execution.md` as a fallback; always write the new name and never silently rename.
 
 ```yaml
 ---
@@ -70,7 +72,7 @@ PASS requires observed successful execution evidence; FAIL requires observed fai
 | Execute a documented, safe local targeted run | L0 | None when explicitly listed safe and no shared/environment-dependent effects |
 | Execute full, long, shared or environment-dependent tests | L3 | Always, unless the exact command is listed safe in `qa-process.md` |
 | Install dependencies or alter project configuration | L5 | Always; not performed by this skill |
-| Write `execution.md` and logs on a non-default branch | L1 | No separate gate; workflow plan approval first in orchestrated workflows |
+| Write `09_execution.md` and logs on a non-default branch | L1 | No separate gate; workflow plan approval first in orchestrated workflows |
 | Publish results or create a work item | L4 | Separate explicit approval via `qa-publish` |
 
 Never run production-facing, destructive, migration, deployment or load commands as a test run. Never suppress failures, change thresholds, mark skipped cases as passed, expose credentials, edit `.github/ai-qa/project/**`, or modify tests automatically.
