@@ -73,4 +73,6 @@ Change the policy through `qa-configure` (`qa-process.md` → *qa-work policy*).
 
 ## Integrations without MCP
 
+If the Atlassian MCP server is not allowed, `qa-configure` can copy `jira_tool.py`, `confluence_tool.py` and a `.env.example` into `qa-work/tools/atlassian/` (only for the systems you use). Copy `.env.example` to `.env`, add your own credentials, and run `pip install requests python-dotenv truststore`. The scripts support Cloud and Server/DC and let the skills read tickets and pages and post comments. They are project-owned and never overwritten or deleted by updates.
+
 Every operation has a manual fallback. For reads, paste the work item, page or log into chat. For writes, the skill writes the exact payload to `qa-work/<id>/outputs/` and tells you where to paste it. Every external write, including a manual hand-off that you then paste yourself, is preceded by an L4 gate that shows the action, target, exact payload and side effect.

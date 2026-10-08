@@ -31,7 +31,7 @@ flowchart TD
 | 6 Defaults | Fills ∅/✗ gaps from `framework/defaults/`, marked ★ with the date |
 | 7 Packs | One pack per test path. Unselected packs are listed for removal and deleted only after L5 approval; they are recorded in `project/pruned-packs.txt` so `update` and `refresh` don't reinstate them. No match → reduced-confidence warning. No framework → ∅, ★ and an offer of a gated scaffold |
 | 8 Approval | Shows the exact diff and waits for an explicit yes |
-| 9 Write | Writes the files listed below, plus `.vscode/mcp.json` only if MCP was chosen |
+| 9 Write | Writes the files listed below, plus `.vscode/mcp.json` only if MCP was chosen, or the Jira/Confluence fallback scripts in `qa-work/tools/atlassian/` if MCP was rejected |
 | 10 Verify | Conventions match their cited examples, the test command exists (help/list only, never run), `project.md` cites sources, and a read-only provider probe succeeds |
 | 11 Summary | What's ready, what's degraded, first commands, and an offer of `qa-baseline` |
 
@@ -51,6 +51,7 @@ flowchart LR
 | Conventions | `.github/ai-qa/project/conventions/` `git`, `testing`, `qa-process`, `integrations`, `reporting` |
 | Instructions | `.github/instructions/qa-project.instructions.md` and one `qa-<pack>.instructions.md` per selected pack |
 | MCP | `.vscode/mcp.json`, only if MCP was chosen |
+| No MCP (Jira/Confluence) | `qa-work/tools/atlassian/{jira_tool.py,confluence_tool.py,.env.example}`, only the scripts for systems in use; project-owned, never overwritten |
 
 ## Refresh
 

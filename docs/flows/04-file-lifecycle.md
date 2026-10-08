@@ -36,14 +36,16 @@ flowchart LR
   C --> P["project layer<br/>.github/ai-qa/project/"]
   C --> R["rendered instructions<br/>.github/instructions/"]
   C --> M["MCP config<br/>.vscode/mcp.json"]
+  C --> T["Atlassian scripts<br/>qa-work/tools/atlassian/"]
   P --> P1["project.md"]
   P --> P2["discovery.md"]
   P --> P3["conventions/<br/>5 files"]
   R --> R1["qa-project<br/>.instructions.md"]
   R --> R2["qa-pack<br/>.instructions.md<br/>one per selected pack"]
   M --> M1["only if MCP<br/>was chosen"]
+  T --> T1["only if Jira/Confluence MCP<br/>was rejected; project-owned"]
   classDef created fill:#d4edda,stroke:#28a745,color:#000
-  class P,P1,P2,P3,R,R1,R2,M,M1 created
+  class P,P1,P2,P3,R,R1,R2,M,M1,T,T1 created
 ```
 
 On refresh, only the managed sections of these files change. Framework files, code, tests and dependency manifests are never touched.

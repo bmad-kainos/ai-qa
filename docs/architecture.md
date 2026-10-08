@@ -14,6 +14,7 @@ For how it is installed, configured and used, see the [flow diagrams](flows/READ
 | Conventions | `.github/ai-qa/project/conventions/{git,testing,qa-process,integrations,reporting}.md` | Project | `qa-configure` only (L5) |
 | Rendered instructions | `.github/instructions/qa-project.instructions.md`, `qa-<pack>.instructions.md` | Project | `qa-configure` only (L5) |
 | MCP config | `.vscode/mcp.json` (only if MCP chosen) | Project | `qa-configure` only (L5) |
+| Atlassian fallback scripts | `qa-work/tools/atlassian/` (only if Jira/Confluence MCP rejected) | Project | `qa-configure` only (L5); never overwritten or deleted by update |
 | Artefacts | `qa-work/<work-id>/` | Project | `qa` and skills (L1) |
 | Baselines | `.github/ai-qa/baselines/<date>.md\|.json` | Project | `qa-baseline` (L1) |
 
