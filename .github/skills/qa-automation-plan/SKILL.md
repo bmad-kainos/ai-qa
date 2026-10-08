@@ -76,7 +76,7 @@ For `Manual`, state the exact observable check and environment/access required. 
 
 ### Classify automation impact
 
-Do not estimate hours here (the hour bands in `effort-estimation.md` are used only by `qa-test-plan` for sprint scope). Give an impact level for the work: **None** (existing coverage sufficient), **Low** (small additions to existing test files/fixtures), **Medium** (new scenarios requiring a file/class), **High** (significant effort or framework work such as new fixture types/helpers/conftest patterns). Explain the classification. This impact level does not replace each scenario's automate/manual/not-needed decision.
+Do not estimate hours here (the hour bands in `effort-estimation.md` are used only by `qa-test-plan` for sprint scope). Give an impact level for the work: **None** (existing coverage sufficient), **Low** (small additions to existing test files/fixtures), **Medium** (new scenarios requiring a file/class), **High** (significant effort or framework work such as new fixture types/helpers/conftest patterns). Explain the classification. This impact level does not replace each scenario's Automate / Automate (blocked) / Manual / Not needed decision.
 
 ## Output
 

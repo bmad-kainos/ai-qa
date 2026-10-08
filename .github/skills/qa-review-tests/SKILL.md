@@ -24,7 +24,7 @@ Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argume
 
 ## Inputs
 
-Accept `design` or `code` mode with a scenario/design document, ticket/ACs, test file(s), PR/diff or module. If the mode is not given, infer it (scenario/design document → `design`; test code or diff → `code`) and state the assumption; if both are supplied, review both. Use stable FR/NFR IDs if supplied; if absent, derive provisional IDs from accessible requirements. Reuse prior coverage/risk findings only if their sources are current. If tests/results or a diff are inaccessible, constrain the review to supplied evidence and identify what was not reviewed.
+Accept `design` or `code` mode with a scenario/design document, ticket/ACs, test file(s), PR/diff or module. If the mode is not given, infer it (scenario/design document → `design`; test code or diff → `code`) and state the assumption; if both are supplied, run both modes and write both artefacts (`07_design_review.md` and `11_code_review.md`), each with its own verdict. Use stable FR/NFR IDs if supplied; if absent, derive provisional IDs from accessible requirements. Reuse prior coverage/risk findings only if their sources are current. If tests/results or a diff are inaccessible, constrain the review to supplied evidence and identify what was not reviewed.
 
 If prior artefacts are missing, gather the minimum yourself; never refuse. Do not infer test pass status from source code, a test title or a stale report.
 
