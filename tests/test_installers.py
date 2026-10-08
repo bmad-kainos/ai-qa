@@ -204,6 +204,10 @@ class RealFrameworkTests(unittest.TestCase):
 
                     invoke("install")
                     invoke("verify")
+                    tools = target / ".github/ai-qa/framework/templates/atlassian-tools"
+                    for name_ in ("jira_tool.py", "confluence_tool.py", ".env.example"):
+                        self.assertTrue((tools / name_).is_file(), name_)
+                    self.assertFalse((target / "qa-work/tools").exists())
                     framework = target / ".github/ai-qa/framework/method/safety.md"
                     framework.write_text("local edit\n")
                     invoke("update")
@@ -214,6 +218,16 @@ class RealFrameworkTests(unittest.TestCase):
                     Path(str(framework) + ".ai-qa-new").unlink()
                     after = {p.relative_to(target): p.read_bytes() for p in target.rglob("*") if p.is_file() and ".git" not in p.parts}
                     self.assertEqual(after, before)
+
+
+class AtlassianToolTemplateTests(unittest.TestCase):
+    def test_scripts_compile_and_hold_no_secrets(self):
+        tools = ROOT / ".github/ai-qa/framework/templates/atlassian-tools"
+        for script in ("jira_tool.py", "confluence_tool.py"):
+            compile((tools / script).read_text(), script, "exec")
+        env = (tools / ".env.example").read_text()
+        self.assertIn("your_atlassian_api_token_here", env)
+        self.assertNotIn("digital.nhs.uk", env)
 
 
 if __name__ == "__main__":

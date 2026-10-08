@@ -5,7 +5,7 @@ How to add a test pack or a provider. For every change:
 1. If existing installations must re-render or reconfigure, add a `refresh-required: <version>` line to [migrations](migrations.md).
 2. Run `python3 -m unittest discover -s tests`.
 
-Don't pin models, add AI-generated markers, or add runtime dependencies or client code to the framework files.
+Don't pin models, add AI-generated markers, or add runtime dependencies or client code to the framework files. The one exception is `templates/atlassian-tools/`, the optional Jira/Confluence fallback scripts that `qa-configure` copies into `qa-work/tools/atlassian/`.
 
 ## Adding a pack
 
