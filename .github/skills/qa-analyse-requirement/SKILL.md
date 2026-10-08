@@ -14,7 +14,7 @@ Use `single` mode for one ticket or requirement, `batch` mode for a sprint, back
 
 ## Reads
 
-Always read `.github/ai-qa/project/project.md`: use Components and Constraints to identify affected scope, derive relevant NFRs and evaluate readiness. Read `.github/ai-qa/project/conventions/integrations.md` (Work items: provider, deployment, identifiers and preferred/fallback transports), `conventions/qa-process.md` (Readiness, Definition of done and QA evidence, Work-id rule, Locale and Team options), and `conventions/git.md` (Ticket syntax and Branch patterns). Read `.github/ai-qa/framework/method/readiness.md`, `.github/ai-qa/framework/method/traceability.md`, `questions.md`, `safety.md`, `artefacts.md` and `precedence.md`. Optional prior artefacts: `qa-work/<work-id>/01_requirement_analysis.md`, `02_code_context.md`, `03_coverage_assessment.md`, `05_regression_risk.md` and `index.md`.
+Always read `.github/ai-qa/project/project.md`: use Components and Constraints to identify affected scope, derive relevant NFRs and evaluate readiness. Read `.github/ai-qa/project/conventions/integrations.md` (Work items: provider, deployment, identifiers and preferred/fallback transports), `conventions/qa-process.md` (Readiness, Definition of done and QA evidence, Work-id rule, Locale and Team options), and `conventions/git.md` (Ticket syntax and Branch patterns). Read `.github/ai-qa/framework/method/readiness.md`, `.github/ai-qa/framework/method/traceability.md`, `clarifying-questions.md`, `safety.md`, `artefacts.md` and `precedence.md`. Optional prior artefacts: `qa-work/<work-id>/01_requirement_analysis.md`, `02_code_context.md`, `03_coverage_assessment.md`, `05_regression_risk.md` and `index.md`.
 
 If the project layer is missing, use only supplied text and read-only repository/session evidence, label the limits, and suggest `qa-configure`; never refuse solely because a prior artefact is absent. A missing provider does not block analysis: ask the user to paste the work-item title, description and acceptance criteria.
 
@@ -103,11 +103,11 @@ Use judgment and the actual system boundaries: a signal does not override missin
 Conduct a focused interview to resolve requirement and design decisions. Ask **one question at a time**, wait for the answer, then decide whether another question is needed. Walk only decision branches that affect behavior, dependencies, testability, safety or acceptance. Include relevant context and consequences; offer a recommended Option A and alternatives. Use this exact question shape:
 
 ```md
-**Question** <number> — <topic>
+**Question <n> — <topic>**
 
 <context, decision needed, and relevant options>
 
-**Option A** (recommended): <description>
+**Option A (recommended):** <description>
 **Option B**: <description>
 ...
 ```

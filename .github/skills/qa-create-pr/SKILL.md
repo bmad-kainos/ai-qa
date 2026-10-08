@@ -16,7 +16,7 @@ Create a draft pull request for this repository using its confirmed branching st
 Do not use to merge, deploy, make a PR ready for review or silently commit or push. The skill is directly invocable; no preceding workflow is required.
 
 ## Reads
-Always read `.github/ai-qa/project/project.md`; `.github/ai-qa/project/conventions/git.md` sections `Remote host`, `Base branch`, `Protected branches`, `Branch patterns`, `Ticket syntax`, `PR title pattern`, `PR types`, `Prefix-to-type mapping`, `PR templates`, `Exemplar PR` and `Draft and reviewer policy`; `conventions/integrations.md`, `qa-process.md` and `reporting.md`; `.github/ai-qa/framework/method/safety.md`, `git.md` and `artefacts.md`; `.github/ai-qa/framework/providers/operations.md` and the configured repository provider recipe; actual project PR template(s); and `assets/pr-example.md`. Discover GitHub templates at `.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/` and Azure Repos templates at `.azuredevops/pull_request_template.md` only as candidates; use paths actually recorded in `PR templates`. If a value is absent, consult `.github/ai-qa/framework/defaults/git.md` and label it as a framework default, not a project fact. Read prior index/drafts only while their source revisions remain current. If the project layer is missing, use read-only session evidence and suggest `qa-configure`.
+Always read `.github/ai-qa/project/project.md`; `.github/ai-qa/project/conventions/git.md` sections `Remote host`, `Base branch`, `Protected branches`, `Branch patterns`, `Ticket syntax`, `PR title pattern`, `PR types`, `Prefix-to-type mapping`, `PR templates`, `Exemplar PR` and `Draft and reviewer policy`; `conventions/integrations.md`, `qa-process.md` and `reporting.md`; `.github/ai-qa/framework/method/safety.md`, `work-id-and-git.md` and `artefacts.md`; `.github/ai-qa/framework/providers/operations.md` and the configured repository provider recipe; actual project PR template(s); and `assets/pr-example.md`. Discover GitHub templates at `.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/` and Azure Repos templates at `.azuredevops/pull_request_template.md` only as candidates; use paths actually recorded in `PR templates`. If a value is absent, consult `.github/ai-qa/framework/defaults/git.md` and label it as a framework default, not a project fact. Read prior index/drafts only while their source revisions remain current. If the project layer is missing, use read-only session evidence and suggest `qa-configure`.
 
 ## Work-id
 Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
@@ -30,7 +30,7 @@ Resolve the source branch, confirmed base, remote/repository, optional ticket/wo
 	- If the user provides a branch name, use it.
 	- Validate only that the provided branch exists locally. If it does not, ask the user to confirm the branch name before continuing.
 	- Only get the current branch from the local repository, for example with `git branch --show-current`, when the user did not provide one.
-	- If the result is empty, detached, or the confirmed base branch, stop and ask the user for the correct feature branch.
+	- If the result is empty, detached, or the confirmed base branch, never draft from it. Say so and offer `qa-create-branch` (L2) to create a feature branch. Committing is a separate user step (no implicit commits) and the push is a separate L4 gate via `qa-create-branch`; draft the PR only once the branch has commits beyond the base on the remote. If there are no commits beyond the base, say there is nothing to open a PR for.
 
 2. **Resolve the base branch and repository context**
 	- Use the `Base branch` and `Remote host` values from confirmed project conventions. If missing, use `.github/ai-qa/framework/defaults/git.md` as a clearly marked candidate and ask the user to confirm; never assume `main` or another base.
@@ -46,17 +46,18 @@ Resolve the source branch, confirmed base, remote/repository, optional ticket/wo
 4. **Read the PR template and example**
 	- Use the actual project template path(s) discovered and recorded in `PR templates`; check the GitHub `.github/pull_request_template.md`/`.github/PULL_REQUEST_TEMPLATE/` and Azure Repos `.azuredevops/pull_request_template.md` locations as applicable.
 	- Use [assets/pr-example.md](assets/pr-example.md) to match tone, detail and formatting style; use the configured `Exemplar PR` where available.
-	- If a required example or project template cannot be read, stop and resolve the path or checkout before drafting.
+	- If the bundled `assets/pr-example.md` cannot be read, stop and resolve the checkout before drafting. A missing configured `Exemplar PR` is optional; if no project template can be read, fall back to the framework default Summary / List of Changes structure and label it as a default.
 
 5. **Fetch the work-item details when applicable**
 	- If the branch contains a key matching configured `Ticket syntax`, use the configured work-item provider operation `workitem.get` with that key.
-	- If the provider is unavailable or lookup fails, disclose the failure and ask the user to confirm the key or paste the title and description; do not silently substitute a different provider.
+		- If lookup returns 429/5xx, disclose the failure and retry once with bounded back-off. For 401/403/404, report the actual failure without retrying. If the provider is unavailable or the lookup still fails, ask the user to paste the title, description and acceptance criteria (per `.github/ai-qa/framework/method/clarifying-questions.md`); do not silently substitute a different provider.
 	- If there is no recognisable ticket key, derive intent only from available user context and ask the user to confirm the intent before continuing.
 	- Use the work-item title and description as the primary source for the PR title wording and Summary. Do not invent requirements or user-facing outcomes unsupported by the work item or diff.
 
 6. **Analyse the branch changes relative to the base branch**
 	- Compare the source branch with the base branch using the remote-tracking refs and the exact three-dot diff: `git diff origin/<base>...origin/<branch>` (substitute the confirmed remote name where it is not `origin`). This matches the PR comparison semantics and excludes local uncommitted changes.
-	- If remote-tracking refs are unavailable, ask the user before falling back to a local branch comparison or fetching/pushing. A push is always a separate L4 gate handled by `qa-create-branch`; PR creation never pushes implicitly.
+		- If a remote-tracking ref is unavailable, do not infer that the source branch is unpushed. Refresh or query each missing ref against the confirmed remote. If the base ref is unavailable, report that blocker and resolve the base ref; do not offer a push. If the base ref exists but the source branch is confirmed absent remotely, state that the PR cannot be created until it is pushed and hand off explicitly to the `qa-create-branch` push gate (L4). If the source exists remotely but its tracking ref was missing, fetch it and continue. A local comparison may be offered only as a labelled preview. PR creation never pushes implicitly.
+	- Once both remote refs are resolved, check whether the source has commits beyond the base, for example with `git rev-list --count origin/<base>..origin/<branch>` (substitute the confirmed remote name where it is not `origin`). If the count is zero, stop and say there is nothing to open a PR for; do not draft or create a PR.
 	- Start with a lightweight inventory such as `--name-status`. Use `git diff --stat origin/<base>...origin/<branch>` or branch-only commit subjects only when they materially improve the List of Changes. Fetch a full patch only if necessary.
 	- Use the diff to derive the List of Changes and validate an optional scope. Do not use the diff as the primary source for Summary.
 
@@ -64,7 +65,7 @@ Resolve the source branch, confirmed base, remote/repository, optional ticket/wo
 	- Extract the branch prefix and its mapped PR type from `Prefix-to-type mapping`.
 	- Analyse the change category from the diff and work-item intent. Use only the project's confirmed `PR types` and mapping; if absent, use candidate values from framework defaults only after marking them as defaults.
 	- If the prefix/type appears unsuitable, suggest the more appropriate configured prefix/type.
-	- Show the current prefix/type and suggested prefix/type in plain chat. Ask the user to confirm whether to use the suggestion or proceed with the original. Do not proceed until the user explicitly confirms the choice, even if it is unchanged. Do not rename the branch silently.
+	- Ask only when the prefix/type appears unsuitable: show the current and suggested prefix/type in plain chat with a recommendation and let the user choose. A valid prefix/type needs no separate question; state it in the L4 gate summary. Do not rename the branch silently.
 
 8. **Build the PR title and body**
 	- Follow the confirmed title pattern exactly; when using a framework default, identify it as such and obtain confirmation.
@@ -76,7 +77,7 @@ Resolve the source branch, confirmed base, remote/repository, optional ticket/wo
 	- Avoid unnecessarily bloated preambles; detailed notes belong in List of Changes. Summary must be suitable for a commit log and should not start with “This pull request” or similar phrasing.
 	- Write List of Changes from the actual diff using short bullets with **bold area prefixes** such as **backend**, **frontend**, **docs**, **automation** or **copilot**, choosing prefixes appropriate to the changes.
 	- Match the tone and bullet style of the example file and configured exemplar.
-	- Include relevant work/requirement IDs, observed test commands/results, known gaps and risks. A commit is not evidence of release, test PASS or completed work-item scope.
+	- Include relevant work/requirement IDs, observed test commands/results (`Not run` when there is no test evidence), known gaps and risks. A commit is not evidence of release, test PASS or completed work-item scope.
 	- If the user asks to omit or reword specific phrasing, apply that change before creation.
 
 9. **Present the proposed PR title and body to the user in the response**
@@ -96,7 +97,7 @@ Resolve the source branch, confirmed base, remote/repository, optional ticket/wo
 
 11. **Return the draft PR link**
 	- Include the actual PR URL in the final response and state clearly that the PR is a draft.
-	- If no PR was created, return the existing URL or accurately label the outcome `DRAFT`, `BLOCKED` or `UNVERIFIED`.
+	- If no PR was created, return the existing URL or accurately label the outcome with an `operations.md` result status (`blocked`, `unverified`, `failed` or `unsupported`). State **not created** only when creation is known not to have occurred; if the create may have succeeded but read-back failed, report `unverified` and that the outcome is unknown, and do not retry creation until it is checked.
 
 ### Command minimisation
 - Do not rediscover the branch if the user already supplied it.
@@ -122,7 +123,7 @@ Progress:
 
 ### Troubleshooting
 - If the PR title or Summary format is unclear, reread the configured project PR conventions and template before drafting.
-- If work-item lookup fails for a detected key, stop and ask the user to confirm the key or provide the work-item context.
+- If work-item lookup returns 429/5xx, disclose the failure and retry once with bounded back-off; report 401/403/404 without retrying. If the provider is unavailable or lookup still fails, ask the user to paste the title, description and acceptance criteria.
 - If the configured CLI needs multiline body content, write it to a temporary file and use `--body-file` or the provider's supported file-input form instead of inline Markdown.
 - If a PR already exists for the same head and target, return that PR's link rather than attempting creation.
 
@@ -132,12 +133,12 @@ Progress:
 - Use the actual project template recorded under `PR templates`; inspect the discovered GitHub or Azure Repos location as applicable.
 - Use `assets/pr-example.md` as the formatting reference.
 - Base List of Changes on the actual GitHub-style diff between remote-tracking refs for source and base branches, using `git diff origin/<base>...origin/<branch>` (replace `origin` only with the confirmed remote name).
-- Use `workitem.get` for ticket details when the branch contains a key matching configured ticket syntax. If lookup fails, stop and ask the user to confirm the key or provide its context.
+- Use `workitem.get` for ticket details when the branch contains a key matching configured ticket syntax. Retry once with bounded back-off only for 429/5xx reads; report 401/403/404 without retrying. If unavailable or still failing, ask the user to paste its context.
 - Create a draft PR only. Do not switch it to ready for review.
 - Return the created PR link, or the existing PR link when one already exists for the same head and target.
 
 ## Output
-Save a requested PR receipt under `qa-work/<work-id>/outputs/` with the frontmatter required by `.github/ai-qa/framework/method/artefacts.md`: `work-id`, `skill: qa-create-pr`, `framework-version`, `created` (UTC ISO-8601) and `inputs` (work item, branch, PR artefact references and revisions). Include proposed or created title/body, head/base and revisions, included file/commit inventory, test evidence, confirmed prefix/type, approvals, draft state, and verified URL/ID. If not approved, unavailable or not read back, label `DRAFT`, `BLOCKED` or `UNVERIFIED`, never `created`.
+Save a requested PR receipt under `qa-work/<work-id>/outputs/` with the frontmatter required by `.github/ai-qa/framework/method/artefacts.md`: `work-id`, `skill: qa-create-pr`, `framework-version`, `created` (UTC ISO-8601) and `inputs` (work item, branch, PR artefact references and revisions). Include proposed or created title/body, head/base and revisions, included file/commit inventory, test evidence, confirmed prefix/type, approvals, draft state, and verified URL/ID. If not approved, unavailable or creation is known to have failed, label with an `operations.md` result status (`blocked`, `failed` or `unsupported`) and **not created**. If a create may have succeeded but read-back is unavailable, label `unverified`, state that the outcome is unknown, do not claim **not created**, and do not retry until checked.
 
 Update `qa-work/<work-id>/index.md` with the receipt link and PR status, and record the L4 gate action, target, exact payload/side effect, approver/time and resulting ID/URL. Preserve existing records and mark stale drafts when inputs change. Standalone index updates follow the L1 rules; orchestrated writes require workflow-plan approval.
 
