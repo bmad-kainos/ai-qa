@@ -35,7 +35,7 @@ Collect as much of the following as is available. Work with whatever the user pr
 | Stories tested | `workitem.search` scoped to the confirmed sprint/project, if available |
 | Test pass rate | CI output, `ci.test-results`, test report or user description |
 | Tests added this sprint | Git log or user description |
-| Flaky tests | `ci.runs`/run details or user description |
+| Flaky tests | `ci.test-results` across comparable runs or user-supplied per-test history |
 | Bugs found in testing | `workitem.search` for bugs in the confirmed sprint/project |
 | Escaped defects (found in production) | User description or available work-item data |
 | Blocked tickets | `workitem.search` or user description |
