@@ -11,13 +11,15 @@ Generate a well-structured, actionable bug report from reproduction steps, faili
 Use when a defect has been found during manual or automated testing, a confirmed application defect needs a tracker-ready report, or a user asks to raise/log a bug. If classification remains uncertain, use `qa-analyse-failure` first or clearly label the report suspected. Creating a work item is done only via `qa-publish` using `workitem.create` at L4; this skill does not call a provider directly.
 
 ## Reads
-Always read `.github/ai-qa/project/project.md` for project summary, components, constraints, environments and dependencies; read `.github/ai-qa/project/conventions/qa-process.md` for evidence/reporting process, `conventions/integrations.md` for configured work-item provider and transport, and `conventions/reporting.md` for report formats. Read `.github/ai-qa/framework/method/{safety,discovery,failure-classes,artefacts,work-id-and-git}.md`, the applicable work-item template/provider guidance, and fresh `qa-work/<work-id>/` execution, failure analysis and index artefacts. If project files or prior analysis are missing, gather the minimum from supplied evidence and read-only repository context; never refuse solely because an artefact is absent.
+Always read `.github/ai-qa/project/project.md` for project summary, components, constraints, environments and dependencies; read `.github/ai-qa/project/conventions/qa-process.md` for evidence/reporting process, `conventions/integrations.md` for configured work-item provider and transport, and `conventions/reporting.md` for report formats. Read `.github/ai-qa/framework/method/{safety,discovery,failure-classes,artefacts,work-id-and-git,clarifying-questions}.md`, the applicable work-item template/provider guidance, and fresh `qa-work/<work-id>/` execution, failure analysis and index artefacts. If project files or prior analysis are missing, gather the minimum from supplied evidence and read-only repository context; never refuse solely because an artefact is absent.
 
 ## Work-id
 Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
-Gather what went wrong; reproduction steps; expected behavior from the confirmed AC/spec/FR; actual behavior; environment/build/branch/commit; related ticket; supporting logs, screenshots or test output; frequency, impact and workaround. If anything is missing, gather the minimum from the run, source or user-provided evidence. Mark nonessential unknown fields `Unknown`; do not fabricate logs, identifiers, causes or impact. Confirm report and evidence freshness before reuse.
+Gather what went wrong; reproduction steps; expected behavior from the confirmed AC/spec/FR; actual behavior; environment/build/branch/commit; related ticket; supporting logs, screenshots or test output; frequency, impact and workaround. If anything is missing, gather the minimum from the run, source or user-provided evidence. Mark nonessential unknown fields `Unknown` (required fields: `Not provided`); do not fabricate logs, identifiers, causes or impact.
+
+If required fields are still missing (steps to reproduce, expected behaviour, actual behaviour, environment/build, supporting evidence), do not refuse or reply that you lack context. Follow the missing-input rule in `.github/ai-qa/framework/method/clarifying-questions.md`: draft now with gaps marked `Not provided` (status `DRAFT`, gaps noted in confidence), then ask up to 5 questions built from what the user said, and re-draft with the answers. If almost nothing is known (no feature, page or symptom), apply the exception in that rule: ask the anchoring questions first. For thin evidence, assign the rubric level the evidence supports and label it provisional with the reason; never omit severity. Save a `DRAFT` with open questions to `qa-work` and overwrite it on re-draft. Example: for "raise a bug, the button isn't clicking", draft with the known symptom and ask which page or screen, what the button is called, what happens on click (nothing, an error, other), what should happen, and which browser or build. Confirm report and evidence freshness before reuse.
 
 ## Procedure
 1. Confirm reproducibility where evidence permits. Distinguish an application defect from a test defect, stale expectation, flaky/nondeterministic behavior, environment/infra, test data, access or unknown using `failure-classes.md`. Cross-check a comparable baseline and available existing work items to avoid duplicates. If the classification is unknown, label it **suspected** and state the focused diagnostic that would decide it.
@@ -39,11 +41,11 @@ Gather what went wrong; reproduction steps; expected behavior from the confirmed
 	<One sentence: what is broken and where>
 
 	## Severity
-	<Critical / High / Medium / Low> — <one-line evidence-based justification>
+	<Critical / High / Medium / Low, add "(provisional)" when evidence is thin> — <one-line evidence-based justification>
 
 	## Environment
-	- Environment: <configured environment or Unknown>
-	- Branch / version: <branch, commit or version, or Unknown>
+	- Environment: <configured environment or Not provided>
+	- Branch / version: <branch, commit or version, or Not provided>
 	- Related ticket: <confirmed work-item key or N/A>
 	- Requirement: <FR/NFR/spec reference or Unknown>
 

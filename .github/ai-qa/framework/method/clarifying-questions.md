@@ -2,6 +2,19 @@
 
 Ask only when an essential scope, requirement, target branch, contradictory fact, access dependency or gated side effect cannot be resolved from available evidence. Start with a read-only repository scan and current project context. Never ask what the repository already answers. When ambiguity is non-blocking, record it and proceed with a bounded, clearly stated assumption.
 
+## Missing required input: draft first, then ask
+
+When a skill is producing an artefact that explicitly supports `DRAFT` status and required input is missing, never stop or end with a bare refusal such as "I need more context". Consumer-specific interview and approval protocols, including Option-A interviews, take precedence. Otherwise, draft first, then ask:
+
+1. Scan the user's text, branch, runs, logs and repository first; never ask what they already answer.
+2. Produce the draft now with what is known. Mark each gap `Not provided`, keep the status `DRAFT` and note the gaps in confidence. Do not fabricate values.
+3. In the same reply, ask at most 5 targeted questions, ordered by how much each answer improves the output. Build each from something the user said (the named element, page, trigger or symptom) where possible, and ask directly about any required field the user omitted entirely; say what each answer unlocks. Answers are optional. Skip questions when only nonessential fields remain; this rule overrides the "ask only when essential" guidance above for required fields only.
+4. When answers arrive, re-draft. Ask a follow-up only for a still-significant gap, and stop after two rounds.
+
+Mark missing required fields `Not provided` and missing optional fields `Unknown`.
+
+Exception: when almost nothing is known (no feature, page or symptom), skip the draft and ask the 2 or 3 anchoring questions, then draft. With nothing to build on, use: what were you doing and on which page or feature, what went wrong, and what did you expect.
+
 ## Option-A interview format
 
 Ask **one question at a time**. Show the evidence and why the answer matters, then give a recommendation and alternatives:
