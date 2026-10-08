@@ -143,8 +143,10 @@ if [[ "$COMMAND" != uninstall ]]; then
   find "$SOURCE/skills" -mindepth 1 -maxdepth 1 -type d -name 'qa-*' -print 2>/dev/null | sed 's|.*/||' | sort -u > "$tmp/skill-names"
   cat "$tmp/agent-names" "$tmp/skill-names" | sort -u > "$tmp/names"
   for d in agents skills ai-qa/framework; do [[ ! -d "$SOURCE/$d" ]] || find "$SOURCE/$d" -type f -print; done | sort > "$tmp/source-list"
+  pruned="$tmp/pruned-packs"; sed -n 's/^[[:space:]]*\([A-Za-z0-9_-][A-Za-z0-9_-]*\)[[:space:]]*$/\1/p' "$TARGET/.github/ai-qa/project/pruned-packs.txt" > "$pruned" 2>/dev/null || :
   while IFS= read -r src; do
     rel="${src#"$SOURCE/"}"; case "$rel" in agents/qa*.agent.md|skills/qa-*/*|ai-qa/framework/*) ;; *) continue ;; esac
+    case "$rel" in ai-qa/framework/packs/*/*) pack="${rel#ai-qa/framework/packs/}"; pack="${pack%%/*}"; if [[ "$pack" != _TEMPLATE ]] && grep -Fxq "$pack" "$pruned"; then continue; fi ;; esac
     dest="$rel"
     if [[ "$PREFIX" != qa ]]; then case "$rel" in agents/qa*) dest="agents/${PREFIX}${rel#agents/qa}" ;; skills/qa-*) dest="skills/${PREFIX}-${rel#skills/qa-}" ;; esac; fi
     outrel=".github/$dest"; safe_rel "$outrel"; staged="$tmp/assets/$outrel"; mkdir -p "$(dirname "$staged")"; cp "$src" "$staged"

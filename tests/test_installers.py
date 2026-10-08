@@ -108,6 +108,29 @@ class SyntheticInstallerTests(unittest.TestCase):
                 self.assertEqual((self.target / ".github/workflows/ci.yml").read_bytes(), before[Path(".github/workflows/ci.yml")])
                 self.assertEqual(instructions.read_text(), "Existing instructions.\n")
 
+    def test_pruned_packs_are_not_reinstated_on_update(self):
+        for runner in runners():
+            self.fresh(runner)
+            self.framework_file("ai-qa/framework/packs/alpha/pack.md", "Alpha.\n")
+            self.framework_file("ai-qa/framework/packs/beta/pack.md", "Beta.\n")
+            self.framework_file("ai-qa/framework/packs/_TEMPLATE/pack.md", "Template.\n")
+            with self.subTest(runner=runner[0]):
+                self.call(runner, "install")
+                packs = self.target / ".github/ai-qa/framework/packs"
+                (packs / "beta/pack.md").unlink()
+                (packs / "beta").rmdir()
+                project = self.target / ".github/ai-qa/project"
+                project.mkdir(parents=True)
+                (project / "pruned-packs.txt").write_text("beta\n_TEMPLATE-not-listed\n")
+                self.call(runner, "update")
+                self.call(runner, "update")
+                self.assertFalse((packs / "beta").exists())
+                self.assertFalse(list(packs.rglob("*.ai-qa-new")))
+                self.assertTrue((packs / "alpha/pack.md").exists())
+                self.assertTrue((packs / "_TEMPLATE/pack.md").exists())
+                manifest = json.loads((self.target / ".github/ai-qa/manifest.json").read_text())
+                self.assertNotIn(".github/ai-qa/framework/packs/beta/pack.md", manifest["files"])
+
     def test_collision_prefix_and_reference_rewrite(self):
         for runner in runners():
             self.fresh(runner)

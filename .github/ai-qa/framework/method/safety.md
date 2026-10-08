@@ -21,6 +21,7 @@ These rules apply to the `qa` and `qa-configure` agents, every skill, every prov
 - The fix loop never touches product code.
 - Never delete, skip or disable tests; never loosen assertions unless the relevant FR supports it.
 - Never install dependencies or write project adaptation files without L5 approval.
+- Only `qa-configure` may delete unselected framework packs (`.github/ai-qa/framework/packs/<pack>/`) and record them in `.github/ai-qa/project/pruned-packs.txt`; this is an L5 adaptation-layer write that requires a preview listing every path to be deleted and explicit approval. No other agent or skill may delete framework files.
 - Only `qa-configure` writes `.github/ai-qa/project/**`, rendered `.github/instructions/qa-*.instructions.md` and `.vscode/mcp.json`.
 - Never publish or perform an external write without L4 approval for the exact action, target and payload.
 

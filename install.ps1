@@ -185,6 +185,9 @@ try {
             }
             foreach ($folder in (Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'skills') -Directory -Filter 'qa-*' -ErrorAction SilentlyContinue)) { $rename[$folder.Name] = $Prefix + $folder.Name.Substring(2) }
         }
+        $prunedPacks = @()
+        $prunedFile = Join-Path $ResolvedTarget '.github/ai-qa/project/pruned-packs.txt'
+        if (Test-Path -LiteralPath $prunedFile -PathType Leaf) { $prunedPacks = @(Get-Content -LiteralPath $prunedFile | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^[A-Za-z0-9_-]+$' }) }
         $items = @()
         $items += Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'agents') -Filter 'qa*.agent.md' -File -Recurse -ErrorAction SilentlyContinue
         foreach ($folder in (Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'skills') -Directory -Filter 'qa-*' -ErrorAction SilentlyContinue)) { $items += Get-ChildItem -LiteralPath $folder.FullName -File -Recurse }
@@ -192,6 +195,7 @@ try {
         foreach ($item in $items) {
             if (IsLink $item.FullName) { Fail "Refusing symlink source: $($item.FullName)" }
             $tail = $item.FullName.Substring($SourceRoot.Length + 1).Replace('\', '/')
+            if ($tail -match '^ai-qa/framework/packs/([^/]+)/' -and $Matches[1] -ne '_TEMPLATE' -and $prunedPacks -contains $Matches[1]) { continue }
             if ($tail -match '^agents/qa') { $tail = $tail -replace '^agents/qa', $Prefix }
             elseif ($tail -match '^skills/qa-') { $tail = $tail -replace '^skills/qa-', "$Prefix-" }
             $bytes = [IO.File]::ReadAllBytes($item.FullName)
