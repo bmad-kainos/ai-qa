@@ -19,7 +19,7 @@ Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argume
 ## Inputs
 Gather what went wrong; reproduction steps; expected behavior from the confirmed AC/spec/FR; actual behavior; environment/build/branch/commit; related ticket; supporting logs, screenshots or test output; frequency, impact and workaround. If anything is missing, gather the minimum from the run, source or user-provided evidence. Mark nonessential unknown fields `Unknown` (required fields: `Not provided`); do not fabricate logs, identifiers, causes or impact.
 
-If required fields are still missing (steps to reproduce, expected behaviour, actual behaviour, environment/build, supporting evidence), do not refuse or reply that you lack context. Follow the missing-input rule in `.github/ai-qa/framework/method/clarifying-questions.md`: draft now with gaps marked `Not provided` (status `DRAFT`, gaps noted in confidence), then ask up to 5 questions built from what the user said, and re-draft with the answers. If almost nothing is known (no feature, page or symptom), apply the exception in that rule: ask the anchoring questions first. For thin evidence, state severity as `Not assessed` or a provisional level with the reason. Save a `DRAFT` with open questions to `qa-work` and overwrite it on re-draft. Example: for "raise a bug, the button isn't clicking", draft with the known symptom and ask which page or screen, what the button is called, what happens on click (nothing, an error, other), what should happen, and which browser or build. Confirm report and evidence freshness before reuse.
+If required fields are still missing (steps to reproduce, expected behaviour, actual behaviour, environment/build, supporting evidence), do not refuse or reply that you lack context. Follow the missing-input rule in `.github/ai-qa/framework/method/clarifying-questions.md`: draft now with gaps marked `Not provided` (status `DRAFT`, gaps noted in confidence), then ask up to 5 questions built from what the user said, and re-draft with the answers. If almost nothing is known (no feature, page or symptom), apply the exception in that rule: ask the anchoring questions first. For thin evidence, assign the rubric level the evidence supports and label it provisional with the reason; never omit severity. Save a `DRAFT` with open questions to `qa-work` and overwrite it on re-draft. Example: for "raise a bug, the button isn't clicking", draft with the known symptom and ask which page or screen, what the button is called, what happens on click (nothing, an error, other), what should happen, and which browser or build. Confirm report and evidence freshness before reuse.
 
 ## Procedure
 1. Confirm reproducibility where evidence permits. Distinguish an application defect from a test defect, stale expectation, flaky/nondeterministic behavior, environment/infra, test data, access or unknown using `failure-classes.md`. Cross-check a comparable baseline and available existing work items to avoid duplicates. If the classification is unknown, label it **suspected** and state the focused diagnostic that would decide it.
@@ -41,7 +41,7 @@ If required fields are still missing (steps to reproduce, expected behaviour, ac
 	<One sentence: what is broken and where>
 
 	## Severity
-	<Critical / High / Medium / Low> — <one-line evidence-based justification>
+	<Critical / High / Medium / Low, add "(provisional)" when evidence is thin> — <one-line evidence-based justification>
 
 	## Environment
 	- Environment: <configured environment or Not provided>
