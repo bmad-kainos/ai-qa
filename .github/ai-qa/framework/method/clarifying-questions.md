@@ -4,7 +4,7 @@ Ask only when an essential scope, requirement, target branch, contradictory fact
 
 ## Missing required input: draft first, then ask
 
-When required input is missing, never stop or end with a bare refusal such as "I need more context". Draft first, then ask:
+When a skill is producing an artefact that explicitly supports `DRAFT` status and required input is missing, never stop or end with a bare refusal such as "I need more context". Consumer-specific interview and approval protocols, including Option-A interviews, take precedence. Otherwise, draft first, then ask:
 
 1. Scan the user's text, branch, runs, logs and repository first; never ask what they already answer.
 2. Produce the draft now with what is known. Mark each gap `Not provided`, keep the status `DRAFT` and note the gaps in confidence. Do not fabricate values.

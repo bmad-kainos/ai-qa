@@ -44,8 +44,8 @@ If required fields are still missing (steps to reproduce, expected behaviour, ac
 	<Critical / High / Medium / Low> — <one-line evidence-based justification>
 
 	## Environment
-	- Environment: <configured environment or Unknown>
-	- Branch / version: <branch, commit or version, or Unknown>
+	- Environment: <configured environment or Not provided>
+	- Branch / version: <branch, commit or version, or Not provided>
 	- Related ticket: <confirmed work-item key or N/A>
 	- Requirement: <FR/NFR/spec reference or Unknown>
 
