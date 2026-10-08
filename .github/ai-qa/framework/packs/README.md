@@ -1,6 +1,6 @@
 # Framework pack catalogue
 
-`qa-configure` selects packs per test path after inspecting the actual runner, the dependencies and representative tests. It renders `instructions.template.md` to `.github/instructions/qa-<pack>.instructions.md`, with `applyTo` set to discovered paths only. Never edit packs to configure a project. Project conventions take precedence over pack guidance.
+`qa-configure` selects packs per test path after inspecting the actual runner, the dependencies and representative tests. It renders `instructions.template.md` to `.github/instructions/qa-<pack>.instructions.md`, with `applyTo` set to discovered paths only. Never edit packs to configure a project. After approval, `qa-configure` removes the packs that are not selected and lists them in `.github/ai-qa/project/pruned-packs.txt` so the installer's `update` does not reinstate them. Project conventions take precedence over pack guidance.
 
 | Pack | Tier | Covers | Files |
 |---|---|---|---|

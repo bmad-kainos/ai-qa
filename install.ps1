@@ -144,7 +144,7 @@ try {
     if ($Command -in @('update', 'uninstall') -and -not $Manifest) { Fail "No managed installation to $Command" }
     if ($Command -eq 'install' -and $Manifest) { Fail 'Already installed; use update or verify' }
     if ($Command -eq 'update' -and -not $PrefixExplicit) { $Prefix = $Manifest.prefix }
-    if ($Manifest -and $Command -ne 'uninstall' -and $Prefix -ne $Manifest.prefix) { Fail "Installed prefix is '$($Manifest.prefix)'; use the same -Prefix" }
+    if ($Manifest -and $Command -notin @('uninstall', 'verify') -and $Prefix -ne $Manifest.prefix) { Fail "Installed prefix is '$($Manifest.prefix)'; use the same -Prefix" }
 
     if ($Command -eq 'verify') {
         if (-not $Manifest) { Fail 'AI-QA manifest missing' }
@@ -185,6 +185,9 @@ try {
             }
             foreach ($folder in (Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'skills') -Directory -Filter 'qa-*' -ErrorAction SilentlyContinue)) { $rename[$folder.Name] = $Prefix + $folder.Name.Substring(2) }
         }
+        $prunedPacks = @()
+        $prunedFile = Join-Path $ResolvedTarget '.github/ai-qa/project/pruned-packs.txt'
+        if (Test-Path -LiteralPath $prunedFile -PathType Leaf) { $prunedPacks = @(Get-Content -LiteralPath $prunedFile | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^[A-Za-z0-9_-]+$' }) }
         $items = @()
         $items += Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'agents') -Filter 'qa*.agent.md' -File -Recurse -ErrorAction SilentlyContinue
         foreach ($folder in (Get-ChildItem -LiteralPath (Join-Path $SourceRoot 'skills') -Directory -Filter 'qa-*' -ErrorAction SilentlyContinue)) { $items += Get-ChildItem -LiteralPath $folder.FullName -File -Recurse }
@@ -192,8 +195,9 @@ try {
         foreach ($item in $items) {
             if (IsLink $item.FullName) { Fail "Refusing symlink source: $($item.FullName)" }
             $tail = $item.FullName.Substring($SourceRoot.Length + 1).Replace('\', '/')
-            if ($tail -match '^agents/qa') { $tail = $tail -replace '^agents/qa', $Prefix }
-            elseif ($tail -match '^skills/qa-') { $tail = $tail -replace '^skills/qa-', "$Prefix-" }
+            if ($tail -match '^ai-qa/framework/packs/([^/]+)/' -and $Matches[1] -ne '_TEMPLATE' -and $prunedPacks -contains $Matches[1]) { continue }
+            if ($tail -match '^agents/qa') { $tail = $tail -replace '^agents/qa', "agents/$Prefix" }
+            elseif ($tail -match '^skills/qa-') { $tail = $tail -replace '^skills/qa-', "skills/$Prefix-" }
             $bytes = [IO.File]::ReadAllBytes($item.FullName)
             if ($Prefix -ne 'qa' -and $item.Extension -in @('.md', '.txt', '.json', '.yaml', '.yml')) {
                 $text = $Encoding.GetString($bytes)
@@ -304,7 +308,9 @@ try {
     }
     if ($Command -eq 'uninstall') {
         foreach ($relative in ($createdDirs | Sort-Object { ($_ -split '/').Count } -Descending)) {
-            $directory = SafePath $relative
+            if ([IO.Path]::IsPathRooted($relative) -or $relative -match '(^|/)\.\.(/|$)' -or $relative.Contains('|') -or $relative -notmatch '^\.github(/|$)|^qa-work(/|$)') { Fail "Unsafe created directory: $relative" }
+            $directory = Join-Path $ResolvedTarget $relative
+            if (IsLink $directory) { Fail "Refusing symlink: $directory" }
             if ((Test-Path -LiteralPath $directory -PathType Container) -and
                 -not (Get-ChildItem -LiteralPath $directory -Force | Select-Object -First 1)) {
                 Remove-Item -LiteralPath $directory -Force
