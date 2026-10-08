@@ -67,7 +67,7 @@ Report counts only with structured-source evidence. Statistics must explicitly s
 | Action | Level | Gate |
 |---|---:|---|
 | Read repository, structured reports and CI via `ci.runs`/`ci.run.get`/`ci.test-results` | L0 | None |
-| Write a dated baseline on a non-default branch | L1 | No separate gate; workflow plan approval first in orchestrated workflows |
+| Write a dated baseline on a non-default branch (default branch: `method/safety.md` fallback) | L1 | No separate gate; workflow plan approval first in orchestrated workflows |
 | Run local/full/environment-dependent tests | L3 | Explicit approval unless the exact command is marked safe in `qa-process.md` |
 | Run `qa-stats.py` from the supplied framework checkout | L0 | No install; path must be the framework checkout, not target project |
 | Publish baseline externally or alter project configuration | L4/L5 | Not performed here; separate approval via owning skill |

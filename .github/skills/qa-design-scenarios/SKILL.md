@@ -14,6 +14,8 @@ Use to create or revise manual scenarios for a ticket, feature, requirement set 
 
 ## Reads
 
+For each optional prior artefact, fall back to its legacy name per `artefacts.md` and report it.
+
 Always read `.github/ai-qa/project/project.md`: use Environments, Data stores and external dependencies, Constraints and Components. Read `.github/ai-qa/project/conventions/testing.md` (Scopes, Environments and base URLs, Test data rules, Manual testing ownership), `conventions/qa-process.md` (Scenario format, Team options, Locale, Work-id rule) and `conventions/git.md` (Ticket syntax) as applicable. Read `.github/ai-qa/framework/method/scenario-format.md`, `traceability.md`, `dedup-rule.md`, `safety.md`, `artefacts.md` and `precedence.md`. Optional prior artefacts: `01_requirement_analysis.md`, `03_coverage_assessment.md`, `02_code_context.md`, `05_regression_risk.md`, `06_automation_plan.md`, `index.md`.
 
 If the project layer is missing, use supplied/repository evidence, state environment and convention unknowns, and suggest `qa-configure`; never refuse because prior analyses are absent.
@@ -95,7 +97,7 @@ Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 
 | Action | Level | Gate |
 |---|---|---|
 | Read requirements, test evidence and configuration | L0 | None |
-| Draft scenarios; write `04_test_scenarios.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Draft scenarios; write `04_test_scenarios.md` and update `index.md` on a non-default branch (default branch: `method/safety.md` fallback) | L1 | No gate; summarise changes |
 | Execute scenarios or change environment/data | L3 | Separate explicit approval; never use production unless explicitly configured safe |
 | Upload scenarios or write comments/work items | L4 | Not done here; hand off to `qa-publish` with exact-payload approval |
 | Install tools or edit project conventions | L5 | Not done here; `qa-configure` only for project layer |

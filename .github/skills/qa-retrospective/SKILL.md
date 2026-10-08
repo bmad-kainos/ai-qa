@@ -23,7 +23,7 @@ Always read `.github/ai-qa/project/project.md` sections `Components`, `Test land
 Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
-Determine sprint name/date range, work ID, stories tested, runs and pass/fail/skipped/blocked counts, bugs found during testing, escaped defects, flaky tests, manual versus automated coverage and a previous comparable period. Work with partial data; show every missing data value exactly as `not available`, never as zero. Do not require an integration when the user provides pasted data. If prior artefacts are missing, gather the minimum yourself; never refuse.
+Determine sprint name/date range (if none is given, ask once for the sprint or date range, then proceed with partial data), work ID, stories tested, runs and pass/fail/skipped/blocked counts, bugs found during testing, escaped defects, flaky tests, manual versus automated coverage and a previous comparable period. Work with partial data; show every missing data value exactly as `not available`, never as zero. Do not require an integration when the user provides pasted data. If prior artefacts are missing, gather the minimum yourself; never refuse.
 
 ## Procedure
 ### Step 1 — Gather data

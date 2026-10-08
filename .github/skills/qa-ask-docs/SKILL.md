@@ -23,10 +23,10 @@ Always read `.github/ai-qa/project/project.md` sections `Summary`, `Documentatio
 Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
 
 ## Inputs
-Take the question, area, document link, version/branch and optional work ID. Clarify ambiguous product scope when sources conflict. A `qa-work/<work-id>/index.md` is useful context only when its source revisions remain current. If prior artefacts are missing, gather the minimum yourself; never refuse.
+Take the question, area, document link, version/branch and optional work ID. Clarify ambiguous product scope when sources conflict; for an unscoped question, ask the user to narrow it (area or page) after a first bounded search. A `qa-work/<work-id>/index.md` is useful context only when its source revisions remain current. If prior artefacts are missing, gather the minimum yourself; never refuse.
 
 ## Procedure
-1. Identify the documentation root: use `conventions/reporting.md` `Documentation` and `project.md` `Documentation sources`. If not recorded, inspect `docs/wiki/index.md`, `docs/index.md`, `wiki/index.md` and the repository `README.md`. If ambiguous, ask the user which root is authoritative.
+1. Identify the documentation root: use `conventions/reporting.md` `Documentation` and `project.md` `Documentation sources`. If not recorded, inspect `docs/wiki/index.md`, `docs/index.md`, `wiki/index.md` and the repository `README.md`; fall back to a bare `docs/` folder (and `docs/**/README.md`) before asking. If ambiguous, ask the user which root is authoritative, proposing the best candidate as Option A.
 2. Analyse the index or root page first to identify relevant documentation. For a configured remote source, use `docs.search` through the provider, deployment and transport in `conventions/integrations.md`; scope the search to the configured space/wiki or the root page named by the user. Search is bounded and must report partial results when pagination is incomplete.
 3. Retrieve pages to find the answer to the question. Use `docs.get` through the same configured provider and read actual page content, not just titles. Track page path/URL, section, revision and date. Do not search outside the docs folder unless the user explicitly asks or approves it.
 4. If documentation is not found, follow `references/answer-not-found.md`.

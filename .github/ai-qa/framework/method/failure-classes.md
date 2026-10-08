@@ -17,7 +17,7 @@ Capture the failing test ID, exact assertion/error, expected and observed behavi
 ## Fix loop
 
 - Fix **test defects only**.
-- Change only files created or modified in this work item; never product code.
+- Change only test files created or modified in this work item, or pre-existing test files explicitly named in its owned list and logged in `index.md` (L1); never product code.
 - Never delete, skip or disable tests.
 - Never loosen assertions unless the relevant FR supports it.
 - Maximum 3 iterations; stop early if the same failure repeats.

@@ -31,6 +31,10 @@ Numbers give reading order; gaps are allowed when a step is skipped. Create only
 
 Always write the numbered names. When a numbered file is absent, read the legacy name as a fallback: `requirement.md`, `context.md`, `coverage.md`, `design.md`, `regression.md`, `automation.md` (plan or generation record), `review.md` (design or code review; decide from its `skill`/mode front matter and content), `outputs/test-plan.md`. `execution.md` is the legacy name of `09_execution.md`. Never silently rename or delete a legacy file: report it, write the new file, and let the user migrate (see `docs/migrations.md`). If both exist, the numbered file wins; note the legacy file in the index.
 
+## Gap markers
+
+Use these markers for missing or unrun information: `Not provided` (required input missing), `Unknown` (optional value missing), `Not assessed` (area not analysed), `Not run` (no execution evidence), `Not published` (nothing posted externally), and `Not configured` (project setting absent). These are gap markers, not workflow statuses or result values: use the required status/result vocabulary where specified, including `Blocked` and `PASS` / `FAIL` / `BLOCKED` / `Not run` with provenance. Do not use `N/A` or `NOT FOUND` as generic gap markers; `qa-ask-docs` states a documentation gap as `Not documented` with `Scope searched`. `qa-retrospective` and `qa-tech-report` keep `not available` / `not computed` for now (wording decision pending). This complements the `Not provided` rule in `clarifying-questions.md`.
+
 ## Commit and ignore defaults
 
 By default, commit `qa-work/<work-id>/index.md` and `qa-work/<work-id>/outputs/`; ignore everything else, including intermediate artefacts and `logs/`. Projects can change this policy in `.github/ai-qa/project/conventions/qa-process.md` under `qa-work policy`. Honour a confirmed project policy. Never commit credentials, cookies, personal data, raw logs, live identifiers or confidential payloads. Test-data files in outputs still require data/safety review.

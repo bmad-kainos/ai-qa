@@ -190,7 +190,7 @@ E2E Coverage:              X
 QA Summary
 | Ticket | Readiness | Max risk | Coverage verdict | Scenarios written/not written | Automated/manual/not needed | Run result | Published |
 |---|---|---|---|---|---|---|---|
-| <key> | <Green/Amber/Red> | <level and score> | <Pass/Needs Improvement/Insufficient/Not assessed> | <counts> | <decision> | <Not run or evidenced result> | <No or receipt> |
+| <key> | <Green/Amber/Red> | <level and score> | <Pass/Needs Improvement/Insufficient/Not assessed> | <counts> | <decision> | <Not run or evidenced result> | <Not published or receipt> |
 
 Highest Priority Refinement Items
 - <ticket and decision required before planning/development>
@@ -239,7 +239,7 @@ Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 
 |---|---|---|
 | Read supplied text, repository evidence, or configured work items with `workitem.get`/`workitem.search` | L0 | None |
 | Ask clarification questions in chat | L0 | None |
-| Write `01_requirement_analysis.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Write `01_requirement_analysis.md` and update `index.md` on a non-default branch (default branch: `method/safety.md` fallback) | L1 | No gate; summarise changes |
 | Comment on or update an external work item | L4 | Not performed by this skill; hand off to `qa-publish` after exact-payload approval |
 | Change branches, commit, run shared/environment tests, install dependencies, or edit project conventions | L2/L3/L5 | Not performed by this skill; separate gate and owner apply |
 

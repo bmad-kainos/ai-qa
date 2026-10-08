@@ -14,6 +14,8 @@ Use for a ticket, feature/spec, requirement set, sprint or supplied group of wor
 
 ## Reads
 
+For each optional prior artefact, fall back to its legacy name per `artefacts.md` and report it.
+
 Always read `.github/ai-qa/project/project.md`: use Summary, Components, Environments, Data stores and external dependencies, CI/CD, Test landscape and Constraints. Read `.github/ai-qa/project/conventions/qa-process.md` (Test plan destination and timing, Definition of done and QA evidence, Scenario format, Work-id rule, Locale), `conventions/testing.md` (Scopes, Environments and base URLs, Test data rules), `conventions/integrations.md` for configured work-item search, and `conventions/git.md` for Ticket syntax. Read `.github/ai-qa/framework/method/traceability.md`, `dedup-rule.md`, `readiness.md`, `regression-areas.md`, `effort-estimation.md` for sprint scope, `safety.md`, `artefacts.md` and `precedence.md`. Optional prior artefacts: `01_requirement_analysis.md`, `02_code_context.md`, `03_coverage_assessment.md`, `04_test_scenarios.md`, `05_regression_risk.md`, `06_automation_plan.md`, `07_design_review.md`, `index.md`.
 
 Use `.github/ai-qa/framework/templates/test-plan.md` as the document template when present. If project context or template is absent, proceed from accessible evidence and mark the gap; suggest `qa-configure` for missing project configuration.
@@ -91,7 +93,7 @@ Open the plan with the TL;DR and Next Steps directly after the title; the TL;DR 
 | Action | Level | Gate |
 |---|---|---|
 | Read project files, prior artefacts and `workitem.get`/`workitem.search` | L0 | None |
-| Write local test plan and index on a non-default branch | L1 | No gate for standalone artefact; summarise changes. Workflow L1 plan gate remains separate. |
+| Write local test plan and index on a non-default branch (default branch: `method/safety.md` fallback) | L1 | No gate for standalone artefact; summarise changes. Workflow L1 plan gate remains separate. |
 | Run environment-dependent tests or alter test data | L3 | Not performed; separate explicit gate |
 | Publish a plan, post a comment or update a work item | L4 | Not performed here; exact payload/target approval through `qa-publish` |
 | Install tools or change adaptation-layer files | L5 | Not performed; `qa-configure` only for project-owned files |

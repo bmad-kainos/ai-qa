@@ -14,6 +14,8 @@ Use `requirement` scope for per-FR evidence at unit/integration/E2E levels and t
 
 ## Reads
 
+For each optional prior artefact, fall back to its legacy name per `artefacts.md` and report it.
+
 Always read `.github/ai-qa/project/project.md`, especially Test landscape, Components, Constraints and dependencies. Read `.github/ai-qa/project/conventions/testing.md` (Scopes, Commands and Reports), `conventions/qa-process.md` (Definition of done and QA evidence, Work-id rule, Commands safe to run) and `conventions/git.md` (Ticket syntax and Branch patterns) as applicable. Read `.github/ai-qa/framework/method/traceability.md`, `precedence.md`, `safety.md` and `artefacts.md`. Optional prior artefacts: `01_requirement_analysis.md`, `02_code_context.md`, `05_regression_risk.md`, `index.md`; optional coverage report supplied by the user or already present.
 
 If project context is missing, use the accessible repository and label the test landscape as observed/inferred; suggest `qa-configure`. Never require a coverage tool or prior skill.
@@ -126,7 +128,7 @@ Include test inventory and report provenance; include severity headings only whe
 | Action | Level | Gate |
 |---|---|---|
 | Read source, test files, reports and configuration | L0 | None |
-| Write `03_coverage_assessment.md` and update `index.md` on a non-default branch | L1 | No gate; summarise changes |
+| Write `03_coverage_assessment.md` and update `index.md` on a non-default branch (default branch: `method/safety.md` fallback) | L1 | No gate; summarise changes |
 | Run tests, generate reports, install coverage tools, or access shared environments | L3/L5 | Not performed; separate approval required |
 | Edit project context/conventions or publish results externally | L4/L5 | Not performed; `qa-configure`/`qa-publish` only |
 
