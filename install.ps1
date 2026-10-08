@@ -144,7 +144,7 @@ try {
     if ($Command -in @('update', 'uninstall') -and -not $Manifest) { Fail "No managed installation to $Command" }
     if ($Command -eq 'install' -and $Manifest) { Fail 'Already installed; use update or verify' }
     if ($Command -eq 'update' -and -not $PrefixExplicit) { $Prefix = $Manifest.prefix }
-    if ($Manifest -and $Command -ne 'uninstall' -and $Prefix -ne $Manifest.prefix) { Fail "Installed prefix is '$($Manifest.prefix)'; use the same -Prefix" }
+    if ($Manifest -and $Command -notin @('uninstall', 'verify') -and $Prefix -ne $Manifest.prefix) { Fail "Installed prefix is '$($Manifest.prefix)'; use the same -Prefix" }
 
     if ($Command -eq 'verify') {
         if (-not $Manifest) { Fail 'AI-QA manifest missing' }
@@ -308,7 +308,9 @@ try {
     }
     if ($Command -eq 'uninstall') {
         foreach ($relative in ($createdDirs | Sort-Object { ($_ -split '/').Count } -Descending)) {
-            $directory = SafePath $relative
+            if ([IO.Path]::IsPathRooted($relative) -or $relative -match '(^|/)\.\.(/|$)' -or $relative.Contains('|') -or $relative -notmatch '^\.github(/|$)|^qa-work(/|$)') { Fail "Unsafe created directory: $relative" }
+            $directory = Join-Path $ResolvedTarget $relative
+            if (IsLink $directory) { Fail "Refusing symlink: $directory" }
             if ((Test-Path -LiteralPath $directory -PathType Container) -and
                 -not (Get-ChildItem -LiteralPath $directory -Force | Select-Object -First 1)) {
                 Remove-Item -LiteralPath $directory -Force
