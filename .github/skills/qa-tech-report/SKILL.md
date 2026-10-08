@@ -63,6 +63,14 @@ git log --after="<start-date>" --before="<end-date>" --no-merges --format="%h | 
 
 Use the requested path/ref filters when supplied and record the exact command, ref, timezone and range. The live git history is the only valid source for what changed in that range; do not infer from prior conversation, cached knowledge or workspace files.
 
+### Weekly mode — additional step
+For weekly mode, after the git log command and before applying the no-commits hard stop, use configured provider operation `workitem.search` for current in-progress items, whether or not the period has commits. Scope it using confirmed project/work-item conventions and a finite page size; follow pagination and report partial/incomplete results honestly. Use item summaries (not IDs) to populate “Next week”. Never hard-code a project key or issue tracker. Prioritise:
+1. Items where commits were made in the requested date range (cross-reference the git log output).
+2. Build/delivery-focused items over review or discovery tasks.
+3. Older in-progress items that are more likely to be near completion.
+
+Keep to 3 bullets maximum. If more items match, select the best 3 and separately tell the user which were omitted and why so they can override the selection. Project channel formatting comes from `conventions/reporting.md` `Channel templates`; do not impose Slack-specific formatting. When the period is empty, record the search results and hard-stop outcome in the index; do not add them to the exact report body.
+
 ### No commits — hard stop rule
 If the command returns no output, the period has no commits. Calculate the exact calendar dates for the requested range (for example, “last 3 weeks” from today's date means today minus 21 days through today). Output only this report body (front matter and Result/Do next are skipped for `.txt`; the outcome is carried in `index.md`), saved as the project-configured report file name:
 
@@ -72,7 +80,7 @@ Period: [START DATE] to [END DATE]
 No commits were made during this period.
 ```
 
-Stop. Do not fall back to an earlier period. Do not mention prior work or explain what the project does. Do not add commentary to this report. For `weekly` mode only, still run the "Next week" `workitem.search` step below. For an empty period, preserve this exact report text; record the report and the hard-stop outcome in the index gate/evidence log.
+Stop. Do not fall back to an earlier period. Do not mention prior work or explain what the project does. Do not add commentary to this report. For `weekly` mode, complete the work-item search above before stopping. Preserve this exact report text; record the report and the hard-stop outcome in the index gate/evidence log.
 
 ### Prerequisites
 All modes require git access. Weekly mode additionally requires an available configured work-item provider to query in-progress items; without one, report that next-period data is not available rather than inventing commitments.
@@ -175,14 +183,6 @@ The following are common Conventional Commit examples only, not a default projec
 
 ### Output file
 Use the configured file naming convention and destination in `conventions/reporting.md`. If absent, mark `TECH_UPDATE_[START-DATE]_to_[END-DATE].txt` in `qa-work/<work-id>/outputs/` as the framework candidate, using the actual calendar dates rather than today's date by default. For example: `TECH_UPDATE_2026-05-12_to_2026-06-02.txt`. Output is plain text: use no Markdown formatting in the report body; use hyphens for bullets and plain dashes or equals signs for section dividers. The standard and detailed formats may have their own plain-text headings.
-
-### Weekly mode — additional step
-After the nonempty git log, use configured provider operation `workitem.search` for current in-progress items. Scope it using confirmed project/work-item conventions and a finite page size; follow pagination and report partial/incomplete results honestly. Use item summaries (not IDs) to populate “Next week”. Never hard-code a project key or issue tracker. Prioritise:
-1. Items where commits were made in the requested date range (cross-reference the git log output).
-2. Build/delivery-focused items over review or discovery tasks.
-3. Older in-progress items that are more likely to be near completion.
-
-Keep to 3 bullets maximum. If more items match, select the best 3 and separately tell the user which were omitted and why so they can override the selection. Project channel formatting comes from `conventions/reporting.md` `Channel templates`; do not impose Slack-specific formatting.
 
 ### Handling edge cases
 **No commits in the date range:** follow the hard stop above; do not scroll past it.
