@@ -190,10 +190,10 @@ Questions for Refinement:
 	- <focused question>
 
 Observability Review:
-	Logging Required:       <Yes / No>
-	Metrics Required:       <Yes / No>
-	Audit Events Required:  <Yes / No>
-	Coverage Status:        <Complete / Partial / Missing>
+	Logging Required:       <Yes / No / Unknown>
+	Metrics Required:       <Yes / No / Unknown>
+	Audit Events Required:  <Yes / No / Unknown>
+	Coverage Status:        <Complete / Partial / Missing / Unknown>
 
 Testing Prerequisites:
 	- [ ] <prerequisite and status; never include secret values>

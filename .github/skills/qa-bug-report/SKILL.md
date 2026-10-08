@@ -86,9 +86,11 @@ framework-version: "<installed-version-or-unknown>"
 created: "<UTC-ISO-8601>"
 inputs:
   - source: "<failure/test/spec/work artefact path or link>"
-	 revision: "<run ID/SHA/document revision/observed time>"
+    revision: "<run ID/SHA/document revision/observed time>"
 ---
 ```
+
+Start the saved file from `.github/ai-qa/framework/templates/artefact.md`: title, **Result:** and **Do next:** lines, the report template as the skill-specific section, then **Drift**. Publish only the report template content, not the artefact header or Drift.
 
 The output is the report template above, plus a short confidence/reproduction status and evidence provenance. Redact PII, credentials, tokens and sensitive payloads. Do not overwrite a stale report silently.
 

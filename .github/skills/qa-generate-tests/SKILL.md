@@ -173,7 +173,7 @@ When the spec changes, rerun this method with the updated spec. The inventory ma
 ## Output
 Write the inventory and generation record to `qa-work/<work-id>/10_test_generation.md`; write only the approved, work-item-owned test files. Update `qa-work/<work-id>/index.md` with step status, source/branch revisions, inventory and test paths, per-requirement assessed/automated/not-automated decisions, validation evidence, gaps, approvals and gate log. Use the required artefact front matter:
 
-Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `automation.md` as a fallback; always write the new name and never silently rename.
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `automation.md` as a fallback; always write the new name and never silently rename.
 
 ```yaml
 ---
@@ -182,8 +182,8 @@ skill: "qa-generate-tests"
 framework-version: "<installed-version-or-unknown>"
 created: "<UTC-ISO-8601>"
 inputs:
-	- source: "<plan/spec/requirement/repository path or link>"
-		revision: "<commit/document revision/observed time>"
+  - source: "<plan/spec/requirement/repository path or link>"
+    revision: "<commit/document revision/observed time>"
 ---
 ```
 

@@ -26,7 +26,7 @@ Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argume
 
 ## Inputs
 
-Accept a ticket or pasted requirement, FR/NFR IDs, feature, changed files, commit/diff, current repository, or a branch for `verify`. If prior requirements are unavailable, derive provisional stable IDs from provided acceptance criteria; if no ticket text is supplied, use the named feature and clearly distinguish assumptions. Gather only relevant code and tests. `verify` must not checkout, switch, reset or modify branches; if the branch is unknown, report context without claiming branch verification.
+Accept a ticket or pasted requirement, FR/NFR IDs, feature, changed files, commit/diff, current repository, or a branch for `verify`. If prior requirements are unavailable, derive provisional stable IDs from provided acceptance criteria; if no ticket text is supplied, use the named feature and clearly distinguish assumptions. Gather only relevant code and tests. `verify` must not checkout, switch, reset or modify branches; if the branch is unknown, ask once for it (offering the current branch as the candidate) and, until answered, report context without claiming branch verification.
 
 If prior artefacts are missing, gather the minimum yourself; never refuse. If the repository or requested branch is inaccessible, map supplied requirements to likely components only as a clearly marked hypothesis and report what could not be checked.
 
@@ -40,7 +40,7 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. If th
 
 | Requirement | Branch evidence | Status | Finding |
 |---|---|---|---|
-| FR/NFR ID and expected behavior | path/symbol/line or `not found` | Present / Matches / Deviates / Missing | Exact behavior, difference or uncertainty |
+| FR/NFR ID and expected behavior | path/symbol/line or `not found` | Present / Matches / Deviates / Missing / Not verifiable | Exact behavior, difference or uncertainty |
 
    `Present` means implementation exists but conformance is not established; `Matches` means evidence supports the stated behavior; `Deviates` means observable logic differs; `Missing` means no implementation was found in the inspected scope. Also report flag wiring and environment-dependent logic explicitly. If evidence is inaccessible, add `Not verifiable` rather than mislabeling missing.
 6. Stop when the minimal relevant flow and associated test/docs links are established. Record uninspected paths and uncertainty instead of expanding to a general tour.
@@ -49,7 +49,7 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. If th
 
 Write `qa-work/<work-id>/02_code_context.md` with front matter `work-id`, `skill: qa-map-code`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (branch/base/commit/source revision). Include scope and evidence revision; component map and requirement IDs; minimal affected file/symbol list and control/data-flow summary; dependencies, boundaries, side effects, flags, environment logic and failure/observability paths; related tests, docs and relevant configured commands (references only); in `verify` mode, the per-requirement status table plus explicit flag/environment findings; unknowns, confidence and what was not inspected. Update `qa-work/<work-id>/index.md` with requirement-to-component links, branch/base/commit, evidence source, verification statuses, unknown paths and artefact link. The concise chat response should identify the highest-value paths and any missing or deviating behavior.
 
-Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `context.md` as a fallback; always write the new name and never silently rename.
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `context.md` as a fallback; always write the new name and never silently rename.
 
 ## Side effects and safety
 

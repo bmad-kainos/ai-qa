@@ -38,7 +38,7 @@ Ordered: blockers first, then risk tier, then effort. Cite the source artefact n
 
 | Ticket | Readiness | Max risk | Coverage verdict | Scenarios written/not written | Automated/manual/not needed | Run result | Published |
 |---|---|---|---|---|---|---|---|
-| <ticket> | <Green / Amber / Red> | <LOW / MEDIUM / HIGH / CRITICAL> | <Pass / Needs Improvement / Insufficient / Not assessed> | <written/not written counts> | <decision and rationale> | <PASS / FAIL / BLOCKED / Not run> | <destination/receipt or Not published> |
+| <ticket> | <Green / Amber / Red / Unknown> | <LOW / MEDIUM / HIGH / CRITICAL / Unknown> | <Pass / Needs Improvement / Insufficient / Not assessed> | <written/not written counts> | <decision and rationale> | <PASS / FAIL / BLOCKED / Not run> | <destination/receipt or Not published> |
 
 ## Risk Assessment
 

@@ -26,6 +26,6 @@ Use these exact columns in the index and ticket/sprint plan. State `Not assessed
 
 | Ticket | Readiness | Max risk | Coverage verdict | Scenarios written/not written | Automated/manual/not needed | Run result | Published |
 |---|---|---|---|---|---|---|---|
-| <ticket or work ID> | <Green / Amber / Red> | <LOW / MEDIUM / HIGH / CRITICAL / Unknown> | <Pass / Needs Improvement / Insufficient / Not assessed> | <counts and linked IDs> | <decision and rationale> | <PASS / FAIL / BLOCKED / Not run, with evidence> | <destination and receipt / Not published> |
+| <ticket or work ID> | <Green / Amber / Red / Unknown> | <LOW / MEDIUM / HIGH / CRITICAL / Unknown> | <Pass / Needs Improvement / Insufficient / Not assessed> | <counts and linked IDs> | <decision and rationale> | <PASS / FAIL / BLOCKED / Not run, with evidence> | <destination and receipt / Not published> |
 
 Never infer a passing result, requirement coverage or publication from a file's existence. A published status requires the provider receipt/link.

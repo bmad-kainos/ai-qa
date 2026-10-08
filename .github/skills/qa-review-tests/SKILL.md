@@ -26,7 +26,7 @@ Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argume
 
 ## Inputs
 
-Accept `design` or `code` mode with a scenario/design document, ticket/ACs, test file(s), PR/diff or module. Use stable FR/NFR IDs if supplied; if absent, derive provisional IDs from accessible requirements. Reuse prior coverage/risk findings only if their sources are current. If tests/results or a diff are inaccessible, constrain the review to supplied evidence and identify what was not reviewed.
+Accept `design` or `code` mode with a scenario/design document, ticket/ACs, test file(s), PR/diff or module. If the mode is not given, infer it (scenario/design document → `design`; test code or diff → `code`) and state the assumption; if both are supplied, run both modes and write both artefacts (`07_design_review.md` and `11_code_review.md`), each with its own verdict. Use stable FR/NFR IDs if supplied; if absent, derive provisional IDs from accessible requirements. Reuse prior coverage/risk findings only if their sources are current. If tests/results or a diff are inaccessible, constrain the review to supplied evidence and identify what was not reviewed.
 
 If prior artefacts are missing, gather the minimum yourself; never refuse. Do not infer test pass status from source code, a test title or a stale report.
 
@@ -38,13 +38,13 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. Do no
 2. For each requirement, trace expected behavior to scenario/test assertions at unit, integration and E2E levels. Check actual assertions, not just filenames or test names. Separate existence, assertion quality, measured coverage, execution status and deployment validation.
 3. Check success, negative, boundary/equivalence, failure/exception, authorization, changed flag ON/OFF, backward compatibility, environment differences, cross-service data and HIGH/CRITICAL regression as applicable. Review deterministic setup, isolation, safe data/cleanup, retries/time dependencies, readable outcomes, fixtures/markers, CI selection and flake risk.
 4. Evaluate mocking at system boundaries: mocks should not hide the behavior/contract under test or replace real dependencies when the configured level requires them. Identify over-mocking and uncontrolled external dependencies.
-5. Rank every finding by severity: **Critical**, **High**, **Medium** or **Low**. Include evidence (path/line, requirement or assertion), impact and a specific recommendation/owner. Do not fix the finding.
+5. Rank every finding by severity: **Critical**, **High**, **Medium** or **Low**. **Critical** means a defect that lets a HIGH/CRITICAL-risk requirement ship untested or tested falsely (for example an assertion that cannot fail, or a secret committed in a test). Include evidence (path/line, requirement or assertion), impact and a specific recommendation/owner. Do not fix the finding.
 
 ### Design mode
 
 1. Check every FR/NFR is covered by one or more scenarios or explicitly justified under **Scenarios Not Written**. Each scenario must name `Covers: FRn`/`NFRn`, have reproducible setup, a deterministic expected outcome and be appropriate to its test level.
 2. Check redundancy against `.github/ai-qa/framework/method/dedup-rule.md`. Do not duplicate pure internal logic already covered by passing unit tests; preserve business outcomes, real boundaries, HIGH/CRITICAL risk, cross-service data and both states of changed flags. Missing passing-unit evidence does not justify claiming a scenario redundant.
-3. Check the scenario set for deterministic data, environment clarity, cleanup, meaningful categories, boundary/negative paths and traceable assertions. Check that every scenario is written in the configured `Scenario format` (`bdd` or `steps`, per `.github/ai-qa/framework/method/scenario-format.md`) and that formats are not mixed. Identify contradictory, untestable or duplicate scenarios.
+3. Check the scenario set for deterministic data, environment clarity, cleanup, meaningful categories, boundary/negative paths and traceable assertions. Check that every scenario is written in the configured `Scenario format` (`bdd` or `steps`, per `.github/ai-qa/framework/method/scenario-format.md`) and that formats are not mixed. If no `Scenario format` is configured, require `bdd` as the framework default and identify any scenario using another format as a deviation. Identify contradictory, untestable or duplicate scenarios.
 4. Compare the design against `05_regression_risk.md` if available. Flag gaps for each HIGH/CRITICAL area; if that artefact is absent, independently obtain minimum risk evidence or explicitly say risk comparison was limited.
 
 ### Code mode
@@ -60,7 +60,7 @@ For generated or existing API tests, also check the source quality criteria: beh
 
 Write `qa-work/<work-id>/07_design_review.md` (design mode) or `qa-work/<work-id>/11_code_review.md` (code mode) with front matter `work-id`, `skill: qa-review-tests`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirements/design/diff/test revisions and mode). The legacy name for both is `review.md`; read it as a fallback, never rename silently. Include scope, branch/revision, execution provenance, requirement-to-test/assertion matrix, limitations and an overall verdict: **Pass**, **Needs Improvement** or **Insufficient**. Findings must use:
 
-Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `review.md` as a fallback; always write the new name and never silently rename.
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `review.md` as a fallback; always write the new name and never silently rename.
 
 | Severity | Finding | Evidence | Recommendation |
 |---|---|---|---|

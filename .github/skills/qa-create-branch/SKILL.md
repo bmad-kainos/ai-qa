@@ -11,7 +11,7 @@ Resolve and validate a branch proposal from this repository's recorded conventio
 Use when QA work needs an isolated branch or when validating a proposed branch against project rules. Do not use as implicit approval to commit, push, create a PR, merge, discard work or edit project conventions.
 
 ## Reads
-Always read `.github/ai-qa/project/project.md` for project/repository identity and source context; read `.github/ai-qa/project/conventions/git.md` sections `Remote host`, `Base branch`, `Protected branches`, `Branch patterns`, `Ticket syntax`, and related PR/commit conventions, plus `conventions/qa-process.md` `Team options` for an optional branch-description length rule. Read `.github/ai-qa/framework/method/{safety,discovery,artefacts,work-id-and-git}.md`, repository contributing guidance and current `qa-work/<work-id>/index.md` if present. Inspect actual branch, HEAD, refs and dirty state. If project configuration is missing, use read-only repository evidence; for missing values only, consult `.github/ai-qa/framework/defaults/git.md`, mark each chosen fallback `★ Default`, and suggest `qa-configure`. Never hard-code a branch or base name.
+Always read `.github/ai-qa/project/project.md` for project/repository identity and source context; read `.github/ai-qa/project/conventions/git.md` sections `Remote host`, `Base branch`, `Protected branches`, `Branch patterns`, `Ticket syntax`, and related PR/commit conventions, plus `conventions/qa-process.md` `Team options` for an optional branch-description length rule. Read `.github/ai-qa/framework/method/{safety,discovery,artefacts,work-id-and-git,precedence}.md`, repository contributing guidance and current `qa-work/<work-id>/index.md` if present. Inspect actual branch, HEAD, refs and dirty state. If project configuration is missing, use read-only repository evidence; for missing values only, consult `.github/ai-qa/framework/defaults/git.md`, mark each chosen fallback `Framework default (unconfirmed)`, and suggest `qa-configure`. Never hard-code a branch or base name.
 
 ## Work-id
 Resolve per `.github/ai-qa/framework/method/work-id-and-git.md`: explicit argument → ticket key from current branch via the `Ticket syntax`/`Branch patterns` in conventions/git.md → `adhoc-<yyyymmdd>-<slug>`.
@@ -21,26 +21,14 @@ Take task/work ID, optional requested name/base and whether the user is asking o
 
 ## Procedure
 1. Read the project's `Base branch`, `Protected branches`, `Branch patterns` and `Ticket syntax` exactly. Check whether an optional branch-description length appears under `qa-process.md` `Team options`; apply it only when configured. Validate ticket syntax and pattern together. Never assume or hard-code branch, base, ticket, team or remote names.
-2. If a required convention is absent, use only the corresponding rule in `.github/ai-qa/framework/defaults/git.md`, label it `★ Default`, and include that provenance in the proposal. Project conventions and observed repository evidence take precedence over defaults; record conflicts rather than silently resolving them.
+2. If a required convention is absent, use only the corresponding rule in `.github/ai-qa/framework/defaults/git.md`, label it `Framework default (unconfirmed)`, and include that provenance in the proposal. Project conventions and observed repository evidence take precedence over defaults; record conflicts rather than silently resolving them.
 3. Inspect current branch/HEAD, base ref/SHA, local and remote candidate refs, protected status and worktree. If already on the requested valid branch, propose reuse. Otherwise propose a unique name consistent with the confirmed pattern, ticket syntax and optional description length. Show branch name, base and SHA, ticket match, evidence/defaults, dirty state, conflicts, and exact planned effects.
 4. **Proposal mode has no side effect.** Return the proposal and wait for an explicit request/affirmative before creating. For creation, present the exact action and target, base, commands/effects and how existing changes are preserved, then obtain explicit L2 approval. Do not treat a request to propose as permission to create.
 5. After L2 approval, create/switch to the local branch without resetting, cleaning, stashing or discarding any changes. Never force checkout, overwrite/delete an existing branch or modify protected/default branches. A dirty worktree is preserved exactly; if the branch operation cannot proceed without affecting it, stop and offer safe choices. Verify branch name, base relationship, refs and unchanged user work, then report the local outcome.
 6. **Never push on create.** When handed off from `qa-create-pr` (no remote branch yet), verify the source branch has at least one commit beyond its confirmed base before offering a push; if it does not, say there is nothing to push or open a PR for yet. If it is ahead, offer the push as a separate step; if the user then requests a push, show the exact remote and branch plus effects and get a separate L4 approval. After an authorised push, report its result; do not merge. Recheck branch and work-item freshness before later automation.
 
 ## Output
-Present the proposal in chat. When creation is approved, write the step result to `qa-work/<work-id>/09_execution.md` and update `qa-work/<work-id>/index.md` with current/base refs, branch name, dirty state, `★ Default` choices, L2 approval, local outcome and push state (`not pushed` unless separately approved). Use:
-
-```yaml
----
-work-id: "<work-id>"
-skill: "qa-create-branch"
-framework-version: "<installed-version-or-unknown>"
-created: "<UTC-ISO-8601>"
-inputs:
-	- source: "<task/conventions/git/repository path or link>"
-		revision: "<commit/document revision/observed time>"
----
-```
+Present the proposal in chat. When creation is approved, record the step result in the body of `qa-work/<work-id>/index.md` only (`09_execution.md` is reserved for test execution): current/base refs, branch name, dirty state, `Framework default (unconfirmed)` choices, L2 approval, local outcome and push state (`not pushed` unless separately approved). Preserve existing index front matter; when initializing an index, use `.github/ai-qa/framework/templates/work-index.md` unchanged, including its `skill: "qa-workflow"` metadata.
 
 Report: proposed/created/reused branch; validated pattern/ticket syntax; base name and SHA; protected/default status; dirty-tree handling; defaults used; L2 decision; remote state; and blockers. Do not create an index only to justify a branch proposal; if no branch was created and persistence was not requested, no artefact write is needed.
 

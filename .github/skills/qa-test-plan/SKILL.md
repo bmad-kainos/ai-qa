@@ -73,7 +73,7 @@ Do not fabricate ticket lists when a sprint/query is inaccessible; report the pr
 ```md
 | Ticket | Readiness | Max risk | Coverage verdict | Scenarios written/not written | Automated/manual/not needed | Run result | Published |
 |---|---|---|---|---|---|---|---|
-| <key> | <Green/Amber/Red/Unknown> | <LOW/MEDIUM/HIGH/CRITICAL> | <Pass/Needs Improvement/Insufficient/Not assessed> | <written>/<not written> | <decision> | <Not run/PASS/FAIL/BLOCKED with evidence> | <Not published or confirmed receipt> |
+| <key> | <Green/Amber/Red/Unknown> | <LOW/MEDIUM/HIGH/CRITICAL/Unknown> | <Pass/Needs Improvement/Insufficient/Not assessed> | <written>/<not written> | <decision> | <Not run/PASS/FAIL/BLOCKED with evidence> | <Not published or confirmed receipt> |
 ```
 
 Do not claim publication until `qa-publish` returns a receipt/link. Do not claim tests pass without current run evidence. Mark unavailable information explicitly and list it as an open question or blocker.

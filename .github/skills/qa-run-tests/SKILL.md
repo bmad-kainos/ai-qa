@@ -21,7 +21,7 @@ Take the requested scope (`all`, path/node, tag, or risk), work ID, target revis
 
 ## Procedure
 1. Inventory matching tests, requirements/risk links, known skips/quarantines, dependencies, cleanup and existing fresh runs. Confirm current branch, commit, selected files, worktree state and environment classification. Do not infer coverage from names alone.
-2. Resolve the command from `conventions/testing.md` `Commands`: use its `all`, `path`, `tag` or `list-help` entry as applicable. For a risk-selected subset, select existing cases from requirement-to-test traceability and regression/risk evidence, then use the documented path/tag command. Never invent a package script, runner flag or environment URL. Confirm documented `lint-compile` only when that is the requested validation, not as a substitute for execution.
+2. Resolve the command from `conventions/testing.md` `Commands`: use its `all`, `path`, `tag` or `list-help` entry as applicable. For a risk-selected subset, select existing cases from requirement-to-test traceability and regression/risk evidence, then use the documented path/tag command. Never invent a package script, runner flag or environment URL. A command counts as documented when it is in `conventions/testing.md` `Commands`; a command found only in the README or CI configuration is a candidate to propose with its source, not a documented command. Confirm documented `lint-compile` only when that is the requested validation, not as a substitute for execution.
 3. Before a gated run, show the exact command and selector, target revision, environment, expected duration, data effects, cleanup, reports/log destination and reason for the scope. A full suite, shared/environment-dependent run or long run is L3 unless the exact command is listed as safe in `conventions/qa-process.md`. Proceed only after explicit affirmative approval. A narrower run is also L3 when it has environment-dependent or shared-service effects.
 4. Run the approved command and capture the exact command, environment, start/end time, exit code, test identifiers and report/log paths. Parse available JUnit XML, TRX, pytest JSON, Playwright JSON or console output. Prefer structured reports; do not infer totals from incomplete/truncated output. Record passed, failed, skipped, blocked and not-run distinctly. A zero exit code without usable run evidence is not enough to claim PASS.
 5. Classify the environment outcome from `project.md`. Missing dependency or infrastructure is `BLOCKED`, not an application failure; dependency installation is a separate L5 action. Do not label unavailable tests as passed. Perform only documented test-data cleanup, and report cleanup failure separately. Never rerun an unsafe or shared operation without the required gate.
@@ -30,7 +30,7 @@ Take the requested scope (`all`, path/node, tag, or risk), work ID, target revis
 ## Output
 Write the execution summary to `qa-work/<work-id>/09_execution.md` and safe, redacted run logs/reports to `qa-work/<work-id>/logs/`. Update `qa-work/<work-id>/index.md` with scope, revision, environment, command, result, failed IDs, artefact links, status and any approval/gate log. Each Markdown artefact uses:
 
-Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `templates/artefact.md`. If the numbered file is absent, read legacy `execution.md` as a fallback; always write the new name and never silently rename.
+Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `execution.md` as a fallback; always write the new name and never silently rename.
 
 ```yaml
 ---
@@ -39,8 +39,8 @@ skill: "qa-run-tests"
 framework-version: "<installed-version-or-unknown>"
 created: "<UTC-ISO-8601>"
 inputs:
-	- source: "<test/plan/run/config path or link>"
-		revision: "<commit/run ID/document revision/observed time>"
+  - source: "<test/plan/run/config path or link>"
+    revision: "<commit/run ID/document revision/observed time>"
 ---
 ```
 
@@ -63,7 +63,7 @@ Use this execution record template:
 - Drift:
 ```
 
-PASS requires observed successful execution evidence; FAIL requires observed failing tests; incomplete runs are BLOCKED or Not run. Never write `PASS` merely because a command was proposed, started, or returned without a parseable result. Raw logs containing secrets or sensitive data are not saved or committed.
+PASS requires observed successful execution evidence; FAIL requires observed failing tests; incomplete runs are BLOCKED or Not run. When outcomes mix, the overall Result takes the highest-precedence one: FAIL over BLOCKED over PASS (list the counts regardless). Never write `PASS` merely because a command was proposed, started, or returned without a parseable result. Raw logs containing secrets or sensitive data are not saved or committed.
 
 ## Side effects and safety
 | Action | Level | Gate |
