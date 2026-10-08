@@ -103,11 +103,11 @@ Use judgment and the actual system boundaries: a signal does not override missin
 Conduct a focused interview to resolve requirement and design decisions. Ask **one question at a time**, wait for the answer, then decide whether another question is needed. Walk only decision branches that affect behavior, dependencies, testability, safety or acceptance. Include relevant context and consequences; offer a recommended Option A and alternatives. Use this exact question shape:
 
 ```md
-**Question** <number> — <topic>
+**Question <n> — <topic>**
 
 <context, decision needed, and relevant options>
 
-**Option A** (recommended): <description>
+**Option A (recommended):** <description>
 **Option B**: <description>
 ...
 ```
