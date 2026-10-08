@@ -10,12 +10,6 @@ inputs:
 
 # Test Plan — <ticket or sprint>
 
-**Author:** <current user or role, if known>
-**Date:** <date>
-**Project:** <project name and confirmed identifier>
-**Scope:** <ticket / sprint / feature>
-**Status:** Draft
-
 ## TL;DR
 
 - **Verdict:** <Go / Go with conditions / No-go / Not assessed, with one-line reason>
@@ -29,6 +23,12 @@ Ordered: blockers first, then risk tier, then effort. Cite the source artefact n
 | # | Action | Owner | Evidence (FR/NFR/scenario ID) | Blocker | Source |
 |---|---|---|---|---|---|
 | 1 | <action> | <owner> | <ID> | <Yes / No> | <e.g. 03> |
+
+**Author:** <current user or role, if known>
+**Date:** <date>
+**Project:** <project name and confirmed identifier>
+**Scope:** <ticket / sprint / feature>
+**Status:** Draft
 
 ## Summary
 

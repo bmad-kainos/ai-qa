@@ -53,7 +53,7 @@ inputs:
 
 `inputs` lists every decision-relevant upstream source: ticket/AC revision, branch/commit, project context and conventions, applicable pack/version, earlier analysis artefacts and test-run IDs as appropriate. Do not put secrets in metadata. For non-Markdown outputs use a suitable metadata comment/header when the format supports it; log raw-log provenance in `09_execution.md` and the index, not by modifying logs.
 
-After the front-matter, every skill-produced artefact opens with a header of two lines before any other section: **Result:** one-sentence verdict or outcome, and **Do next:** at most 3 ordered actions (or "None"). Details follow below it.
+After the front-matter, every skill-produced artefact except `index.md` and `outputs/08_test_plan.md` opens with a header of two lines before any other section (those two open with the title and TL;DR instead, see below; the TL;DR verdict and next action serve as Result and Do next): **Result:** one-sentence verdict or outcome, and **Do next:** at most 3 ordered actions (or "None"). Details follow below it.
 
 Start each skill-produced artefact from `.github/ai-qa/framework/templates/artefact.md`. It provides this front-matter, a scope and status line, a skill-specific output section and the **Drift** section that every skill must include. Start `index.md` from `templates/work-index.md` instead.
 

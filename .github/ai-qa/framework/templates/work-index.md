@@ -10,11 +10,6 @@ inputs:
 
 # QA Work Index
 
-**Scope:** <ticket, feature or bounded investigation>
-**Branch / revision:** <confirmed branch and commit>
-**Workflow:** <design / automate / full / triage / independent skill>
-**Updated:** <UTC timestamp>
-
 ## TL;DR
 
 - **Verdict:** <Go / Go with conditions / No-go / Not assessed, with one-line reason>
@@ -28,6 +23,11 @@ Ordered: blockers first, then risk tier, then effort. Cite the source artefact n
 | # | Action | Owner | Evidence (FR/NFR/scenario ID) | Blocker | Source |
 |---|---|---|---|---|---|
 | 1 | <action> | <owner> | <ID> | <Yes / No> | <e.g. 03> |
+
+**Scope:** <ticket, feature or bounded investigation>
+**Branch / revision:** <confirmed branch and commit>
+**Workflow:** <design / automate / full / triage / independent skill>
+**Updated:** <UTC timestamp>
 
 ## Workflow step status and staleness
 

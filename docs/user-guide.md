@@ -65,7 +65,7 @@ The work id is resolved in this order:
 | File | Contents | Default |
 |---|---|---|
 | `index.md` | Step status, staleness, traceability matrix, QA Summary, gate log | committed |
-| `01_requirement_analysis.md` … `09_execution.md` | Per-step outputs | ignored |
+| `01_requirement_analysis.md` … `07_design_review.md`, `09_execution.md` … `11_code_review.md` | Per-step outputs | ignored |
 | `logs/` | Raw logs | ignored |
 | `outputs/` | `08_test_plan.md`, `comment.md`, `bug-*.md`, `test-data.*` | committed |
 
