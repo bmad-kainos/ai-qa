@@ -53,8 +53,23 @@ If prior artefacts are missing, gather the minimum yourself; never refuse. Do no
 2. Apply the pack's documented anti-patterns. For API tests, inspect the published contract and check applicable happy path, omitted required fields, invalid types, auth failure, response schema and at least two boundary cases per constrained field; assert status and error-body structure. Do not invent expected codes without a contract.
 3. Check tests are independent, deterministic, isolated, safe to repeat, and assert behavior rather than implementation details. Assess mocks, boundary fidelity, data lifecycle, secrets, retries, timing, skipped/disabled tests and flake risk. Verify requirement traceability to assertions.
 4. Treat execution separately. Report results only when a current run/result artefact was provided or authorized and available. This review does not itself execute tests.
+5. In code mode, assess each quality-gate heading below from the reviewed evidence. Assign exactly `PASS` when the heading was assessed and no gap was found; assign `FAIL` when evidence shows a gap or is insufficient to verify the heading. State the evidence or limitation for every result. Tag each finding with one or more of the exact headings it affects.
 
 For generated or existing API tests, also check the source quality criteria: behavior-describing names; no dependency on test execution order; minimum, maximum, valid mid-value and invalid-value cases for constrained inputs; error assertions covering both status and body structure; no hard-coded credentials/tokens/secrets; and shared setup in configured fixtures/configuration rather than duplicated inside each test.
+
+### Code-mode quality-gate headings
+
+In code mode, assess and report all five headings, even when no finding is raised:
+
+| Heading | Check |
+|---|---|
+| Conventions | Tests follow the configured and neighboring paths, names, fixtures/builders, assertions and setup conventions. |
+| Good practice | Tests are behavior-focused, deterministic, isolated, repeatable and maintainable, with appropriate boundary fidelity and no flake-prone timing or order dependencies. |
+| Correct coverage | Assertions trace to requirements and cover the applicable outcomes, negative/boundary cases and high-risk behavior. |
+| No duplication | Tests add distinct assurance and do not duplicate coverage without a stated reason. |
+| Safe by default | Test data and setup are safe; secrets are absent; tests do not use production systems or disable/skip coverage. |
+
+Insufficient evidence is `FAIL`, not an assumed pass; explain what was unavailable in the evidence cell. A finding may affect more than one heading and must carry each applicable heading as a tag in its Finding cell. Keep the existing severity levels, ranking and findings-table columns unchanged; gate tags do not change severity. Any `FAIL` means the overall verdict cannot be **Pass**: use **Insufficient** when every `FAIL` is caused only by unavailable evidence, otherwise **Needs Improvement**. Five `PASS` results do not by themselves make the verdict **Pass**; open findings still apply.
 
 ## Output
 
@@ -65,6 +80,18 @@ Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 
 | Severity | Finding | Evidence | Recommendation |
 |---|---|---|---|
 | <Critical/High/Medium/Low> | <specific defect, gap or risk> | <path:line, FR/NFR, assertion or missing evidence> | <concrete action and responsible role> |
+
+In code mode, include this gate table with the findings table. Use exactly one `PASS` or `FAIL` result for every heading and cite its review evidence or limitation:
+
+| Quality gate heading | Result | Evidence / related findings |
+|---|---|---|
+| Conventions | <PASS / FAIL> | <evidence or limitation> |
+| Good practice | <PASS / FAIL> | <evidence or limitation> |
+| Correct coverage | <PASS / FAIL> | <evidence or limitation> |
+| No duplication | <PASS / FAIL> | <evidence or limitation> |
+| Safe by default | <PASS / FAIL> | <evidence or limitation> |
+
+Tag each finding in the existing `Finding` cell with its applicable heading(s), for example `[Conventions; Safe by default]`; retain the exact existing `Severity`, `Finding`, `Evidence` and `Recommendation` columns and severity ranking. Do not add these code-mode headings to design-mode output.
 
 State whether every FR/NFR is covered or justified Not Written, dedup decisions, determinism, regression HIGH/CRITICAL coverage and what was not reviewed. Update `qa-work/<work-id>/index.md` with reviewed design/diff/commit, requirement coverage, test-result provenance, verdict, findings and link. Return the most important findings and verdict in chat. Never rewrite reviewed tests.
 
