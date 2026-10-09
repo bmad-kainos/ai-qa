@@ -77,7 +77,7 @@ A self-hosted/custom URL suggests Server/DC (**◐ Inferred**), not confirmed. P
 }
 ```
 
-Runtime install (separate L5 approval, user's own machine): `uv` via `brew install uv` (macOS) or the installer from the uv documentation. Detect it first with a platform-appropriate read-only lookup: `command -v uvx` (POSIX shells) or `Get-Command uvx` (PowerShell).
+Runtime preference: `uv`, then `pipx`, then Docker (or Podman). Runtime install (separate L5 approval, user's own machine): `uv` via `brew install uv` (macOS) or the installer from the uv documentation. Detect it first with a platform-appropriate read-only lookup: `command -v uvx` (POSIX shells) or `Get-Command uvx` (PowerShell); use the same lookup for `pipx` and `docker`.
 
 **Cloud variant** (`*.atlassian.net`): replace the token inputs with an account email and an API token, and set the same `env` keys the server expects for Cloud.
 
@@ -94,7 +94,19 @@ Runtime install (separate L5 approval, user's own machine): `uv` via `brew insta
 
 Add matching `promptString` inputs (`atlassian-email`, and `atlassian-token` with `"password": true`).
 
-**Docker variant** (when `uv` cannot be installed): the server runs from its published image, so `command` is `docker`, not `uvx`. Pin a version tag rather than `latest`, preview the exact `docker pull <image>:<tag>` command and get separate L5 approval before running it. Pass each variable by name so values stay out of the file.
+**pipx variant** (when `uv` cannot be installed but Python and `pipx` are available): same package, same pin and same first-run approval, since `pipx run` downloads and caches it. **Unverified** until it starts.
+
+```json
+"mcp-atlassian": {
+  "type": "stdio",
+  "command": "pipx",
+  "args": ["run", "--spec", "mcp-atlassian==<pinned-version>", "mcp-atlassian"]
+}
+```
+
+Use the same `env` block as the `uvx` variant for the deployment.
+
+**Docker variant** (only if neither `uv` nor `pipx` is usable, and the user confirms they are licensed to use Docker; Podman is a compatible alternative with `command` set to `podman`): the server runs from its published image, so `command` is `docker`, not `uvx`. Pin a version tag rather than `latest`, preview the exact `docker pull <image>:<tag>` command and get separate L5 approval before running it. Pass each variable by name so values stay out of the file.
 
 ```json
 "mcp-atlassian": {
