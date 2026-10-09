@@ -24,7 +24,7 @@ flowchart TD
 | Step | What happens |
 |---|---|
 | 1 Preflight | Reads the manifest and version. Decides first run or refresh |
-| 2 Local discovery | Follows `method/discovery.md` across repo shape, build, frameworks and data, test stack and conventions, execution, CI/CD, git, PRs, CODEOWNERS, definition of done, docs and integrations. Never runs the test suite |
+| 2 Local discovery | Follows `method/discovery.md` across repo shape, build, frameworks and data, test stack and conventions, execution, CI/CD, git, PRs, branch protection, CODEOWNERS, definition of done, docs and integrations. Never runs the test suite |
 | 3 Integrations | Picks a provider per capability and identifies the deployment: `*.atlassian.net` → Cloud ◐, a self-hosted URL → Server/DC ◐, confirmed by a read-only `serverInfo` probe or asked once. Orders transports from preferred to fallback |
 | 4 Remote docs | Optional second pass over a Confluence space or Azure Wiki root you name. Index pages first |
 | 5 Confirm | Asks only about ⚠ conflicts, behaviour-relevant ◐, ? and relevant ∅ findings. Each question shows the evidence and a recommended Option A. "Accept all" and one optional constraints question are supported. Environment-variable names only, never secrets. Also decides the manual scenario format, `bdd` (Given / When / Then) or `steps` (numbered steps with expected results), from how acceptance criteria and existing manual tests are written |
