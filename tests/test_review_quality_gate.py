@@ -34,6 +34,10 @@ class CodeReviewQualityGateTests(unittest.TestCase):
         skill = SKILL.read_text(encoding="utf-8")
 
         self.assertIn("Any `FAIL` means the overall verdict cannot be **Pass**", skill)
+        self.assertIn(
+            "use **Insufficient** when every `FAIL` is caused only by unavailable evidence, otherwise **Needs Improvement**",
+            skill,
+        )
 
 
 if __name__ == "__main__":
