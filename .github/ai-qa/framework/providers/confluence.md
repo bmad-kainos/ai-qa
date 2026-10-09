@@ -2,7 +2,7 @@
 
 Use the [provider contract](operations.md). Determine deployment, space key/ID, page ID, parent, content representation and edit permission. A rendered Markdown preview is not a valid Confluence storage body; convert and validate supported rich content carefully, preserving links, tables and code blocks. Treat macros, attachments and embedded content as potentially lossy.
 
-**MCP tool-name hints:** For Cloud, check Atlassian remote MCP capabilities such as `mcp_atlassian_mcp_confluence_search`, `mcp_atlassian_mcp_confluence_get_page`, `mcp_atlassian_mcp_confluence_create_page` and `mcp_atlassian_mcp_confluence_update_page`. A community server such as `sooperset/mcp-atlassian` may support Cloud and Server/DC. Verify tool names, schemas, deployment and write/read-back capability against the available tools; names here are hints, not guarantees.
+**MCP tool-name hints:** For Cloud, check Atlassian remote MCP capabilities such as `mcp_atlassian_mcp_confluence_search`, `mcp_atlassian_mcp_confluence_get_page`, `mcp_atlassian_mcp_confluence_create_page` and `mcp_atlassian_mcp_confluence_update_page`. A community server such as `sooperset/mcp-atlassian` may support Cloud and Server/DC. Verify tool names, schemas, deployment and write/read-back capability against the available tools; names here are hints, not guarantees. For the install recipe and `.vscode/mcp.json` entry, see the `sooperset/mcp-atlassian` recipe in [jira.md](jira.md).
 ## Deployment: Cloud
 
 ### Deployment and authentication

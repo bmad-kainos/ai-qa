@@ -51,6 +51,82 @@ A self-hosted/custom URL suggests Server/DC (**◐ Inferred**), not confirmed. P
 
 **MCP hints:** an approved community MCP server such as `sooperset/mcp-atlassian` may support Jira Server/DC. Verify the installed tool names, deployment support, inputs and permissions. The Atlassian remote MCP is a Cloud hint; do not assume it connects to Server/DC.
 
+**MCP server recipe (`sooperset/mcp-atlassian`, covers Jira and Confluence; Cloud and Server/DC):** it runs on demand as `uvx --no-python-downloads mcp-atlassian@<pinned-version>`, so install only the `uv` runtime first (Docker is the alternative, see below). `--no-python-downloads` stops `uv` silently installing a Python interpreter (the server needs Python 3.10 or newer); if no compatible Python is present, treat `uv` as unavailable or ask separate L5 approval for an exact Python install command. Pin an exact, verified release (check the latest on PyPI) in both the previewed command and the `args` entry, so a later cache refresh cannot pull a different release; upgrades are a separately approved change. The first `uvx` invocation downloads and caches `mcp-atlassian`, which is dependency acquisition: preview that exact command and get separate L5 approval before it runs. Draft the `.vscode/mcp.json` entry with `inputs` so no secret is written, then ask separate L5 approval for each of: the write, any runtime install, the package or image acquisition (the first `uvx` run, `pipx run`, or `docker pull`), and, for Docker, the `docker run` command, because the written config launches it whenever VS Code starts the server. Do not write the config until all of these are approved. The JSON below is the **Server/DC** variant (personal access tokens, `*_PERSONAL_TOKEN`); use the Cloud variant for `*.atlassian.net`. Confirm variable names against the server's authentication docs before writing. Each product needs only its own URL and credential: drop the Confluence inputs and `env` keys if only Jira is used, and the Jira ones if only Confluence is used. **Unverified** until the server starts and a read-only tool call succeeds.
+
+```json
+{
+  "inputs": [
+    { "id": "jira-url", "type": "promptString", "description": "Jira base URL" },
+    { "id": "jira-token", "type": "promptString", "description": "Jira personal access token", "password": true },
+    { "id": "confluence-url", "type": "promptString", "description": "Confluence base URL" },
+    { "id": "confluence-token", "type": "promptString", "description": "Confluence personal access token", "password": true }
+  ],
+  "servers": {
+    "mcp-atlassian": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["--no-python-downloads", "mcp-atlassian@<pinned-version>"],
+      "env": {
+        "JIRA_URL": "${input:jira-url}",
+        "JIRA_PERSONAL_TOKEN": "${input:jira-token}",
+        "CONFLUENCE_URL": "${input:confluence-url}",
+        "CONFLUENCE_PERSONAL_TOKEN": "${input:confluence-token}"
+      }
+    }
+  }
+}
+```
+
+Runtime preference: `uv`, then `pipx`, then Docker (or Podman). Runtime install (separate L5 approval, user's own machine) is offered only where an exact command is listed here: `uv` on macOS `brew install uv`, on Windows `winget install --id=astral-sh.uv -e`. For Linux and other systems, `pipx`, Docker and Podman, no install command is provided here: tell the user to follow the vendor's installation documentation themselves (Docker also needs a licence check and often admin rights), then re-run the lookup; if it is still absent, use the fallback. Never run a downloaded installer script on the user's behalf. Detect each tool first with a platform-appropriate read-only lookup: `command -v uvx` (POSIX shells) or `Get-Command uvx` (PowerShell); use the same lookup for `pipx` and `docker`.
+
+**Cloud variant** (`*.atlassian.net`): replace the token inputs with an account email and an API token, and set the same `env` keys the server expects for Cloud.
+
+```json
+"env": {
+  "JIRA_URL": "${input:jira-url}",
+  "JIRA_USERNAME": "${input:atlassian-email}",
+  "JIRA_API_TOKEN": "${input:atlassian-token}",
+  "CONFLUENCE_URL": "${input:confluence-url}",
+  "CONFLUENCE_USERNAME": "${input:atlassian-email}",
+  "CONFLUENCE_API_TOKEN": "${input:atlassian-token}"
+}
+```
+
+Add matching `promptString` inputs (`atlassian-email`, and `atlassian-token` with `"password": true`).
+
+**pipx variant** (when `uv` cannot be installed but Python and `pipx` are available): same package, same pin and same first-run approval, since `pipx run` downloads and caches it. **Unverified** until it starts.
+
+```json
+"mcp-atlassian": {
+  "type": "stdio",
+  "command": "pipx",
+  "args": ["run", "--spec", "mcp-atlassian==<pinned-version>", "mcp-atlassian"]
+}
+```
+
+Use the same `env` block as the `uvx` variant for the deployment.
+
+**Docker variant** (only if neither `uv` nor `pipx` is usable, and the user confirms they are licensed to use Docker; Podman is a compatible alternative with `command` set to `podman`): the server runs from its published image, so `command` is `docker`, not `uvx`. Pin a version tag rather than `latest`, and keep `--pull=never` in the `docker run` arguments: `docker run` otherwise pulls a missing image itself, bypassing the approved `docker pull`, so a missing image must fail and send Configure back to request a new pull approval. preview the exact `docker pull <image>:<tag>` command and the exact `docker run` arguments and get separate L5 approval for each before the config is written. Pass each variable by name so values stay out of the file, and forward exactly the variables the deployment and the selected products need: drop the `-e` and `env` entries of any product not in use (Confluence-only users get no Jira entries, and the reverse). The example below is Server/DC with both products; for Cloud, forward `JIRA_USERNAME`, `JIRA_API_TOKEN`, `CONFLUENCE_USERNAME` and `CONFLUENCE_API_TOKEN` instead of the `*_PERSONAL_TOKEN` names, with the matching `env` values from the Cloud variant.
+
+```json
+"mcp-atlassian": {
+  "type": "stdio",
+  "command": "docker",
+  "args": ["run", "--rm", "-i", "--pull=never",
+    "-e", "JIRA_URL", "-e", "JIRA_PERSONAL_TOKEN",
+    "-e", "CONFLUENCE_URL", "-e", "CONFLUENCE_PERSONAL_TOKEN",
+    "ghcr.io/sooperset/mcp-atlassian:<pinned-tag>"],
+  "env": {
+    "JIRA_URL": "${input:jira-url}",
+    "JIRA_PERSONAL_TOKEN": "${input:jira-token}",
+    "CONFLUENCE_URL": "${input:confluence-url}",
+    "CONFLUENCE_PERSONAL_TOKEN": "${input:confluence-token}"
+  }
+}
+```
+
+Confirm the image name and tag against the server's installation docs before writing. After a VS Code reload, verify with a tool listing and one read-only call.
+
 | Operation | MCP | CLI | REST | Manual |
 |---|---|---|---|---|
 | L0 `workitem.get` | Issue-get capability; verify normalized fields | No CLI in matrix | `GET /rest/api/2/issue/{key}`; discover AC field and fetch comments/links | User pastes issue plus source URL; mark unverified |
