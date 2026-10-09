@@ -29,6 +29,11 @@ class CodeReviewQualityGateTests(unittest.TestCase):
         self.assertIn("Tag each finding in the existing `Finding` cell", skill)
         self.assertIn("Keep the existing severity levels, ranking and findings-table columns unchanged", skill)
 
+    def test_any_fail_prevents_pass_verdict(self):
+        skill = SKILL.read_text(encoding="utf-8")
+
+        self.assertIn("Any `FAIL` means the overall verdict cannot be **Pass**", skill)
+
 
 if __name__ == "__main__":
     unittest.main()

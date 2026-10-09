@@ -69,7 +69,7 @@ In code mode, assess and report all five headings, even when no finding is raise
 | No duplication | Tests add distinct assurance and do not duplicate coverage without a stated reason. |
 | Safe by default | Test data and setup are safe; secrets are absent; tests do not use production systems or disable/skip coverage. |
 
-Insufficient evidence is `FAIL`, not an assumed pass; explain what was unavailable in the evidence cell. A finding may affect more than one heading and must carry each applicable heading as a tag in its Finding cell. Keep the existing severity levels, ranking and findings-table columns unchanged; gate tags do not change severity.
+Insufficient evidence is `FAIL`, not an assumed pass; explain what was unavailable in the evidence cell. A finding may affect more than one heading and must carry each applicable heading as a tag in its Finding cell. Keep the existing severity levels, ranking and findings-table columns unchanged; gate tags do not change severity. Any `FAIL` means the overall verdict cannot be **Pass**: use **Insufficient** when every `FAIL` is caused only by unavailable evidence, otherwise **Needs Improvement**. Five `PASS` results do not by themselves make the verdict **Pass**; open findings still apply.
 
 ## Output
 
