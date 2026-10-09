@@ -51,7 +51,7 @@ A self-hosted/custom URL suggests Server/DC (**◐ Inferred**), not confirmed. P
 
 **MCP hints:** an approved community MCP server such as `sooperset/mcp-atlassian` may support Jira Server/DC. Verify the installed tool names, deployment support, inputs and permissions. The Atlassian remote MCP is a Cloud hint; do not assume it connects to Server/DC.
 
-**MCP server recipe (`sooperset/mcp-atlassian`, covers Jira and Confluence; Cloud and Server/DC):** it runs on demand as `uvx mcp-atlassian`, so only the `uv` runtime needs installing (Docker is the alternative); there is no separate package install. Draft this `.vscode/mcp.json` entry with `inputs` so no secret is written, then ask separate L5 approval for the write and for any runtime install. Server/DC uses a personal access token (`*_PERSONAL_TOKEN`); Cloud uses `*_USERNAME` plus `*_API_TOKEN`. Confirm variable names against the server's authentication docs before writing, and drop the Confluence entries if only Jira is used. **Unverified** until the server starts and a read-only tool call succeeds.
+**MCP server recipe (`sooperset/mcp-atlassian`, covers Jira and Confluence; Cloud and Server/DC):** it runs on demand as `uvx mcp-atlassian`, so install only the `uv` runtime first (Docker is the alternative, see below). The first `uvx` invocation downloads and caches `mcp-atlassian`, which is dependency acquisition: preview that exact command and get separate L5 approval before it runs. Draft the `.vscode/mcp.json` entry with `inputs` so no secret is written, then ask separate L5 approval for each of: the write, any runtime install, and the first `uvx` (or `docker pull`) run. The JSON below is the **Server/DC** variant (personal access tokens, `*_PERSONAL_TOKEN`); use the Cloud variant for `*.atlassian.net`. Confirm variable names against the server's authentication docs before writing, and drop the Confluence entries if only Jira is used. **Unverified** until the server starts and a read-only tool call succeeds.
 
 ```json
 {
@@ -77,7 +77,43 @@ A self-hosted/custom URL suggests Server/DC (**◐ Inferred**), not confirmed. P
 }
 ```
 
-Runtime install (separate L5 approval, user's own machine): `uv` via `brew install uv` (macOS) or the installer from the uv documentation; offer Docker instead if the user prefers or cannot install `uv`. After a VS Code reload, verify with a tool listing and one read-only call.
+Runtime install (separate L5 approval, user's own machine): `uv` via `brew install uv` (macOS) or the installer from the uv documentation. Detect it first with a platform-appropriate read-only lookup: `command -v uvx` (POSIX shells) or `Get-Command uvx` (PowerShell).
+
+**Cloud variant** (`*.atlassian.net`): replace the token inputs with an account email and an API token, and set the same `env` keys the server expects for Cloud.
+
+```json
+"env": {
+  "JIRA_URL": "${input:jira-url}",
+  "JIRA_USERNAME": "${input:atlassian-email}",
+  "JIRA_API_TOKEN": "${input:atlassian-token}",
+  "CONFLUENCE_URL": "${input:confluence-url}",
+  "CONFLUENCE_USERNAME": "${input:atlassian-email}",
+  "CONFLUENCE_API_TOKEN": "${input:atlassian-token}"
+}
+```
+
+Add matching `promptString` inputs (`atlassian-email`, and `atlassian-token` with `"password": true`).
+
+**Docker variant** (when `uv` cannot be installed): the server runs from its published image, so `command` is `docker`, not `uvx`. Pin a version tag rather than `latest`, preview the exact `docker pull <image>:<tag>` command and get separate L5 approval before running it. Pass each variable by name so values stay out of the file.
+
+```json
+"mcp-atlassian": {
+  "type": "stdio",
+  "command": "docker",
+  "args": ["run", "--rm", "-i",
+    "-e", "JIRA_URL", "-e", "JIRA_PERSONAL_TOKEN",
+    "-e", "CONFLUENCE_URL", "-e", "CONFLUENCE_PERSONAL_TOKEN",
+    "ghcr.io/sooperset/mcp-atlassian:<pinned-tag>"],
+  "env": {
+    "JIRA_URL": "${input:jira-url}",
+    "JIRA_PERSONAL_TOKEN": "${input:jira-token}",
+    "CONFLUENCE_URL": "${input:confluence-url}",
+    "CONFLUENCE_PERSONAL_TOKEN": "${input:confluence-token}"
+  }
+}
+```
+
+Confirm the image name and tag against the server's installation docs before writing. After a VS Code reload, verify with a tool listing and one read-only call.
 
 | Operation | MCP | CLI | REST | Manual |
 |---|---|---|---|---|
