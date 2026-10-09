@@ -7,6 +7,7 @@ Use the [provider contract](operations.md). Confirm owner/repository, issue vers
 | L0 `workitem.get` / `workitem.search` | Approved issue get/scoped search | `gh issue view` / `gh issue list` if authenticated | Issues get/search; normalize title, body, AC if present, type, state, links, comments, updated | Pasted issue/query results, unverified |
 | L4 `workitem.comment` / `workitem.create` | Approved comment/create issue | `gh issue comment` / `gh issue create` if approved | Issue comment/issue POST; GET exact result | Paste-ready issue/comment in `outputs/`, unverified |
 | L0 `repo.pr.list` / L4 `repo.pr.create` | Approved PR list/create | `gh pr list` / `gh pr create` | PR list/POST then GET returned head/base | Paste-ready PR in `outputs/`, unverified |
+| L0 `repo.branch-protection` | Approved repository settings/rules read, if exposed | `gh api` (see below) | Classic protection and branch rules endpoints (see below) | Pasted settings screenshot or text, unverified |
 | L0 `ci.runs` / `ci.run.get` | Approved Actions run list/detail | `gh run list` / `gh run view` | Actions workflow-runs list/GET specific run, paginate | Human run URL/detail, unverified |
 | L0 `ci.test-results` | Approved check/artifact results tool | `gh run view` checks/jobs, artifacts if approved | Check runs/artifacts only if actual test result report can be read | Exported test report with provenance, unverified |
 
@@ -72,5 +73,18 @@ For Actions, first read `gh workflow list --repo <owner>/<repo>` and `gh run vie
 gh pr view <number> --repo <owner>/<repo> --json number,url,title,headRefName,baseRefName
 gh run view <run-id> --repo <owner>/<repo> --json status,conclusion,url
 ```
+
+### Branch protection (`repo.branch-protection`, L0)
+
+Read-only; run both checks for the confirmed base branch, because rulesets (repository or organization) are separate from classic protection. **Unverified** until exercised with the available permission.
+
+```text
+gh api repos/<owner>/<repo>/branches/<url-encoded-base>/protection
+gh api repos/<owner>/<repo>/rules/branches/<url-encoded-base>
+```
+
+URL-encode the base branch as a single path segment (e.g. `release/1.0` becomes `release%2F1.0`); an unencoded `/` selects the wrong route and can be misreported as blocked.
+
+Classic protection: a 404 whose message is "Branch not protected" means `classic_protection: none`; a 403, or a 404 for another reason, means blocked, so report `blocked` with the reason. Rules: an empty array means `rules: none`; otherwise record the rule types. An organization ruleset appears here when it applies to the branch. Return `∅` only when both checks completed and found nothing. Never infer protection from a branch name.
 
 For `ci.test-results`, green Actions conclusion alone does not establish test counts. Read an approved test-report artifact/check output actually linked to the run and report parsed passed/failed/skipped counts with artifact URL, or return `unsupported`/`unknown`; never invent counts. For `ci.runs`, `gh run list --repo <owner>/<repo> --limit 30` or the scoped Actions runs REST endpoint is a list operation distinct from `ci.run.get`.

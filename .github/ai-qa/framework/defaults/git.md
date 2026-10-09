@@ -12,7 +12,7 @@ No default. Read project conventions; never guess a base branch.
 
 ## Protected branches
 
-No default. Discover from repository settings or project documentation; do not infer protection from a branch name.
+No default. Discover from repository settings or project documentation, using the read-only Branch protection probe in `method/discovery.md`; do not infer protection from a branch name.
 
 ## Branch patterns
 

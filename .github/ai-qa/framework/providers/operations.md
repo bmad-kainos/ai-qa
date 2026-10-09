@@ -23,6 +23,8 @@ For Atlassian, `*.atlassian.net` suggests Cloud (**◐ Inferred**); a self-hoste
 | Azure Repos PR | ✓ | `az repos pr` | — | ✓ |
 | Azure Pipelines | — | `az pipelines` | ✓ | ✓ |
 | GitHub PR and Actions | ✓ | `gh` | — | ✓ |
+| GitHub branch protection (`repo.branch-protection`) | ✓ | `gh api` | ✓ | ✓ |
+| Azure Repos branch protection (`repo.branch-protection`) | ✓ | `az repos policy` | ✓ | ✓ |
 
 ## Operation contract
 
@@ -35,6 +37,7 @@ All reads are scoped and bounded. Return every required field or an explicit `un
 | L0 | `docs.search` | provider, deployment, confirmed space/wiki, scoped query, finite `page_size`, optional cursor | canonical page IDs, titles, paths/URLs, continuation or `none`, partial/completeness indicator |
 | L0 | `docs.get` | provider, deployment, page ID/path and scope | actual body and `body_format`, title, parent/space/wiki, version/ETag, canonical URL |
 | L0 | `repo.pr.list` | provider, repository, state/filter, finite `page_size`, optional cursor | PR ID/number, title, head, base, status/draft state, URL, continuation/completeness |
+| L0 | `repo.branch-protection` | provider, repository, confirmed base branch | `classic_protection` (required reviews, required status checks, restrictions, or `none`), `rules` (applicable rulesets/policies, or `none`), `completeness` per source; `unknown`/`blocked` with reason when a source cannot be read |
 | L0 | `ci.runs` | provider, repository/project, pipeline/workflow ID, bounded query and page size | run IDs, timestamps, state/result, URL where available, continuation/completeness |
 | L0 | `ci.run.get` | provider, repository/project, run ID | run/commit/ref, state, conclusion, URL, timestamps, relevant jobs |
 | L0 | `ci.test-results` | provider, repository/project, run ID | provider-supported test counts, failures, report/artifact URLs, completeness; `unsupported` if not exposed |

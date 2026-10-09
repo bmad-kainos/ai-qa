@@ -39,7 +39,8 @@ Record status, conclusion and evidence for every domain. “Not applicable” al
 | Execution | Scripts, CI steps, README commands and report outputs; distinguish documented/configured commands from commands actually run. |
 | CI/CD | Jobs, triggers, artefacts and deployment stages from workflow/pipeline files. |
 | Git | Recent branches, non-merge and merge commits, ticket patterns and source recency; never infer base branch without conventions. |
-| PRs | GitHub and ADO templates, contributing docs and recent merged PRs when a transport is available; recency beats volume. |
+| PRs | GitHub and ADO templates, contributing docs and recent merged PRs when a transport is available; recency beats volume. If an authenticated CLI is present, run the read-only listing (e.g. `gh pr list --state merged`); do not record `?` for a probe that was never attempted. |
+| Branch protection | Protection and rulesets on the confirmed base branch. Use repository documentation or the configured read-only provider transport, in the normal transport order, via the L0 `repo.branch-protection` operation in `providers/operations.md`. For GitHub CLI, query both classic protection (`gh api repos/<owner>/<repo>/branches/<url-encoded-base>/protection`) and rules applicable to the branch (`gh api repos/<owner>/<repo>/rules/branches/<url-encoded-base>`); for ADO, query branch policies. Record `∅` only when completed checks establish that neither applies. Record `?` only when the available checks are blocked or fail (e.g. 403 without admin rights) or none is available, and state the reason. Never infer protection from a branch name. |
 | CODEOWNERS | `CODEOWNERS` locations and relevant path ownership, or bounded search evidence. |
 | Definition of done and QA evidence | CONTRIBUTING, project docs, templates, CI checks, test reports or confirmed user statement. |
 | Manual scenario format | How acceptance criteria are written in recent tickets and docs (Given/When/Then, step lists, free text), existing manual test-case documents or templates, and test-plan pages. Record the sample and the proportion in each style. This decides the `Scenario format` setting in `qa-process.md` (`bdd` or `steps`); see `scenario-format.md`. Cucumber `.feature` files indicate *automated* BDD, not the manual style. |
@@ -47,7 +48,7 @@ Record status, conclusion and evidence for every domain. “Not applicable” al
 | Integrations | Remote host, ticket syntax, Atlassian/ADO URLs, `.vscode/mcp.json`, authenticated CLIs (`gh auth status`, `az account show`) and environment-variable names. Record only status/identity metadata; never expose tokens or secret values. |
 | Project context | Purpose, components, technology stack, environments, data stores/dependencies, CI/CD, test landscape, constraints, docs, unknowns/conflicts and provenance; link sources and confidence. |
 
-For inaccessible environments or integrations record `?`; do not try live tests. A configured URL is not proof of access. Never run install, migration, deployment, provisioning commands or the suite during discovery. Inspect scripts and data as text. Missing optional integrations do not prevent analysis from pasted content.
+For inaccessible environments or integrations record `?`; do not try live tests. Read-only provider calls (`gh pr list`, branch-protection reads, `serverInfo`) are L0, are not live tests and are allowed during discovery; never call a write operation. A configured URL is not proof of access. Never run install, migration, deployment, provisioning commands or the suite during discovery. Inspect scripts and data as text. Missing optional integrations do not prevent analysis from pasted content.
 
 ## Sampling and evidence
 
