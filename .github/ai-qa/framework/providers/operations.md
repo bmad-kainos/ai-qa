@@ -23,6 +23,8 @@ For Atlassian, `*.atlassian.net` suggests Cloud (**◐ Inferred**); a self-hoste
 | Azure Repos PR | ✓ | `az repos pr` | — | ✓ |
 | Azure Pipelines | — | `az pipelines` | ✓ | ✓ |
 | GitHub PR and Actions | ✓ | `gh` | — | ✓ |
+| GitHub branch protection (`repo.branch-protection`) | ✓ | `gh api` | ✓ | ✓ |
+| Azure Repos branch protection (`repo.branch-protection`) | ✓ | `az repos policy` | ✓ | ✓ |
 
 ## Operation contract
 
