@@ -18,7 +18,7 @@ class CodeReviewQualityGateTests(unittest.TestCase):
 
         for heading in headings:
             with self.subTest(heading=heading):
-                self.assertIn(f"| {heading} | <PASS / FAIL> |", skill)
+                self.assertEqual(skill.count(f"| {heading} | <PASS / FAIL> |"), 1)
 
         self.assertIn("Insufficient evidence is `FAIL`, not an assumed pass", skill)
 
@@ -28,6 +28,7 @@ class CodeReviewQualityGateTests(unittest.TestCase):
         self.assertIn("| Severity | Finding | Evidence | Recommendation |", skill)
         self.assertIn("Tag each finding in the existing `Finding` cell", skill)
         self.assertIn("Keep the existing severity levels, ranking and findings-table columns unchanged", skill)
+        self.assertIn("Do not add these code-mode headings to design-mode output", skill)
 
     def test_any_fail_prevents_pass_verdict(self):
         skill = SKILL.read_text(encoding="utf-8")
