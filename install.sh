@@ -160,7 +160,8 @@ fi
 
 collisions="$tmp/collisions" plan="$tmp/plan" new_files="$tmp/new-files" modified="$tmp/modified"
 : > "$collisions"; : > "$plan"; : > "$new_files"; : > "$modified"
-if [[ "$COMMAND" != uninstall ]]; then
+# Update must tolerate qa-configure's own qa-*.instructions.md; collisions only matter at first install.
+if [[ "$COMMAND" == install ]]; then
   for category in agents instructions; do
     [[ "$category" != instructions || "$PREFIX" == qa ]] || continue
     dir="$TARGET/.github/$category"; [[ ! -L "$dir" ]] || fail "Refusing symlink: $dir"; [[ -d "$dir" ]] || continue

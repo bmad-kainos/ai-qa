@@ -131,6 +131,18 @@ class SyntheticInstallerTests(unittest.TestCase):
                 manifest = json.loads((self.target / ".github/ai-qa/manifest.json").read_text())
                 self.assertNotIn(".github/ai-qa/framework/packs/beta/pack.md", manifest["files"])
 
+    def test_update_keeps_configure_written_instructions(self):
+        for runner in runners():
+            self.fresh(runner)
+            with self.subTest(runner=runner[0]):
+                self.call(runner, "install")
+                instructions = self.target / ".github/instructions"
+                instructions.mkdir(parents=True, exist_ok=True)
+                written = instructions / "qa-project.instructions.md"
+                written.write_text("configured\n")
+                self.call(runner, "update")
+                self.assertEqual(written.read_text(), "configured\n")
+
     def test_collision_prefix_and_reference_rewrite(self):
         for runner in runners():
             self.fresh(runner)

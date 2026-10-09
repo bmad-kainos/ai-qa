@@ -215,7 +215,8 @@ try {
 
     $collisions = [Collections.Generic.List[string]]::new(); $plan = [Collections.Generic.List[object]]::new()
     $newFiles = @{}; $modified = [Collections.Generic.List[string]]::new()
-    if ($Command -ne 'uninstall') {
+    # Update must tolerate qa-configure's own qa-*.instructions.md; collisions only matter at first install.
+    if ($Command -eq 'install') {
         foreach ($category in @('agents', 'instructions')) {
             if ($category -eq 'instructions' -and $Prefix -ne 'qa') { continue }
             $folder = Join-Path $ResolvedTarget ".github/$category"
