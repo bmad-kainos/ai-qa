@@ -14,6 +14,7 @@ class RequestedLevelMismatchTests(unittest.TestCase):
         )
         self.assertIn("Automate (blocked)** with confirmation pending", skill)
         self.assertIn("ask the user whether to use the requested or recommended level", skill)
+        self.assertIn("to **N/A** and apply no mismatch rule", skill)
 
     def test_test_generation_waits_for_confirmation(self):
         skill = (ROOT / ".github/skills/qa-generate-tests/SKILL.md").read_text(encoding="utf-8")
@@ -23,6 +24,9 @@ class RequestedLevelMismatchTests(unittest.TestCase):
         self.assertIn("pending mismatch is not confirmation", skill)
         self.assertIn("| Requirement/source | Requested level | Recommended level | Final level / status |", skill)
         self.assertIn("| Test | Requested level | Recommended level | Final level / status |", skill)
+        self.assertIn("| Test | Endpoint | Requested level | Recommended level | Final level / status |", skill)
+        self.assertLess(skill.index("Level mismatch gate"), skill.index("### API test method"))
+        self.assertEqual(skill.count("Do not generate tests for that scenario until the user confirms"), 1)
 
     def test_shared_criteria_defines_requested_level_confirmation(self):
         criteria = (ROOT / ".github/ai-qa/framework/method/automation-criteria.md").read_text(encoding="utf-8")
