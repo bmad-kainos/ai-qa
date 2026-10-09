@@ -33,7 +33,7 @@ flowchart TD
 | 8 Approval | Shows the exact diff and waits for an explicit yes |
 | 9 Write | Writes the files listed below, plus `.vscode/mcp.json` only if MCP was chosen, or the Jira/Confluence fallback scripts in `qa-work/tools/atlassian/` if MCP was rejected |
 | 10 Verify | Conventions match their cited examples, the test command exists (help/list only, never run), `project.md` cites sources, and a read-only provider probe succeeds |
-| 11 Summary | What's ready, what's degraded, first commands, and an offer of `qa-baseline` |
+| 11 Summary | What's ready, what's degraded, each open `?`/`∅` with its reason and resolving step, then numbered AI-QA next steps (installer `update` if packs were pruned, reload, `refresh`, first skill) and a separate "Configured commands (not run)" line |
 
 ## What it reads and writes
 

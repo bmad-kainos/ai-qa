@@ -79,6 +79,14 @@ This report is written to `.github/ai-qa/project/discovery.md` by `qa-configure`
 | <status> | <GitHub/ADO templates, contributing docs, recent merged PRs if accessible> | <evidence> | <recency; transport/access limits> |
 <!-- /ai-qa:managed:prs -->
 
+<!-- ai-qa:managed:branch-protection -->
+## Branch protection
+
+| Status | Conclusion | Evidence (paths with lines / commands) | Note |
+|---|---|---|---|
+| <status> | <protection or ruleset on the base branch> | <read-only call and result> | <reason if `?`> |
+<!-- /ai-qa:managed:branch-protection -->
+
 <!-- ai-qa:managed:codeowners -->
 ## CODEOWNERS
 
