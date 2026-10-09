@@ -79,9 +79,11 @@ gh run view <run-id> --repo <owner>/<repo> --json status,conclusion,url
 Read-only; run both checks for the confirmed base branch, because rulesets (repository or organization) are separate from classic protection. **Unverified** until exercised with the available permission.
 
 ```text
-gh api repos/<owner>/<repo>/branches/<base>/protection
-gh api repos/<owner>/<repo>/rules/branches/<base>
+gh api repos/<owner>/<repo>/branches/<url-encoded-base>/protection
+gh api repos/<owner>/<repo>/rules/branches/<url-encoded-base>
 ```
+
+URL-encode the base branch as a single path segment (e.g. `release/1.0` becomes `release%2F1.0`); an unencoded `/` selects the wrong route and can be misreported as blocked.
 
 Classic protection: a 404 whose message is "Branch not protected" means `classic_protection: none`; a 403, or a 404 for another reason, means blocked, so report `blocked` with the reason. Rules: an empty array means `rules: none`; otherwise record the rule types. An organization ruleset appears here when it applies to the branch. Return `∅` only when both checks completed and found nothing. Never infer protection from a branch name.
 
