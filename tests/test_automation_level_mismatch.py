@@ -8,7 +8,10 @@ class RequestedLevelMismatchTests(unittest.TestCase):
     def test_automation_plan_shows_both_levels_and_pending_confirmation(self):
         skill = (ROOT / ".github/skills/qa-automation-plan/SKILL.md").read_text(encoding="utf-8")
 
-        self.assertIn("| Scenario / requirement | Requested level | Recommended level |", skill)
+        self.assertIn(
+            "| Scenario / requirement | Decision | Requested level | Recommended level | Final level / status |",
+            skill,
+        )
         self.assertIn("Automate (blocked)** with confirmation pending", skill)
         self.assertIn("ask the user whether to use the requested or recommended level", skill)
 
@@ -18,6 +21,8 @@ class RequestedLevelMismatchTests(unittest.TestCase):
         self.assertIn("Do not generate tests for that scenario until the user confirms", skill)
         self.assertIn("a request alone is not confirmation", skill)
         self.assertIn("pending mismatch is not confirmation", skill)
+        self.assertIn("| Requirement/source | Requested level | Recommended level | Final level / status |", skill)
+        self.assertIn("| Test | Requested level | Recommended level | Final level / status |", skill)
 
     def test_shared_criteria_defines_requested_level_confirmation(self):
         criteria = (ROOT / ".github/ai-qa/framework/method/automation-criteria.md").read_text(encoding="utf-8")

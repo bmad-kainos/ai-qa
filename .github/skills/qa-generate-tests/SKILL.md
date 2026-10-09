@@ -24,9 +24,9 @@ Accept an automation plan, OpenAPI/Swagger file or supplied spec, endpoint descr
 2. Resolve the source contract and map requirements to existing assertions and gaps. Use `project.md` to decide what must be real and what may be mocked. Separate pure logic (unit), a single request/response (integration/API), and multi-step or multi-system journeys (E2E). Do not infer coverage from filenames.
 3. **Present the inventory table before writing any test code.** Include each proposed and deliberately omitted case, requirement/source, level, method/path, category, input, expected observable result, intended test path and confidence/reason. For API work, use these categories: happy, contract, negative, boundary, security, headers. Derive statuses, body shapes, authentication, constraints and headers from the supplied specification or confirmed project evidence; unknown behavior is a question, never a guessed 400/401/422/415.
 
-	 | Requirement/source | Level | Test/case | Category | Input | Expected observable result | Intended path | Confidence / reason |
-	 |---|---|---|---|---|---|---|---|
-	 | FR1 / contract path and operation | Integration | Valid request returns documented result | Happy | Minimal valid input | Contract-defined response | `tests/...` | Observed in source |
+	 | Requirement/source | Requested level | Recommended level | Final level / status | Test/case | Category | Input | Expected observable result | Intended path | Confidence / reason |
+	 |---|---|---|---|---|---|---|---|---|---|
+	 | FR1 / contract path and operation | Not specified | Integration | Integration | Valid request returns documented result | Happy | Minimal valid input | Contract-defined result | `tests/...` | Observed in source |
 
 4. Make the complete inventory visible and state assumptions, omissions and intended files. For API contracts, include documented minimal/full valid cases; required-field absence, invalid type/null/enum cases; each documented boundary; security failures when security applies; response contract/schema; and content negotiation/headers. Prefer parameterised cases, and do not duplicate existing assertions. Mark inapplicable or unsupported cases with a reason. For other test types, include only relevant, risk-based scenarios.
 5. Confirm a non-default branch and that edits are limited to work-item-owned test files. In `design`/`automate`/`full` workflows, wait for the approved plan before L1 edits. Create tests only after the inventory has been presented; match established names, file locations, imports, fixture scopes, builders, tags, assertions, setup, isolation and cleanup. Use deterministic isolated test data. Never add AI-generated markers, secrets or live customer data. Never edit product code, existing tests outside this work item, project conventions or framework packs.
@@ -72,20 +72,20 @@ Does it involve auth flows, chained calls, or multi-system paths? → E2E
 
 When in doubt, prefer integration over E2E for API tests.
 
-Compare an explicit requested level with the independently determined recommendation for every scenario. If they differ, stop for that scenario, show the requested and recommended levels, the evidence-based recommendation and the trade-off of using the requested level, then ask the user to confirm which level to use. Apply this in either direction and for every pair of levels. Do not generate tests for that scenario until the user confirms; a request alone is not confirmation. A prior automation plan with a pending mismatch is not confirmation. Record the request, recommendation and user-confirmed level in the inventory. Confirmation applies only to the named scenario; matched or separately confirmed scenarios may proceed.
+Compare an explicit requested level with the independently determined recommendation for every scenario. If they differ, stop for that scenario, show the requested and recommended levels, the evidence-based recommendation and the trade-off of using the requested level, then ask the user to confirm which level to use. Apply this in either direction and for every pair of levels. Do not generate tests for that scenario until the user confirms; a request alone is not confirmation. A prior automation plan with a pending mismatch is not confirmation. Record the request, recommendation and user-confirmed level in the inventory's Requested level, Recommended level and Final level / status columns; use `Confirmation pending` as the status until the user confirms. Confirmation applies only to the named scenario; matched or separately confirmed scenarios may proceed.
 
 #### Step 3 — Build the test inventory
 Name tests per project conventions. Present this inventory before generating code and include only contract-supported expected results:
 
-| Test | Level | Category | Input | Expected outcome |
-|---|---|---|---|---|
-| valid request returns documented success | Integration | Happy | Valid body | Documented success + response contract |
-| response matches documented schema | Integration | Contract | Valid request | Documented response shape/schema |
-| missing required field returns documented error | Integration | Negative | Body missing required field | Documented status + error body |
-| invalid field type is rejected | Integration | Negative | Wrong field type | Documented validation result |
-| unauthenticated request is rejected | Integration | Security | No auth header | Documented auth result, when security applies |
-| boundary value accepted/rejected | Integration | Boundary | Documented edge value | Contract-defined outcome |
-| response headers/content negotiation | Integration | Headers | Request header/content type | Documented response header/result |
+| Test | Requested level | Recommended level | Final level / status | Category | Input | Expected outcome |
+|---|---|---|---|---|---|---|
+| valid request returns documented success | Not specified | Integration | Integration | Happy | Valid body | Documented success + response contract |
+| response matches documented schema | Not specified | Integration | Integration | Contract | Valid request | Documented response shape/schema |
+| missing required field returns documented error | Not specified | Integration | Integration | Negative | Body missing required field | Documented status + error body |
+| invalid field type is rejected | Not specified | Integration | Integration | Negative | Wrong field type | Documented validation result |
+| unauthenticated request is rejected | Not specified | Integration | Integration | Security | No auth header | Documented auth result, when security applies |
+| boundary value accepted/rejected | Not specified | Integration | Integration | Boundary | Documented edge value | Contract-defined outcome |
+| response headers/content negotiation | Not specified | Integration | Integration | Headers | Request header/content type | Documented response header/result |
 
 Cover at minimum a happy path, contract response, missing required field, invalid type, security when applicable, headers when specified, and constrained boundaries supported by the contract. For each constrained field, inspect min, max, a valid middle and invalid values where defined. Mark unsupported or unknown cases and reasons; never invent statuses.
 

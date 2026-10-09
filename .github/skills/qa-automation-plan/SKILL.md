@@ -84,13 +84,13 @@ Do not estimate hours here (the hour bands in `effort-estimation.md` are used on
 
 ## Output
 
-Write `qa-work/<work-id>/06_automation_plan.md` with front matter `work-id`, `skill: qa-automation-plan`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirements, source revision, test/CI evidence). Include all nine factor answers, an overall impact level and this table. For a mismatch, leave the final level unresolved and show confirmation as pending until the user responds:
+Write `qa-work/<work-id>/06_automation_plan.md` with front matter `work-id`, `skill: qa-automation-plan`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirements, source revision, test/CI evidence). Include all nine factor answers, an overall impact level and this table. The Decision column always holds one of the four decisions; for a mismatch, set it to Automate (blocked) and show Final level / status as Confirmation pending until the user responds, then record the confirmed level and keep Decision as Automate:
 
 Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `automation.md` as a fallback; always write the new name and never silently rename.
 
-| Scenario / requirement | Requested level | Recommended level | Decision / confirmed level | Location | Mocking | Environment / data | CI impact | Justification / evidence |
-|---|---|---|---|---|---|---|---|---|
-| <scenario> | <level / Not specified> | <level> | <Automate (blocked), confirmation pending / confirmed choice> | <configured path> | <real vs mocked> | <environment, data, cleanup> | <command, trigger, runtime, stability> | <recommendation evidence and mismatch trade-off> |
+| Scenario / requirement | Decision | Requested level | Recommended level | Final level / status | Location | Mocking | Environment / data | CI impact | Justification / evidence |
+|---|---|---|---|---|---|---|---|---|---|
+| <scenario> | <Automate / Automate (blocked) / Manual / Not needed> | <level / Not specified> | <level> | <confirmed level / Confirmation pending> | <configured path> | <real vs mocked> | <environment, data, cleanup> | <command, trigger, runtime, stability> | <recommendation evidence and mismatch trade-off> |
 
 Add a short example in the configured Scenario format only when it clarifies planned behavior; label it proposed. State blockers, manual alternatives, residual risk and whether existing coverage suffices. Update `qa-work/<work-id>/index.md` with decisions, FR/NFR links, evidence, environment/CI blockers, impact and artefact link. Summarise the decision and highest-impact scenarios in chat.
 
