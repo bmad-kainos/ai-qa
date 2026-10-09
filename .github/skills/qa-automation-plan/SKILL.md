@@ -61,6 +61,10 @@ When in doubt for API tests, prefer integration over E2E.
 
 `conventions/testing.md` → Scopes is authoritative for available levels, pack, paths and locations. Match existing file naming, fixtures/builders and markers; do not create a new framework when one exists.
 
+### Requested level mismatches
+
+For each scenario, determine the recommended level from the decision tree before considering a user-requested level. If an explicit requested level differs from the recommendation, show both levels, the evidence-based reason for the recommendation and the trade-off of using the requested level, then ask the user whether to use the requested or recommended level. Apply this rule in either direction and for every pair of levels. Until the user answers, mark the scenario **Automate (blocked)** with confirmation pending; do not present a final automation level or let downstream test generation proceed for it. Record the confirmed level, user's choice and rationale. A confirmation applies only to the named scenario. If no level was requested, report **Not specified** and use the recommendation without asking. This rule applies only to scenarios decided **Automate** or **Automate (blocked)**; for **Manual** and **Not needed** scenarios set Requested level, Recommended level and Final level / status to **N/A** and apply no mismatch rule.
+
 ### Decide each scenario
 
 For every requirement/scenario choose exactly one: **Automate**, **Automate (blocked)**, **Manual**, or **Not needed**. Use `Automate (blocked)` when automation is desirable but a named dependency or decision prevents it; downstream skills must not generate tests for it until unblocked. For `Automate`, specify:
@@ -80,12 +84,13 @@ Do not estimate hours here (the hour bands in `effort-estimation.md` are used on
 
 ## Output
 
-Write `qa-work/<work-id>/06_automation_plan.md` with front matter `work-id`, `skill: qa-automation-plan`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirements, source revision, test/CI evidence). Include all nine factor answers, an overall impact level and this table:
+Write `qa-work/<work-id>/06_automation_plan.md` with front matter `work-id`, `skill: qa-automation-plan`, `framework-version`, `created` (UTC ISO date/time) and `inputs` (requirements, source revision, test/CI evidence). Include all nine factor answers, an overall impact level and this table. The Decision column always holds one of the four decisions; for a mismatch, set it to Automate (blocked) and show Final level / status as Confirmation pending until the user responds, then record the confirmed level and keep Decision as Automate:
 
 Open the artefact with **Result** (one-sentence verdict) and **Do next** (max 3 ordered actions) lines per `.github/ai-qa/framework/templates/artefact.md`. If the numbered file is absent, read legacy `automation.md` as a fallback; always write the new name and never silently rename.
 
-| Scenario / requirement | Decision | Level | Location | Mocking | Environment / data | CI impact | Justification / evidence |
-|---|---|---|---|---|---|---|---|
+| Scenario / requirement | Decision | Requested level | Recommended level | Final level / status | Location | Mocking | Environment / data | CI impact | Justification / evidence |
+|---|---|---|---|---|---|---|---|---|---|
+| <scenario> | <Automate / Automate (blocked) / Manual / Not needed> | <level / Not specified / N/A> | <level / N/A> | <confirmed level / Confirmation pending / N/A> | <configured path> | <real vs mocked> | <environment, data, cleanup> | <command, trigger, runtime, stability> | <recommendation evidence and mismatch trade-off> |
 
 Add a short example in the configured Scenario format only when it clarifies planned behavior; label it proposed. State blockers, manual alternatives, residual risk and whether existing coverage suffices. Update `qa-work/<work-id>/index.md` with decisions, FR/NFR links, evidence, environment/CI blockers, impact and artefact link. Summarise the decision and highest-impact scenarios in chat.
 
