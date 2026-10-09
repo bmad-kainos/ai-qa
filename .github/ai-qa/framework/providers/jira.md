@@ -51,7 +51,7 @@ A self-hosted/custom URL suggests Server/DC (**◐ Inferred**), not confirmed. P
 
 **MCP hints:** an approved community MCP server such as `sooperset/mcp-atlassian` may support Jira Server/DC. Verify the installed tool names, deployment support, inputs and permissions. The Atlassian remote MCP is a Cloud hint; do not assume it connects to Server/DC.
 
-**MCP server recipe (`sooperset/mcp-atlassian`, covers Jira and Confluence; Cloud and Server/DC):** it runs on demand as `uvx mcp-atlassian`, so install only the `uv` runtime first (Docker is the alternative, see below). The first `uvx` invocation downloads and caches `mcp-atlassian`, which is dependency acquisition: preview that exact command and get separate L5 approval before it runs. Draft the `.vscode/mcp.json` entry with `inputs` so no secret is written, then ask separate L5 approval for each of: the write, any runtime install, and the first `uvx` (or `docker pull`) run. The JSON below is the **Server/DC** variant (personal access tokens, `*_PERSONAL_TOKEN`); use the Cloud variant for `*.atlassian.net`. Confirm variable names against the server's authentication docs before writing, and drop the Confluence entries if only Jira is used. **Unverified** until the server starts and a read-only tool call succeeds.
+**MCP server recipe (`sooperset/mcp-atlassian`, covers Jira and Confluence; Cloud and Server/DC):** it runs on demand as `uvx mcp-atlassian@<pinned-version>`, so install only the `uv` runtime first (Docker is the alternative, see below). Pin an exact, verified release (check the latest on PyPI) in both the previewed command and the `args` entry, so a later cache refresh cannot pull a different release; upgrades are a separately approved change. The first `uvx` invocation downloads and caches `mcp-atlassian`, which is dependency acquisition: preview that exact command and get separate L5 approval before it runs. Draft the `.vscode/mcp.json` entry with `inputs` so no secret is written, then ask separate L5 approval for each of: the write, any runtime install, and the first `uvx` (or `docker pull`) run. The JSON below is the **Server/DC** variant (personal access tokens, `*_PERSONAL_TOKEN`); use the Cloud variant for `*.atlassian.net`. Confirm variable names against the server's authentication docs before writing, and drop the Confluence entries if only Jira is used. **Unverified** until the server starts and a read-only tool call succeeds.
 
 ```json
 {
@@ -65,7 +65,7 @@ A self-hosted/custom URL suggests Server/DC (**◐ Inferred**), not confirmed. P
     "mcp-atlassian": {
       "type": "stdio",
       "command": "uvx",
-      "args": ["mcp-atlassian"],
+      "args": ["mcp-atlassian@<pinned-version>"],
       "env": {
         "JIRA_URL": "${input:jira-url}",
         "JIRA_PERSONAL_TOKEN": "${input:jira-token}",
