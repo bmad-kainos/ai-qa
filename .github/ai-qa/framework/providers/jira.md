@@ -51,6 +51,34 @@ A self-hosted/custom URL suggests Server/DC (**◐ Inferred**), not confirmed. P
 
 **MCP hints:** an approved community MCP server such as `sooperset/mcp-atlassian` may support Jira Server/DC. Verify the installed tool names, deployment support, inputs and permissions. The Atlassian remote MCP is a Cloud hint; do not assume it connects to Server/DC.
 
+**MCP server recipe (`sooperset/mcp-atlassian`, covers Jira and Confluence; Cloud and Server/DC):** it runs on demand as `uvx mcp-atlassian`, so only the `uv` runtime needs installing (Docker is the alternative); there is no separate package install. Draft this `.vscode/mcp.json` entry with `inputs` so no secret is written, then ask separate L5 approval for the write and for any runtime install. Server/DC uses a personal access token (`*_PERSONAL_TOKEN`); Cloud uses `*_USERNAME` plus `*_API_TOKEN`. Confirm variable names against the server's authentication docs before writing, and drop the Confluence entries if only Jira is used. **Unverified** until the server starts and a read-only tool call succeeds.
+
+```json
+{
+  "inputs": [
+    { "id": "jira-url", "type": "promptString", "description": "Jira base URL" },
+    { "id": "jira-token", "type": "promptString", "description": "Jira personal access token", "password": true },
+    { "id": "confluence-url", "type": "promptString", "description": "Confluence base URL" },
+    { "id": "confluence-token", "type": "promptString", "description": "Confluence personal access token", "password": true }
+  ],
+  "servers": {
+    "mcp-atlassian": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-atlassian"],
+      "env": {
+        "JIRA_URL": "${input:jira-url}",
+        "JIRA_PERSONAL_TOKEN": "${input:jira-token}",
+        "CONFLUENCE_URL": "${input:confluence-url}",
+        "CONFLUENCE_PERSONAL_TOKEN": "${input:confluence-token}"
+      }
+    }
+  }
+}
+```
+
+Runtime install (separate L5 approval, user's own machine): `uv` via `brew install uv` (macOS) or the installer from the uv documentation; offer Docker instead if the user prefers or cannot install `uv`. After a VS Code reload, verify with a tool listing and one read-only call.
+
 | Operation | MCP | CLI | REST | Manual |
 |---|---|---|---|---|
 | L0 `workitem.get` | Issue-get capability; verify normalized fields | No CLI in matrix | `GET /rest/api/2/issue/{key}`; discover AC field and fetch comments/links | User pastes issue plus source URL; mark unverified |
