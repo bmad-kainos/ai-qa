@@ -43,6 +43,8 @@ Does it involve auth flows, chained calls, or multi-system paths? → E2E
 
 When in doubt, prefer integration over E2E for API tests. Project conventions may name levels differently. Choose unit for isolated logic, integration for a request or component boundary, and E2E for cross-system user journeys.
 
+If a user requests a specific level, determine the recommendation independently and compare the two for each scenario. When they differ, show the requested level, recommended level, evidence-based reason for the recommendation, and the trade-off of using the requested level; then ask the user to confirm whether to use the requested or recommended level. Apply this in either direction and to every pair of levels. Until the user confirms, treat that scenario as blocked and do not generate its tests. A confirmation applies only to the named scenario and must be recorded with the final level and rationale.
+
 ## If automation is justified
 
 Propose the following:

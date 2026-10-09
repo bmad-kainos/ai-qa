@@ -72,6 +72,8 @@ Does it involve auth flows, chained calls, or multi-system paths? → E2E
 
 When in doubt, prefer integration over E2E for API tests.
 
+Compare an explicit requested level with the independently determined recommendation for every scenario. If they differ, stop for that scenario, show the requested and recommended levels, the evidence-based recommendation and the trade-off of using the requested level, then ask the user to confirm which level to use. Apply this in either direction and for every pair of levels. Do not generate tests for that scenario until the user confirms; a request alone is not confirmation. A prior automation plan with a pending mismatch is not confirmation. Record the request, recommendation and user-confirmed level in the inventory. Confirmation applies only to the named scenario; matched or separately confirmed scenarios may proceed.
+
 #### Step 3 — Build the test inventory
 Name tests per project conventions. Present this inventory before generating code and include only contract-supported expected results:
 
